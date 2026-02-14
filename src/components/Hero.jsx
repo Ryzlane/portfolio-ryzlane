@@ -68,7 +68,7 @@ const Hero = () => {
             </motion.a>
 
             <motion.a
-              href="/cv.pdf"
+              href={`${import.meta.env.BASE_URL}cv.pdf`}
               download
               className="inline-flex items-center gap-2 text-sm text-noir hover:underline transition-all"
               variants={fadeInUp}
@@ -91,7 +91,7 @@ const Hero = () => {
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
         >
           <img
-            src="/photo-ryzlane.JPG"
+            src={`${import.meta.env.BASE_URL}photo-ryzlane.JPG`}
             alt="Photo de Ryzlane"
             className="w-full h-full rounded-full border-2 border-noir object-cover"
           />

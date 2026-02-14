@@ -1,5 +1,6 @@
 // Section compétences développement avec terminal header
 import { motion } from 'framer-motion';
+import { FaCode } from 'react-icons/fa';
 import { DEV_SECTION } from '../utils/constants';
 
 const DevSkills = () => {
@@ -27,23 +28,30 @@ const DevSkills = () => {
 
         {/* Contenu */}
         <motion.div
-          className="grid md:grid-cols-[1fr,2fr] gap-12 p-8 md:p-12"
+          className="grid md:grid-cols-[1fr,2fr] gap-12 px-8 md:px-12 py-[80px]"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          {/* Card projet */}
-          <motion.div
-            className="card-dark"
-            whileHover={{ scale: 1.02 }}
-            transition={{ duration: 0.3 }}
-          >
-            <h3 className="text-xl font-display font-bold mb-4">{DEV_SECTION.projectTitle}</h3>
-            <p className="text-xs italic opacity-70 mt-8">
+          {/* Bouton projet */}
+          <div className="flex flex-col items-start gap-3">
+            <motion.a
+              href={DEV_SECTION.githubLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary inline-flex items-center gap-3"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+              transition={{ duration: 0.2 }}
+            >
+              <FaCode className="text-xl" />
+              {DEV_SECTION.projectTitle}
+            </motion.a>
+            <p className="text-xs opacity-70 text-left max-w-[200px]">
               {DEV_SECTION.projectNote}
             </p>
-          </motion.div>
+          </div>
 
           {/* Description compétences */}
           <div>

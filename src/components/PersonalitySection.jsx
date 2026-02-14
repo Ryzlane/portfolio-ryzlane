@@ -21,9 +21,9 @@ const SurveyAxis = ({ labelTop, labelBottom, position, index }) => {
 
       {/* Indicateur visuel */}
       <div className="h-20 flex items-center justify-center relative flex-shrink-0">
-        <div className="w-0.5 h-full bg-noir absolute"></div>
+        <div className="w-2 h-full bg-noir absolute"></div>
         <div
-          className="absolute w-4 h-4 bg-noir"
+          className="absolute w-6 h-2 bg-noir"
           style={{ top: `${position}%`, transform: 'translateY(-50%)' }}
         ></div>
       </div>

@@ -106,7 +106,7 @@ export const WRITING_SECTION = {
     articles: [
       {
         id: 1,
-        title: "Politique salariale : comment s'y retrouver ?",
+        title: "Politique salariale : comment s'y retrouver\u00A0?",
         link: "#", // TODO: Lien vers l'article
       },
       {
@@ -123,7 +123,7 @@ export const WRITING_SECTION = {
   },
   creative: {
     title: "Un zeste d'écriture créative",
-    cardTitle: "À demi-rêve",
+    cardTitle: "À demi-rêvé",
     cardSubtitle: "Mon compte Instagram sur lequel je relate mes rêves",
     cardLink: LINKS.instagram,
   },

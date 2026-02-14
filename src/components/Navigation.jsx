@@ -66,15 +66,17 @@ const Navigation = () => {
       </div>
 
       {/* Navigation avec boutons encadrés */}
-      <nav className="bg-blanc border-b border-noir">
+      <nav className="bg-blanc border-b-2 border-noir">
         <div className="max-w-container mx-auto px-6 md:px-12">
           {/* Navigation desktop */}
           <div className="hidden md:flex justify-end">
-            {NAV_LINKS.map((link) => (
+            {NAV_LINKS.map((link, index) => (
               <a
                 key={link.id}
                 href={link.href}
-                className={`px-6 py-3 border-2 border-noir text-sm font-semibold uppercase transition-colors ${
+                className={`px-6 py-3 border-x-2 border-noir text-sm font-semibold uppercase transition-colors ${
+                  index > 0 ? '-ml-[2px]' : ''
+                } ${
                   activeSection === link.id
                     ? 'bg-noir text-blanc'
                     : 'bg-blanc text-noir hover:bg-noir hover:text-blanc'

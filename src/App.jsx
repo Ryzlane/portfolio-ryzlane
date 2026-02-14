@@ -5,7 +5,6 @@ import PersonalitySection from './components/PersonalitySection'
 import DesignSkills from './components/DesignSkills'
 import DevSkills from './components/DevSkills'
 import WritingSection from './components/WritingSection'
-import Footer from './components/Footer'
 import PageTransition from './components/PageTransition'
 import ScrollToTop from './components/ScrollToTop'
 
@@ -19,7 +18,6 @@ function App() {
         <DesignSkills />
         <DevSkills />
         <WritingSection />
-        <Footer />
         <ScrollToTop />
       </div>
     </PageTransition>

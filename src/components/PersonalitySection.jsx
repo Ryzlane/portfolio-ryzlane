@@ -17,7 +17,7 @@ const SurveyAxis = ({ labelTop, labelBottom, position, index }) => {
         visible: { opacity: 1, y: 0 }
       }}
     >
-      <p className="text-base font-semibold mb-auto pb-4 flex items-end justify-center min-h-[3rem]">{labelTop}</p>
+      <p className="text-base mb-auto pb-4 flex items-end justify-center min-h-[3rem]">{labelTop}</p>
 
       {/* Indicateur visuel */}
       <div className="h-20 flex items-center justify-center relative flex-shrink-0">
@@ -28,7 +28,7 @@ const SurveyAxis = ({ labelTop, labelBottom, position, index }) => {
         ></div>
       </div>
 
-      <p className="text-base font-semibold mt-auto pt-4 flex items-start justify-center min-h-[3rem]">{labelBottom}</p>
+      <p className="text-base mt-auto pt-4 flex items-start justify-center min-h-[3rem]">{labelBottom}</p>
     </motion.div>
   );
 };

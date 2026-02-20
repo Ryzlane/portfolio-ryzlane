@@ -15,7 +15,7 @@ const WritingSection = () => {
       >
         {/* Colonne gauche : Rédaction */}
         <div>
-          <h2 className="text-xl font-display font-bold mb-6">
+          <h2 className="text-xl font-display mb-6">
             {WRITING_SECTION.rédaction.title}
           </h2>
           <ul className="space-y-4">
@@ -45,7 +45,7 @@ const WritingSection = () => {
 
         {/* Colonne droite : Écriture créative */}
         <div>
-          <h2 className="text-xl font-display font-bold mb-6 text-right">
+          <h2 className="text-xl font-display mb-6 text-right">
             {WRITING_SECTION.creative.title}
           </h2>
           <div className="flex flex-col items-end gap-3">

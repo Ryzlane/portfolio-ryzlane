@@ -15,7 +15,7 @@ const DesignSkills = () => {
       >
         {/* Texte descriptif */}
         <div>
-          <h2 className="text-xl font-display font-bold mb-6">
+          <h2 className="text-xl font-display mb-6">
             {DESIGN_SECTION.title}
           </h2>
           <p className="text-base leading-relaxed text-muted max-w-2xl">

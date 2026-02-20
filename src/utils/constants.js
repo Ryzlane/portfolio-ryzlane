@@ -9,7 +9,7 @@
 export const LINKS = {
   behance: "https://behance.net/TODO", // TODO: Remplacer par votre lien Behance
   github: "https://github.com/TODO", // TODO: Remplacer par votre lien GitHub
-  linkedin: "https://linkedin.com/in/TODO", // TODO: Remplacer par votre lien LinkedIn
+  linkedin: "https://www.linkedin.com/in/ryzlane-arsac-gothi%C3%A8re/",
   instagram: "https://instagram.com/ademireve", // TODO: Vérifier le lien Instagram "À demi-rêve"
 };
 
@@ -26,16 +26,18 @@ export const HERO_TEXT = {
   title: "RYZLANE●",
   baseline: "Un seul cerveau, mille fenêtres",
   // TODO: Remplacer par votre texte répétitif réel
-  repeatedText: `Je suis le corps. Je suis le corps qui rêve. Je suis le corps qui rêve et qui écrit.
-Je suis le corps qui rêve, qui écrit, qui code. Je suis le corps qui rêve, qui écrit, qui code, qui crée.
-Je suis le corps qui habite mille fenêtres à la fois.`,
+  repeatedText: `Bienvenue dans ma tête. C'est un fouillis, un mélange de choses et d'autres. Je ne suis ni totalement designer, ni totalement développeuse, ni totalement communicante ou rédactrice. J'aime toucher à tout et c'est ce que j'aspire à faire, être un couteau suisse dans l'immensité du web.`,
 };
 
 // ============================================
 // LOGO NAVIGATION
 // ============================================
-// TODO: Remplacer "LOREM IPSUM" par votre texte si différent (ou garder si c'est l'esthétique voulue)
-export const LOGO_TEXT = "LOREM IPSUM";
+export const MARQUEE_ITEMS = [
+  "CODER L'ESTHÉTIQUE",
+  "DESIGNER LA LOGIQUE",
+  "ÉCRIRE L'INVISIBLE",
+  "ENTREPRENDRE L'AUDACE",
+];
 
 // ============================================
 // SONDAGES IFOP (Section Personnalité)
@@ -47,25 +49,25 @@ export const SURVEY_AXES = [
     id: 1,
     labelTop: "Extravertie",
     labelBottom: "Introvertie",
-    position: 70, // TODO: 70 = plutôt introvertie, ajuster si nécessaire
+    position: 47,
   },
   {
     id: 2,
     labelTop: "Théoricienne",
     labelBottom: "Praticienne",
-    position: 45, // TODO: 45 = équilibre, ajuster si nécessaire
+    position: 75,
   },
   {
     id: 3,
     labelTop: "Multi-tâches",
     labelBottom: "Focus laser",
-    position: 60, // TODO: 60 = plutôt focus, ajuster si nécessaire
+    position: 67,
   },
   {
     id: 4,
     labelTop: "Sens de l'esthétique",
     labelBottom: "Sens du fonctionnel",
-    position: 40, // TODO: 40 = plutôt esthétique, ajuster si nécessaire
+    position: 42,
   },
 ];
 

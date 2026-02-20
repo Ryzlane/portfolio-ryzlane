@@ -1,6 +1,6 @@
 // Navigation sticky avec smooth scroll et scroll spy
 import { useState, useEffect } from 'react';
-import { NAV_LINKS, LOGO_TEXT } from '../utils/constants';
+import { NAV_LINKS, MARQUEE_ITEMS } from '../utils/constants';
 
 const Navigation = () => {
   const [activeSection, setActiveSection] = useState('');
@@ -52,29 +52,31 @@ const Navigation = () => {
   };
 
   return (
-    <div className="z-50">
-      {/* Bande noire avec marquee LOREM IPSUM */}
+    <div className="fixed top-0 left-0 right-0 z-50">
+      {/* Bande noire avec marquee */}
       <div className="bg-noir overflow-hidden">
         <div className="flex gap-12 animate-marquee whitespace-nowrap py-2">
-          {/* Répéter plusieurs fois pour effet continu */}
           {[...Array(20)].map((_, i) => (
             <span key={i} className="text-blanc text-sm font-bold tracking-wider">
-              {LOGO_TEXT}
+              {MARQUEE_ITEMS[i % MARQUEE_ITEMS.length]}
             </span>
           ))}
         </div>
       </div>
 
-      {/* Navigation avec boutons encadrés */}
+      {/* Navigation avec logo et boutons encadrés */}
       <nav className="bg-blanc border-b-2 border-noir">
         <div className="max-w-container mx-auto px-6 md:px-12">
           {/* Navigation desktop */}
-          <div className="hidden md:flex justify-end">
+          <div className="hidden md:flex items-stretch">
+            <div className="mr-auto flex items-center py-1 -ml-3">
+              <img src={`${import.meta.env.BASE_URL}logo-square.png`} alt="R." className="h-10" />
+            </div>
             {NAV_LINKS.map((link, index) => (
               <a
                 key={link.id}
                 href={link.href}
-                className={`px-6 py-3 border-x-2 border-noir text-sm font-semibold uppercase transition-colors ${
+                className={`px-6 flex items-center border-x-2 border-noir text-sm font-semibold uppercase transition-colors ${
                   index > 0 ? '-ml-[2px]' : ''
                 } ${
                   activeSection === link.id
@@ -89,7 +91,9 @@ const Navigation = () => {
 
           {/* Navigation mobile */}
           <div className="md:hidden flex items-center justify-between h-16">
-            <span className="text-sm font-bold">MENU</span>
+            <div>
+              <img src={`${import.meta.env.BASE_URL}logo-square.png`} alt="R." className="h-12" />
+            </div>
             <button
               className="flex flex-col gap-1.5 w-6 h-6 justify-center"
               onClick={() => setIsMenuOpen(!isMenuOpen)}

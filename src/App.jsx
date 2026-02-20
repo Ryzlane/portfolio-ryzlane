@@ -13,6 +13,7 @@ function App() {
     <PageTransition>
       <div className="min-h-screen">
         <Navigation />
+        <div className="pt-[90px]" />
         <Hero />
         <PersonalitySection />
         <DesignSkills />

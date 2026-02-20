@@ -31,7 +31,7 @@ const Hero = () => {
           </motion.h1>
 
           <motion.p
-            className="text-xl mt-4 font-bold"
+            className="text-xl mt-4"
             variants={fadeInUp}
             initial="initial"
             animate="animate"
@@ -84,7 +84,7 @@ const Hero = () => {
 
         {/* Colonne droite : Photo */}
         <motion.div
-          className="flex items-center justify-center"
+          className="flex items-center justify-center aspect-square"
           variants={fadeInScale}
           initial="initial"
           animate="animate"

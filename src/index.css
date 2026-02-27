@@ -14,6 +14,13 @@
     background-color: #FFFFFF;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .dark body,
+  html.dark body {
+    color: #F5F5F5;
+    background-color: #1a1a1a;
   }
 
   /* Force Rowdies sur tous les titres */
@@ -23,7 +30,7 @@
 
   /* Focus visible pour accessibilité */
   *:focus-visible {
-    @apply outline-2 outline-offset-2 outline-noir;
+    @apply outline-2 outline-offset-2 outline-noir dark:outline-blanc;
   }
 
   /* Scroll margin pour offset navigation sticky */
@@ -36,17 +43,17 @@
 @layer components {
   /* Bouton primaire noir */
   .btn-primary {
-    @apply bg-noir text-blanc border-2 border-noir px-12 py-4 text-base font-semibold transition-all duration-200 hover:bg-blanc hover:text-noir hover:scale-105;
+    @apply bg-noir text-blanc border-2 border-noir px-12 py-4 text-base font-semibold transition-all duration-200 hover:bg-blanc hover:text-noir hover:scale-105 dark:bg-blanc dark:text-noir dark:border-blanc dark:hover:bg-noir dark:hover:text-blanc;
   }
 
   /* Input formulaire */
   .input-field {
-    @apply w-full border border-noir px-4 py-4 text-base bg-blanc focus:border-2 focus:border-noir transition-all;
+    @apply w-full border border-noir px-4 py-4 text-base bg-blanc focus:border-2 focus:border-noir transition-all dark:bg-[#2a2a2a] dark:border-blanc dark:text-blanc dark:focus:border-blanc;
   }
 
   /* Card noire */
   .card-dark {
-    @apply bg-noir text-blanc p-8;
+    @apply bg-noir text-blanc p-8 dark:bg-blanc dark:text-noir;
   }
 
   /* Section container */
@@ -60,6 +67,9 @@
   /* Border dashed noir */
   .border-dashed-noir {
     border: 1px dashed #000;
+  }
+  .dark .border-dashed-noir {
+    border: 1px dashed #F5F5F5;
   }
 
   /* Texte avec opacity réduite */

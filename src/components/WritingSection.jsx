@@ -7,7 +7,7 @@ const WritingSection = () => {
   return (
     <section id="ecriture" className="section-container">
       <motion.div
-        className="grid md:grid-cols-2 gap-20 border-2 border-noir px-8 md:px-12 py-[80px]"
+        className="grid md:grid-cols-2 gap-20 border-2 border-noir dark:border-blanc px-8 md:px-12 py-[80px]"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}

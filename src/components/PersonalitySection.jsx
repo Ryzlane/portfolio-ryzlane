@@ -9,7 +9,7 @@ const SurveyAxis = ({ labelTop, labelBottom, position, index }) => {
 
   return (
     <motion.div
-      className={`border-t-2 border-dashed border-noir p-8 text-center h-full flex flex-col ${
+      className={`border-t-2 border-dashed border-noir dark:border-blanc p-8 text-center h-full flex flex-col ${
         !isLastInRow ? 'lg:border-r-2 lg:border-dashed' : ''
       } ${isNotFirstInRow ? 'lg:border-l-2 lg:border-dashed' : ''}`}
       variants={{
@@ -21,9 +21,9 @@ const SurveyAxis = ({ labelTop, labelBottom, position, index }) => {
 
       {/* Indicateur visuel */}
       <div className="h-20 flex items-center justify-center relative flex-shrink-0">
-        <div className="w-2 h-full bg-noir absolute"></div>
+        <div className="w-2 h-full bg-noir dark:bg-blanc absolute"></div>
         <div
-          className="absolute w-6 h-2 bg-noir"
+          className="absolute w-6 h-2 bg-noir dark:bg-blanc"
           style={{ top: `${position}%`, transform: 'translateY(-50%)' }}
         ></div>
       </div>
@@ -50,7 +50,7 @@ const PersonalitySection = () => {
 
   return (
     <section className="max-w-container mx-auto px-6 md:px-12 pb-10">
-      <div className="border-x-2 border-b-2 border-noir bg-blanc">
+      <div className="border-x-2 border-b-2 border-noir dark:border-blanc bg-blanc dark:bg-[#1a1a1a]">
         <motion.h2
           className="text-2xl md:text-3xl font-display text-center mb-12 px-8 md:px-12 pt-8 md:pt-12"
           initial={{ opacity: 0, y: 20 }}

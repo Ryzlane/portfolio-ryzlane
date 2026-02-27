@@ -47,7 +47,7 @@ const ContactForm = () => {
   };
 
   return (
-    <section id="contact" className="section-container bg-gris-clair">
+    <section id="contact" className="section-container bg-gris-clair dark:bg-[#2a2a2a]">
       <motion.div
         className="max-w-form mx-auto"
         initial={{ opacity: 0, y: 20 }}
@@ -138,13 +138,13 @@ const ContactForm = () => {
 
           {/* Messages feedback */}
           {status === 'success' && (
-            <p className="text-noir text-center font-semibold mt-4 p-4 border-2 border-noir bg-blanc">
+            <p className="text-noir dark:text-blanc text-center font-semibold mt-4 p-4 border-2 border-noir dark:border-blanc bg-blanc dark:bg-[#2a2a2a]">
               ✓ Message envoyé avec succès ! Je vous réponds rapidement.
             </p>
           )}
 
           {status === 'error' && (
-            <p className="text-noir text-center font-semibold mt-4 p-4 border-2 border-noir bg-gris-clair">
+            <p className="text-noir dark:text-blanc text-center font-semibold mt-4 p-4 border-2 border-noir dark:border-blanc bg-gris-clair dark:bg-[#333]">
               ✗ Erreur lors de l'envoi. Veuillez réessayer.
             </p>
           )}

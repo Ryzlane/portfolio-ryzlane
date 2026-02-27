@@ -6,10 +6,10 @@ import { DEV_SECTION } from '../utils/constants';
 const DevSkills = () => {
   return (
     <section id="developpement" className="section-container">
-      <div className="border-2 border-noir">
+      <div className="border-2 border-noir dark:border-blanc">
         {/* Header terminal-style */}
         <motion.div
-          className="bg-noir text-blanc px-6 py-3 flex justify-between items-center font-mono text-sm border-b-2 border-noir"
+          className="bg-noir text-blanc dark:bg-blanc dark:text-noir px-6 py-3 flex justify-between items-center font-mono text-sm border-b-2 border-noir dark:border-blanc"
         initial={{ opacity: 0, y: -20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}

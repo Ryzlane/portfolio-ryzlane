@@ -7,7 +7,7 @@ const DesignSkills = () => {
   return (
     <section id="design" className="section-container">
       <motion.div
-        className="grid md:grid-cols-[2fr,1fr] gap-12 items-center border-2 border-noir px-8 md:px-12 py-[80px]"
+        className="grid md:grid-cols-[2fr,1fr] gap-12 items-center border-2 border-noir dark:border-blanc px-8 md:px-12 py-[80px]"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}

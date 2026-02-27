@@ -3,7 +3,7 @@ import { FOOTER } from '../utils/constants';
 
 const Footer = () => {
   return (
-    <footer className="bg-noir text-blanc py-12">
+    <footer className="bg-noir text-blanc dark:bg-blanc dark:text-noir py-12">
       <div className="max-w-container mx-auto px-6 md:px-12 text-center">
         {/* Copyright & Tech */}
         <div className="mb-6 opacity-80 text-sm space-y-1">

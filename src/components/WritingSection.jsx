@@ -44,8 +44,8 @@ const WritingSection = () => {
         </div>
 
         {/* Colonne droite : Écriture créative */}
-        <div>
-          <h2 className="text-xl font-display mb-6 text-right">
+        <div className="text-right">
+          <h2 className="text-xl font-display mb-6">
             {WRITING_SECTION.creative.title}
           </h2>
           <div className="flex flex-col items-end gap-3">
@@ -53,7 +53,7 @@ const WritingSection = () => {
               href={WRITING_SECTION.creative.cardLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary inline-flex items-center gap-3"
+              className="btn-primary inline-flex items-center justify-center gap-3 w-48"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
               transition={{ duration: 0.2 }}
@@ -61,7 +61,7 @@ const WritingSection = () => {
               <FaInstagram className="text-xl" />
               {WRITING_SECTION.creative.cardTitle}
             </motion.a>
-            <p className="text-xs opacity-70 text-right max-w-[200px]">
+            <p className="text-xs opacity-70 max-w-[200px] text-right">
               {WRITING_SECTION.creative.cardSubtitle}
             </p>
           </div>

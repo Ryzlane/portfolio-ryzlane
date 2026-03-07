@@ -75,11 +75,9 @@ export const SURVEY_AXES = [
 // SECTION DESIGN
 // ============================================
 export const DESIGN_SECTION = {
-  title: "Mes compétences en design ?",
+  title: "Au pixel près",
   // TODO: Remplacer par votre vraie description
-  description: `Je conçois des interfaces qui respirent la clarté et l'intention.
-Mon approche mêle esthétique minimaliste et architecture de l'information rigoureuse.
-Du wireframe au prototype haute-fidélité, je traduis les besoins utilisateurs en expériences visuelles cohérentes et accessibles.`,
+  description: `J'aime la simplicité, les zones épurées. Un léger soupçon d'UI mais surtout beaucoup d'UX. Je me passionne à sonder les besoins des utilisateurs, les optimisations pour délivrer l'expérience la plus fluide et agréable possible. Vous pouvez retrouver, sur mon Behance, un échantillon de mon travail en tant que designer.`,
   buttonText: "Behance",
   buttonLink: LINKS.behance,
 };
@@ -88,14 +86,32 @@ Du wireframe au prototype haute-fidélité, je traduis les besoins utilisateurs 
 // SECTION DÉVELOPPEMENT
 // ============================================
 export const DEV_SECTION = {
-  title: "Mes compétences en développement ?",
+  title: "Des lignes par milliers",
   // TODO: Remplacer par votre vraie description
-  description: `Je transforme le design en code performant et maintenable.
-Spécialisée en React, JavaScript moderne et architecture frontend, je construis des interfaces qui allient fluidité visuelle et robustesse technique.
-Du composant atomique au système de design complet, je code avec rigueur et attention au détail.`,
-  projectTitle: "Projet phare", // TODO: Remplacer par le nom de votre projet
-  projectNote: "(c'est daté mais c'est from scratch et j'en suis fière)",
+  description: `Ça fait un moment que je n'ai pas développé from\u00A0scratch. Mais c'est une discipline que j'affectionne : surtout le frontend, le don de vie à des projets divers et variés. Mon expérience me permet de comprendre les développeurs et designer ou chaperonner en toute conscience les aspects techniques. Je me suis aussi mise à utiliser Claude\u00A0Code, rendant plus rapide la création de projets que j'imagine.`,
   githubLink: LINKS.github,
+  projects: [
+    {
+      id: 1,
+      title: "Portfolio de Kaan Roussel (React.js, from\u00A0scratch)",
+      link: "https://kaan-roussel.ryzlane.vercel.app/",
+    },
+    {
+      id: 2,
+      title: "OptionBattle, prendre des décisions éclairées (Claude\u00A0Code)",
+      link: "https://optionbattle.ryzlane.com/",
+    },
+    {
+      id: 3,
+      title: "Debunker, challenger ses croyances (Claude\u00A0Code)",
+      link: "https://debunker.ryzlane.com/",
+    },
+    {
+      id: 4,
+      title: "Ce site (Claude\u00A0Code)\u00A0!",
+      link: null,
+    },
+  ],
 };
 
 // ============================================
@@ -125,10 +141,22 @@ export const WRITING_SECTION = {
   },
   creative: {
     title: "Un zeste d'écriture créative",
-    cardTitle: "À demi-rêvé",
+    cardTitle: "Rêves",
     cardSubtitle: "Mon compte Instagram sur lequel je relate mes rêves",
     cardLink: LINKS.instagram,
   },
+};
+
+// ============================================
+// SECTION ENTREPRENEURIAT
+// ============================================
+export const ENTREPRENEURIAT_SECTION = {
+  title: "Le grand saut",
+  description: `En duo, nous avons créé doted. que vous pouvez tester sur une application web ou sur l'Apple Store. Réfléchit ensemble, nous voulions aider les gens à mieux faire face aux montagnes russes de la vie. Basée sur la TCD, une thérapie éprouvée basée sur des compétences multiples, nous y avons ajouté notre patte pour créer la meilleure expérience possible.`,
+  buttons: [
+    { text: "Découvrir", link: "#", icon: "doted" }, // TODO: Lien vers doted.
+    { text: "Éditorial", link: LINKS.instagram, icon: "instagram" },
+  ],
 };
 
 // ============================================
@@ -138,6 +166,7 @@ export const NAV_LINKS = [
   { id: "design", label: "Design", href: "#design" },
   { id: "developpement", label: "Développement", href: "#developpement" },
   { id: "ecriture", label: "Écriture", href: "#ecriture" },
+  { id: "entrepreneuriat", label: "Entrepreneuriat", href: "#entrepreneuriat" },
 ];
 
 // ============================================

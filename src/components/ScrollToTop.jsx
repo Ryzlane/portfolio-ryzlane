@@ -65,7 +65,7 @@ const FloatingContact = () => {
             transition={{ duration: 0.2 }}
             className="fixed bottom-24 right-8 z-50 w-80 bg-blanc dark:bg-[#1a1a1a] border-2 border-noir dark:border-blanc p-6 shadow-xl"
           >
-            <h3 className="font-display text-lg mb-4">Me contacter</h3>
+            <h3 className="font-display text-lg mb-4">Me faire un coucou</h3>
 
             {status === 'success' ? (
               <p className="text-sm text-center py-4">
@@ -86,7 +86,7 @@ const FloatingContact = () => {
                   onChange={(e) => setMessage(e.target.value)}
                   required
                   rows={3}
-                  placeholder="Votre message *"
+                  placeholder="Votre missive *"
                   className="w-full border border-noir dark:border-blanc dark:bg-[#2a2a2a] dark:text-blanc px-3 py-2 text-sm resize-y focus:border-2 focus:border-noir dark:focus:border-blanc transition-all"
                 />
                 <button
@@ -95,7 +95,7 @@ const FloatingContact = () => {
                   className="btn-primary w-full inline-flex items-center justify-center gap-2 !px-4 !py-2 text-sm disabled:opacity-50"
                 >
                   <FaPaperPlane className="text-xs" />
-                  {status === 'loading' ? 'Envoi...' : 'Envoyer'}
+                  {status === 'loading' ? 'Envoi...' : 'Boîte aux lettres'}
                 </button>
                 {status === 'error' && (
                   <p className="text-sm text-center opacity-70">

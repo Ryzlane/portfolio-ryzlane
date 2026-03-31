@@ -14,7 +14,7 @@ function App() {
     <PageTransition>
       <div className="min-h-screen">
         <Navigation />
-        <div className="pt-[90px]" />
+        <div className="pt-[130px]" />
         <Hero />
         <PersonalitySection />
         <DesignSkills />

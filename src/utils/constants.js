@@ -7,8 +7,8 @@
 // LIENS EXTERNES
 // ============================================
 export const LINKS = {
-  behance: "https://behance.net/TODO", // TODO: Remplacer par votre lien Behance
-  github: "https://github.com/TODO", // TODO: Remplacer par votre lien GitHub
+  behance: "https://www.behance.net/ryzlane",
+  github: "https://github.com/Ryzlane",
   linkedin: "https://www.linkedin.com/in/ryzlane-arsac-gothi%C3%A8re/",
   instagram: "https://instagram.com/ademireve", // TODO: Vérifier le lien Instagram "À demi-rêve"
 };
@@ -125,12 +125,12 @@ export const WRITING_SECTION = {
       {
         id: 1,
         title: "Politique salariale : comment s'y retrouver\u00A0?",
-        link: "#", // TODO: Lien vers l'article
+        link: "https://ignition-program.com/tuto/politique-salariale-definition-conseils-et-mise-en-place",
       },
       {
         id: 2,
         title: "Le travail hybride : redéfinir la façon de travailler",
-        link: "#", // TODO: Lien vers l'article
+        link: "https://ignition-program.com/tuto/le-travail-hybride-redefinir-la-facon-dont-nous-travaillons",
       },
       {
         id: 3,
@@ -154,8 +154,8 @@ export const ENTREPRENEURIAT_SECTION = {
   title: "Le grand saut",
   description: `En duo, nous avons créé doted. que vous pouvez tester sur une application web ou sur l'Apple Store. Réfléchit ensemble, nous voulions aider les gens à mieux faire face aux montagnes russes de la vie. Basée sur la TCD, une thérapie éprouvée basée sur des compétences multiples, nous y avons ajouté notre patte pour créer la meilleure expérience possible.`,
   buttons: [
-    { text: "Découvrir", link: "#", icon: "doted" }, // TODO: Lien vers doted.
-    { text: "Éditorial", link: LINKS.instagram, icon: "instagram" },
+    { text: "Découvrir", link: "https://doted.run/", icon: "doted" },
+    { text: "Éditorial", link: "https://www.instagram.com/hellodoted/", icon: "instagram" },
   ],
 };
 

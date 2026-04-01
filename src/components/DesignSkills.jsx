@@ -24,7 +24,7 @@ const DesignSkills = () => {
         </div>
 
         {/* Bouton Behance */}
-        <div className="flex justify-center md:justify-end">
+        <div className="flex justify-start md:justify-end">
           <motion.a
             href={DESIGN_SECTION.buttonLink}
             target="_blank"

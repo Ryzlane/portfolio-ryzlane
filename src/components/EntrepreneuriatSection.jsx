@@ -30,7 +30,7 @@ const EntrepreneuriatSection = () => {
         </div>
 
         {/* Boutons */}
-        <div className="flex flex-col items-center md:items-end gap-4 w-full md:w-auto">
+        <div className="flex flex-col items-start md:items-end gap-4 w-full md:w-auto">
           <motion.a
             href={ENTREPRENEURIAT_SECTION.buttons[0].link}
             target="_blank"

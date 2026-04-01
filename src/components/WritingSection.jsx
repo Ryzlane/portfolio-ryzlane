@@ -44,11 +44,11 @@ const WritingSection = () => {
         </div>
 
         {/* Colonne droite : Écriture créative */}
-        <div className="text-right">
+        <div className="text-left md:text-right">
           <h2 className="text-xl font-display mb-6">
             {WRITING_SECTION.creative.title}
           </h2>
-          <div className="flex flex-col items-end gap-3">
+          <div className="flex flex-col items-start md:items-end gap-3">
             <motion.a
               href={WRITING_SECTION.creative.cardLink}
               target="_blank"
@@ -61,7 +61,7 @@ const WritingSection = () => {
               <FaInstagram className="text-xl" />
               {WRITING_SECTION.creative.cardTitle}
             </motion.a>
-            <p className="text-xs opacity-70 max-w-[200px] text-right">
+            <p className="text-xs opacity-70 max-w-[200px] text-left md:text-right">
               {WRITING_SECTION.creative.cardSubtitle}
             </p>
           </div>

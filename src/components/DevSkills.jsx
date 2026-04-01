@@ -15,7 +15,7 @@ const DevSkills = () => {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6 }}
         >
-          <span>cd ryzlane/projects/dev</span>
+          <span className="hidden md:inline">cd ryzlane/projects/dev</span>
           <a
             href={DEV_SECTION.githubLink}
             target="_blank"

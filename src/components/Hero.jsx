@@ -19,7 +19,7 @@ const Hero = () => {
     <section className="max-w-container mx-auto px-6 md:px-12 pt-10 pb-0">
       <div className="grid md:grid-cols-[3fr,2fr] gap-0 border-2 border-noir dark:border-blanc">
         {/* Colonne gauche : Texte */}
-        <div className="p-8 md:p-12 border-r-2 border-noir dark:border-blanc">
+        <div className="p-8 md:p-12 border-b-2 md:border-b-0 md:border-r-2 border-noir dark:border-blanc">
           <motion.h1
             className="text-hero-mobile md:text-hero font-display font-black leading-none"
             variants={fadeInUp}

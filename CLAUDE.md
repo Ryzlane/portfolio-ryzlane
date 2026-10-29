@@ -22,10 +22,10 @@ Portfolio one-page minimaliste en **noir et blanc** pour Ryzlane Arsac-Gothiere.
 
 ---
 
-## Etat actuel (7 mars 2026)
+## Etat actuel (29 octobre 2026)
 
 ### Contenu personnalise
-- [x] Texte hero (baseline, texte descriptif)
+- [x] Texte hero (positionnement "Produit digital & communaute", baseline, texte descriptif, badge de disponibilite)
 - [x] Marquee : 4 items (CODER L'ESTHETIQUE, DESIGNER LA LOGIQUE, ECRIRE L'INVISIBLE, ENTREPRENDRE L'AUDACE)
 - [x] Lien LinkedIn
 - [x] Photo de profil (`public/photo-ryzlane.JPG`)
@@ -40,15 +40,18 @@ Portfolio one-page minimaliste en **noir et blanc** pour Ryzlane Arsac-Gothiere.
 - [ ] Liens Behance, GitHub (encore en TODO)
 - [ ] OG Image pour partages sociaux
 
-### Sections et titres
+### Sections et titres (ordre d'affichage)
+- **Entrepreneuriat** : "Le grand saut" (remontee juste apres la personnalite)
+- **Produit** : "Du besoin a la mise en ligne" (ExperienceSection + PRODUCT_SECTION)
+- **Communaute** : "Faire parler, faire vivre" (ExperienceSection + COMMUNITY_SECTION)
 - **Design** : "Au pixel pres"
 - **Developpement** : "Des lignes par milliers" / sous-titre projets : "Laboratoire"
 - **Ecriture** : Redaction + Ecriture creative (bouton "Reves" vers Instagram)
-- **Entrepreneuriat** : "Le grand saut" (boutons Decouvrir/Editorial)
 
 ### Composants
-- **Navigation** : Fixed, marquee noire + nav avec logo R. + toggle dark mode (soleil/lune)
-- **Hero** : Grille 3fr/2fr, photo ronde aspect-square, boutons LinkedIn + CV
+- **Navigation** : Fixed, marquee noire + nav avec logo R. + toggle dark mode (soleil/lune). Menu complet a partir de `lg` (1024px), menu hamburger en dessous (6 liens)
+- **Hero** : Grille 3fr/2fr, photo ronde (carre calcule sur la largeur de colonne), boutons LinkedIn + CV
+- **ExperienceSection** : Composant generique (description + liste d'experiences), reutilise pour Produit et Communaute
 - **PersonalitySection** : 4 axes avec curseurs animes
 - **DesignSkills** : Section design avec description + bouton Behance
 - **DevSkills** : Section dev avec description + liste projets "Laboratoire"
@@ -69,7 +72,8 @@ Portfolio one-page minimaliste en **noir et blanc** pour Ryzlane Arsac-Gothiere.
 - `SURVEY_AXES` : Positions des curseurs personnalite
 - `DESIGN_SECTION`, `DEV_SECTION`, `WRITING_SECTION` : Contenu des sections
 - `ENTREPRENEURIAT_SECTION` : Section entrepreneuriat avec boutons
-- `NAV_LINKS` : Liens de navigation (4 sections)
+- `PRODUCT_SECTION`, `COMMUNITY_SECTION` : Sections experiences (role, org, period, summary)
+- `NAV_LINKS` : Liens de navigation (6 sections, meme ordre que App.jsx)
 - `FOOTER` : Copyright et liens sociaux
 
 ### Assets dans `public/`
@@ -118,4 +122,4 @@ npm run deploy     # Deploy GitHub Pages (build + gh-pages)
 
 ---
 
-**Derniere mise a jour** : 7 mars 2026
+**Derniere mise a jour** : 29 octobre 2026

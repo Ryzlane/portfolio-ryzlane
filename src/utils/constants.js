@@ -24,9 +24,12 @@ export const FORMSPREE_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID";
 // ============================================
 export const HERO_TEXT = {
   title: "RYZLANE●",
+  // Positionnement : identique au titre LinkedIn et au CV
+  role: "Produit digital & communauté",
   baseline: "Un seul cerveau, mille fenêtres",
-  // TODO: Remplacer par votre texte répétitif réel
-  repeatedText: `Bienvenue dans ma tête. C'est un fouillis, un mélange de choses et d'autres. Je ne suis ni totalement designer, ni totalement développeuse, ni totalement communicante ou rédactrice. J'aime toucher à tout et c'est ce que j'aspire à faire, être un couteau suisse dans l'immensité du web.`,
+  repeatedText: `Bienvenue dans ma tête : c'est un joyeux fouillis. Mon métier, c'est de faire le lien entre ceux qui construisent un produit et ceux qui l'utilisent. J'ai été Product Owner, cheffe de produit, chargée de communication, et je code un peu. Bref, un couteau suisse qui sait où il plante sa lame.`,
+  // Mettre à null pour masquer le badge de disponibilité
+  availability: "Ouverte aux opportunités · Paris, hybride ou à distance",
 };
 
 // ============================================
@@ -72,6 +75,71 @@ export const SURVEY_AXES = [
 ];
 
 // ============================================
+// SECTIONS EXPÉRIENCES (Produit, Communauté)
+// ============================================
+// Affichées par le composant générique ExperienceSection.
+// Chaque expérience : role (intitulé), org (structure), period (dates), summary (une phrase).
+export const PRODUCT_SECTION = {
+  id: "produit",
+  title: "Du besoin à la mise en ligne",
+  description: `Faire avancer un produit, c'est traduire les besoins des utilisateurs en spécifications claires, prioriser avec l'équipe technique et mesurer ce qui fonctionne. C'est ce que j'ai fait en start-up, souvent avec une casquette de couteau suisse.`,
+  listTitle: "Parcours",
+  experiences: [
+    {
+      id: 1,
+      role: "Cheffe de produit",
+      org: "Flint Media",
+      period: "2021 – 2022",
+      summary: "Refonte du site et de la newsletter, parcours de parrainage, suivi des analytics.",
+    },
+    {
+      id: 2,
+      role: "Program Manager",
+      org: "French Future Academy",
+      period: "2022",
+      summary: "Formations en Design Thinking : organisation des sessions et relation clients.",
+    },
+    {
+      id: 3,
+      role: "Product Owner",
+      org: "JOONE",
+      period: "2020",
+      summary: "Spécifications fonctionnelles et techniques, roadmap de l'équipe tech, mise en place des analytics.",
+    },
+  ],
+};
+
+export const COMMUNITY_SECTION = {
+  id: "communaute",
+  title: "Faire parler, faire vivre",
+  description: `Stratégie de contenus, réseaux sociaux, influence : j'aime trouver le bon format pour la bonne audience, de l'idée jusqu'au montage vidéo.`,
+  listTitle: "Parcours",
+  experiences: [
+    {
+      id: 1,
+      role: "Influence Manager & Content Creator",
+      org: "Editions Goutte d'Or",
+      period: "2026",
+      summary: "Stratégie de publication Instagram et LinkedIn, suivi d'influenceurs, vidéos courtes de la captation au montage.",
+    },
+    {
+      id: 2,
+      role: "Brand & Communication",
+      org: "Ignition Program",
+      period: "2022 – 2023",
+      summary: "Animation des réseaux sociaux, articles de blog, analyse des retombées.",
+    },
+    {
+      id: 3,
+      role: "Éditorial",
+      org: "doted.",
+      period: "depuis 2024",
+      summary: "Ligne éditoriale et animation du compte Instagram @hellodoted.",
+    },
+  ],
+};
+
+// ============================================
 // SECTION DESIGN
 // ============================================
 export const DESIGN_SECTION = {
@@ -87,8 +155,7 @@ export const DESIGN_SECTION = {
 // ============================================
 export const DEV_SECTION = {
   title: "Des lignes par milliers",
-  // TODO: Remplacer par votre vraie description
-  description: `Ça fait un moment que je n'ai pas développé from\u00A0scratch. Mais c'est une discipline que j'affectionne : surtout le frontend, le don de vie à des projets divers et variés. Mon expérience me permet de comprendre les développeurs et designer ou chaperonner en toute conscience les aspects techniques. Je me suis aussi mise à utiliser Claude\u00A0Code, rendant plus rapide la création de projets que j'imagine.`,
+  description: `Le frontend, c'est mon terrain de jeu : donner vie à des projets divers et variés. Cette pratique me permet de comprendre les développeurs, et de designer ou chaperonner en toute conscience les aspects techniques. Aujourd'hui, j'utilise aussi Claude\u00A0Code pour créer plus vite les projets que j'imagine.`,
   githubLink: LINKS.github,
   projects: [
     {
@@ -152,7 +219,7 @@ export const WRITING_SECTION = {
 // ============================================
 export const ENTREPRENEURIAT_SECTION = {
   title: "Le grand saut",
-  description: `En duo, nous avons créé doted. que vous pouvez tester sur une application web ou sur l'Apple Store. Réfléchit ensemble, nous voulions aider les gens à mieux faire face aux montagnes russes de la vie. Basée sur la TCD, une thérapie éprouvée basée sur des compétences multiples, nous y avons ajouté notre patte pour créer la meilleure expérience possible.`,
+  description: `En duo, nous avons créé doted., que vous pouvez tester en application web ou sur l'App\u00A0Store. Pensée à deux, elle aide à mieux faire face aux montagnes russes de la vie. Elle s'inspire de la TCD, une thérapie éprouvée fondée sur des compétences multiples, à laquelle nous avons ajouté notre patte pour créer la meilleure expérience possible.`,
   buttons: [
     { text: "Découvrir", link: "https://doted.run/", icon: "doted" },
     { text: "Éditorial", link: "https://www.instagram.com/hellodoted/", icon: "instagram" },
@@ -162,11 +229,14 @@ export const ENTREPRENEURIAT_SECTION = {
 // ============================================
 // NAVIGATION MENU
 // ============================================
+// Ordre identique à celui des sections dans App.jsx
 export const NAV_LINKS = [
+  { id: "entrepreneuriat", label: "Entrepreneuriat", href: "#entrepreneuriat" },
+  { id: "produit", label: "Produit", href: "#produit" },
+  { id: "communaute", label: "Communauté", href: "#communaute" },
   { id: "design", label: "Design", href: "#design" },
   { id: "developpement", label: "Développement", href: "#developpement" },
   { id: "ecriture", label: "Écriture", href: "#ecriture" },
-  { id: "entrepreneuriat", label: "Entrepreneuriat", href: "#entrepreneuriat" },
 ];
 
 // ============================================

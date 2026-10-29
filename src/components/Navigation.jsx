@@ -96,7 +96,7 @@ const Navigation = () => {
       <nav className="bg-blanc dark:bg-[#1a1a1a] border-b-2 border-noir dark:border-blanc transition-colors">
         <div className="max-w-container mx-auto px-6 md:px-12">
           {/* Navigation desktop */}
-          <div className="hidden md:flex items-stretch">
+          <div className="hidden lg:flex items-stretch">
             <div className="mr-auto flex items-center py-1 -ml-3">
               <img src={`${import.meta.env.BASE_URL}logo-square.png`} alt="R." className="h-10 dark:invert" />
             </div>
@@ -126,7 +126,7 @@ const Navigation = () => {
           </div>
 
           {/* Navigation mobile */}
-          <div className="md:hidden flex items-center justify-between h-16">
+          <div className="lg:hidden flex items-center justify-between h-16">
             <div>
               <img src={`${import.meta.env.BASE_URL}logo-square.png`} alt="R." className="h-12 dark:invert" />
             </div>
@@ -155,7 +155,7 @@ const Navigation = () => {
 
       {/* Menu mobile fullscreen */}
       {isMenuOpen && (
-        <div className="md:hidden fixed inset-0 top-[96px] bg-blanc dark:bg-[#1a1a1a] z-40 flex flex-col gap-6 p-6">
+        <div className="lg:hidden fixed inset-0 top-[96px] bg-blanc dark:bg-[#1a1a1a] z-40 flex flex-col gap-6 p-6">
           {NAV_LINKS.map((link) => (
             <a
               key={link.id}

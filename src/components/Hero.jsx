@@ -30,8 +30,19 @@ const Hero = () => {
             {HERO_TEXT.title.replace('●', '')}<span className="text-3xl align-super">.</span>
           </motion.h1>
 
+          {/* Positionnement (aligné sur LinkedIn et le CV) */}
           <motion.p
-            className="text-xl mt-4"
+            className="text-2xl font-display mt-4"
+            variants={fadeInUp}
+            initial="initial"
+            animate="animate"
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.15 }}
+          >
+            {HERO_TEXT.role}
+          </motion.p>
+
+          <motion.p
+            className="text-xl mt-2"
             variants={fadeInUp}
             initial="initial"
             animate="animate"
@@ -39,6 +50,20 @@ const Hero = () => {
           >
             {HERO_TEXT.baseline}
           </motion.p>
+
+          {/* Badge de disponibilité, masqué si availability est null */}
+          {HERO_TEXT.availability && (
+            <motion.p
+              className="inline-flex items-center gap-2 mt-6 px-3 py-1 border-2 border-noir dark:border-blanc text-sm"
+              variants={fadeInUp}
+              initial="initial"
+              animate="animate"
+              transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
+            >
+              <span className="w-2 h-2 rounded-full bg-noir dark:bg-blanc animate-pulse" aria-hidden="true" />
+              {HERO_TEXT.availability}
+            </motion.p>
+          )}
 
           <motion.p
             className="text-sm text-muted mt-8 max-w-md leading-relaxed"
@@ -82,9 +107,9 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Colonne droite : Photo */}
+        {/* Colonne droite : Photo (carré calculé sur la largeur de la colonne, pas sur sa hauteur) */}
         <motion.div
-          className="flex items-center justify-center aspect-square"
+          className="flex items-center justify-center min-w-0"
           variants={fadeInScale}
           initial="initial"
           animate="animate"
@@ -93,7 +118,7 @@ const Hero = () => {
           <img
             src={`${import.meta.env.BASE_URL}photo-ryzlane.JPG`}
             alt="Photo de Ryzlane"
-            className="w-full h-full rounded-full border-2 border-noir dark:border-blanc object-cover"
+            className="w-full aspect-square rounded-full border-2 border-noir dark:border-blanc object-cover"
           />
         </motion.div>
       </div>

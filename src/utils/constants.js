@@ -25,7 +25,7 @@ export const FORMSPREE_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID";
 export const HERO_TEXT = {
   title: "RYZLANE●",
   // Positionnement : identique au titre LinkedIn et au CV
-  role: "Produit digital & communauté",
+  role: "Produit & communication digitale",
   baseline: "Un seul cerveau, mille fenêtres",
   repeatedText: `Bienvenue dans ma tête : c'est un joyeux fouillis. Mon métier, c'est de faire le lien entre ceux qui construisent un produit et ceux qui l'utilisent. J'ai été Product Owner, cheffe de produit, chargée de communication, et je code un peu. Bref, un couteau suisse qui sait où il plante sa lame.`,
   // Mettre à null pour masquer le badge de disponibilité
@@ -75,7 +75,7 @@ export const SURVEY_AXES = [
 ];
 
 // ============================================
-// SECTIONS EXPÉRIENCES (Produit, Communauté)
+// SECTIONS EXPÉRIENCES (Produit, Communication)
 // ============================================
 // Affichées par le composant générique ExperienceSection.
 // Chaque expérience : role (intitulé), org (structure), period (dates), summary (une phrase).
@@ -110,7 +110,7 @@ export const PRODUCT_SECTION = {
 };
 
 export const COMMUNITY_SECTION = {
-  id: "communaute",
+  id: "communication",
   title: "Faire parler, faire vivre",
   description: `Stratégie de contenus, réseaux sociaux, influence : j'aime trouver le bon format pour la bonne audience, de l'idée jusqu'au montage vidéo.`,
   listTitle: "Parcours",
@@ -233,7 +233,7 @@ export const ENTREPRENEURIAT_SECTION = {
 export const NAV_LINKS = [
   { id: "entrepreneuriat", label: "Entrepreneuriat", href: "#entrepreneuriat" },
   { id: "produit", label: "Produit", href: "#produit" },
-  { id: "communaute", label: "Communauté", href: "#communaute" },
+  { id: "communication", label: "Communication", href: "#communication" },
   { id: "design", label: "Design", href: "#design" },
   { id: "developpement", label: "Développement", href: "#developpement" },
   { id: "ecriture", label: "Écriture", href: "#ecriture" },

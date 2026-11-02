@@ -1,5 +1,5 @@
 // Section générique "expériences" : description à gauche, parcours à droite.
-// Réutilisée pour les sections Produit et Communauté (voir constants.js).
+// Réutilisée pour les sections Produit et Communication (voir constants.js).
 import { motion } from 'framer-motion';
 
 const ExperienceSection = ({ data }) => {

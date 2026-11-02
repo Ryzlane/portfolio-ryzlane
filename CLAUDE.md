@@ -6,7 +6,8 @@ Portfolio one-page minimaliste en **noir et blanc** pour Ryzlane Arsac-Gothiere.
 **Style** : Brutal, minimaliste, typographie forte.
 **Dark mode** : Supporte via toggle (class-based, persistance localStorage + detection systeme).
 
-**URL** : https://ryzlane.github.io/portfolio-ryzlane/
+**URL principale** : https://ryzlane.com (Railway)
+**URL secondaire** : https://ryzlane.github.io/portfolio-ryzlane/ (GitHub Pages)
 **Repo** : https://github.com/Ryzlane/portfolio-ryzlane
 
 ---
@@ -17,12 +18,14 @@ Portfolio one-page minimaliste en **noir et blanc** pour Ryzlane Arsac-Gothiere.
 - **Styling** : Tailwind CSS (darkMode: 'class')
 - **Animations** : Framer Motion
 - **Formulaire contact** : FormSubmit.co (popup flottante)
-- **Deploiement** : GitHub Pages (`npm run deploy`)
-- **Base path** : `/portfolio-ryzlane/` (configure dans `vite.config.js`)
+- **Deploiement ryzlane.com** : Railway (projet "Portfolio", service `portfolio-ryzlane`), deploiement automatique a chaque push sur `master`. Build `npm run build`, demarrage `npm start` (`serve -s dist -l 3000`). Cloudflare gere uniquement le DNS du domaine.
+- **Deploiement GitHub Pages** : manuel via `npm run deploy` (branche `gh-pages`)
+- **Base path** : `VITE_BASE_PATH` (variable Railway = `/`) ; par defaut `/portfolio-ryzlane/` pour GitHub Pages (voir `vite.config.js`)
+- **Si ryzlane.com ne se met pas a jour** : verifier que le plan Railway est actif, puis l'onglet Deployments du service (build en echec ?)
 
 ---
 
-## Etat actuel (29 octobre 2026)
+## Etat actuel (2 novembre 2026)
 
 ### Contenu personnalise
 - [x] Texte hero (positionnement "Produit & communication digitale", baseline, texte descriptif, badge de disponibilite)
@@ -118,8 +121,9 @@ Tous les boutons CTA (Behance, Reves, Decouvrir, Editorial) ont une largeur fixe
 npm run dev        # Serveur local (port 3000+)
 npm run build      # Build production
 npm run deploy     # Deploy GitHub Pages (build + gh-pages)
+git push           # Deploie ryzlane.com via Railway (branche master)
 ```
 
 ---
 
-**Derniere mise a jour** : 29 octobre 2026
+**Derniere mise a jour** : 2 novembre 2026

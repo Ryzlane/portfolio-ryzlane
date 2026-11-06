@@ -111,10 +111,10 @@ ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
 (function () {
   // Quatre axes, deux questions chacun, réponses notées de 0 à 3.
   var AXES = {
-    strat: { label: "Stratégie & impact", expertise: "Piloter par l'impact", next: "Formation « Pilotage par l'impact : avec les OKR » (2 jours)", project: "Coaching stratégique" },
-    disc:  { label: "Discovery", expertise: "Lancer un produit", next: "Formation « Product Management : discovery et stratégie » (2 jours)", project: "Projet d'agence" },
-    deliv: { label: "Delivery & équipe", expertise: "Passer à l'échelle", next: "Offre Immersion : un ou une product person dans votre équipe", project: "Projet en régie" },
-    ia:    { label: "IA", expertise: "Intégrer l'IA", next: "Formation « IA : devenir un PM augmenté » (2 jours)", project: "Besoin IA" }
+    strat: { label: "Stratégie & impact", expertise: "Piloter par l'impact", profile: "Coaching stratégique, ou un·e Product Manager senior en immersion", project: "Coaching stratégique", training: "Pilotage par l'impact : avec les OKR" },
+    disc:  { label: "Discovery", expertise: "Lancer un produit", profile: "Un·e Product Manager ou un·e UX Researcher en immersion", project: "Projet en régie", training: "Product Management : discovery et stratégie" },
+    deliv: { label: "Delivery & équipe", expertise: "Passer à l'échelle", profile: "Un·e Product Owner ou Scrum Master en immersion", project: "Projet en régie", training: "Management : passer en mode produit" },
+    ia:    { label: "IA", expertise: "Intégrer l'IA", profile: "Un·e Product Builder en immersion, ou une squad en mode Agence", project: "Besoin IA", training: "IA : devenir un PM augmenté" }
   };
   var QUESTIONS = [
     { axis: "strat", q: "Vos priorités produit sont-elles reliées à des objectifs mesurables ?", a: ["Non, on suit surtout une liste de demandes", "En partie, pour quelques sujets", "Oui, avec des objectifs revus chaque trimestre", "Oui, et on arbitre la roadmap avec"] },
@@ -190,8 +190,9 @@ ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
 
     var reco = el("div", { class: "reco" });
     reco.appendChild(el("span", { class: "axis" }, "Axe à travailler en premier : " + AXES[weakest].label));
+    reco.appendChild(el("p", null, "Profil recommandé : " + AXES[weakest].profile));
     reco.appendChild(el("p", null, "Expertise Yeita : " + AXES[weakest].expertise));
-    reco.appendChild(el("p", null, "Pour démarrer : " + AXES[weakest].next));
+    reco.appendChild(el("p", { class: "note" }, "Pour aller plus loin : formation « " + AXES[weakest].training + " »"));
     root.appendChild(reco);
 
     var row2 = el("div", { class: "row" });

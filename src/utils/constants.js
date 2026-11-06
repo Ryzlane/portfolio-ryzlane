@@ -82,7 +82,7 @@ export const SURVEY_AXES = [
 export const PRODUCT_SECTION = {
   id: "produit",
   title: "Du besoin à la mise en ligne",
-  description: `Faire avancer un produit, c'est traduire les besoins des utilisateurs en spécifications claires, prioriser avec l'équipe technique et mesurer ce qui fonctionne. C'est ce que j'ai fait en start-up, et ce que je continue de faire avec doted.`,
+  description: `Faire avancer un produit, c'est traduire les besoins des utilisateurs en spécifications claires, prioriser avec l'équipe technique et mesurer ce qui fonctionne. C'est ce que j'ai fait en start-up, souvent avec une casquette de couteau suisse.`,
   listTitle: "Parcours",
   experiences: [
     {

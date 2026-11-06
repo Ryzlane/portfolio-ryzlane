@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Diagnostic produit &amp; IA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Hanken+Grotesk:wght@400;500;700&display=swap">
+<style>
+/* Layout : une colonne de cartes arrondies sur fond crème, reprise de l'identité de Yeita (encre, violet, citron, menthe) ; le diagnostic est le seul bloc citron. Page volontairement en thème clair, comme leur site. */
+:root {
+  --bg: #fffdf9;
+  --card: #ffffff;
+  --ink: #160f20;
+  --muted: #5b5468;
+  --line: #e4def3;
+  --violet: #4d25f7;
+  --violet-soft: #efeafe;
+  --lime: #ebf893;
+  --lime-soft: #f4fbc4;
+  --mint: #6de5a0;
+  --display: "Bricolage Grotesque", "Arial Rounded MT Bold", Arial, sans-serif;
+  --body: "Hanken Grotesk", Arial, Helvetica, sans-serif;
+  color-scheme: light;
+}
+body { background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.6; }
+.wrap { max-width: 980px; margin: 0 auto; padding-block: 40px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid; gap: 24px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 400; line-height: 1.08; text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+h1 { font-size: clamp(32px, 5.6vw, 58px); }
+h1 strong, h2 strong { font-weight: 800; }
+h2 { font-size: clamp(24px, 3.2vw, 34px); }
+h3 { font-size: 19px; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--violet); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--violet); outline-offset: 2px; }
+.eyebrow { justify-self: start; font-size: 13px; font-weight: 700; color: var(--violet); background: var(--violet-soft); padding: 4px 12px; border-radius: 999px; }
+.box { background: var(--card); border: 1px solid var(--line); border-radius: 24px; padding: clamp(20px, 4vw, 40px); display: grid; gap: 18px; min-width: 0; }
+.hero { display: grid; gap: 20px; padding-block: 12px; }
+.hero p.lead { font-size: 18px; }
+mark { background: none; color: var(--violet); font-weight: 800; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; font-size: 14px; }
+.meta span { border: 1px solid var(--line); background: var(--card); border-radius: 999px; padding: 4px 12px; color: var(--muted); }
+.meta span:first-child { border-color: var(--violet); color: var(--ink); font-weight: 700; }
+.obs { display: grid; gap: 12px; }
+.obs > div { display: grid; grid-template-columns: 11ch 1fr; gap: 16px; padding: 16px; border-radius: 16px; background: var(--bg); }
+.obs .tag { font-family: var(--display); font-weight: 800; color: var(--violet); }
+.obs > div > div { display: grid; gap: 6px; }
+.obs .src { font-size: 13px; color: var(--muted); }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 16px; }
+table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px; }
+th, td { text-align: left; vertical-align: top; padding: 12px 14px; border-bottom: 1px solid var(--line); }
+tbody tr:last-child td { border-bottom: none; }
+th { font-weight: 700; background: var(--lime-soft); }
+tr.me td { background: var(--violet-soft); }
+td.no { color: var(--muted); }
+td.yes { font-weight: 800; color: var(--violet); }
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+.two > div { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 20px; border-radius: 16px; background: var(--bg); }
+ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+/* Diagnostic */
+.proto { background: var(--lime); border-radius: 24px; padding: clamp(20px, 4vw, 40px); display: grid; gap: 18px; }
+.proto .eyebrow { background: var(--ink); color: var(--lime); }
+.quiz { background: var(--card); border-radius: 20px; padding: clamp(18px, 3vw, 32px); display: grid; gap: 20px; box-shadow: 0 2px 0 var(--ink); border: 1px solid var(--ink); }
+.progress { height: 8px; background: var(--violet-soft); border-radius: 999px; overflow: hidden; }
+.progress span { display: block; height: 100%; background: var(--violet); width: 0; transition: width .25s; border-radius: 999px; }
+.q { font-family: var(--display); font-size: 22px; line-height: 1.2; }
+.axis { font-size: 13px; font-weight: 700; color: var(--violet); }
+.answers { display: grid; gap: 10px; }
+.answers button { font: inherit; font-size: 15px; text-align: left; background: var(--card); color: var(--ink); border: 1px solid var(--violet); border-radius: 14px; padding: 14px 16px; cursor: pointer; }
+.answers button:hover { background: var(--violet-soft); }
+.row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+.ghost { font: inherit; font-size: 14px; background: none; border: none; color: var(--violet); text-decoration: underline; cursor: pointer; padding: 0; justify-self: start; }
+.solid { font: inherit; font-size: 15px; font-weight: 700; background: var(--violet); color: #ffffff; border: none; border-radius: 14px; padding: 14px 20px; cursor: pointer; }
+.bars { display: grid; gap: 12px; }
+.bar { display: grid; grid-template-columns: 16ch 1fr 4ch; gap: 12px; align-items: center; font-size: 14px; }
+.bar .track { height: 12px; background: var(--violet-soft); border-radius: 999px; overflow: hidden; }
+.bar .fill { height: 100%; background: var(--violet); border-radius: 999px; }
+.bar .val { font-variant-numeric: tabular-nums; text-align: right; }
+.stage { font-family: var(--display); font-size: 30px; font-weight: 800; line-height: 1.1; }
+.reco { border-top: 1px solid var(--line); padding-top: 16px; display: grid; gap: 8px; }
+.note { font-size: 13px; color: var(--muted); }
+.steps { margin: 0; padding-left: 22px; display: grid; gap: 12px; }
+.steps li::marker { color: var(--violet); font-weight: 800; }
+.me-box { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: end; background: var(--ink); color: #fffdf9; border-color: var(--ink); }
+.me-box .eyebrow { background: var(--mint); color: var(--ink); }
+.me-box a { color: var(--lime); }
+.contact { display: grid; gap: 4px; font-size: 15px; }
+@media (max-width: 640px) {
+  .obs > div { grid-template-columns: 1fr; gap: 4px; }
+  .bar { grid-template-columns: 11ch 1fr 4ch; }
+  .me-box { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .progress span { transition: none; } }
+.wrap.embed{padding:0;gap:0;max-width:none}.wrap.embed .proto{border-radius:0}</style>
+</head>
+<body>
+<main class="wrap embed">
+<section class="proto" aria-labelledby="proto-title">
+    <span class="eyebrow">Prototype de Ryzlane Arsac-Gothière</span>
+    <h2 id="proto-title">Faites le diagnostic</h2>
+    <div class="quiz" id="quiz" aria-live="polite"></div>
+    <p class="note" style="color:var(--ink)">Prototype réalisé avec Claude Code. Les questions et les seuils sont des hypothèses à valider avec vos coachs. Aucune réponse n'est enregistrée.</p>
+  </section>
+</main>
+<script>
+(function () {
+  // Quatre axes, deux questions chacun, réponses notées de 0 à 3.
+  var AXES = {
+    strat: { label: "Stratégie & impact", expertise: "Piloter par l'impact", next: "Formation « Pilotage par l'impact : avec les OKR » (2 jours)", project: "Coaching stratégique" },
+    disc:  { label: "Discovery", expertise: "Lancer un produit", next: "Formation « Product Management : discovery et stratégie » (2 jours)", project: "Projet d'agence" },
+    deliv: { label: "Delivery & équipe", expertise: "Passer à l'échelle", next: "Offre Immersion : un ou une product person dans votre équipe", project: "Projet en régie" },
+    ia:    { label: "IA", expertise: "Intégrer l'IA", next: "Formation « IA : devenir un PM augmenté » (2 jours)", project: "Formation IA" }
+  };
+  var QUESTIONS = [
+    { axis: "strat", q: "Vos priorités produit sont-elles reliées à des objectifs mesurables ?", a: ["Non, on suit surtout une liste de demandes", "En partie, pour quelques sujets", "Oui, avec des objectifs revus chaque trimestre", "Oui, et on arbitre la roadmap avec"] },
+    { axis: "strat", q: "Quand une fonctionnalité sort, savez-vous si elle a eu l'effet attendu ?", a: ["Rarement", "Parfois, à l'intuition", "Oui, pour les plus importantes", "Systématiquement, on mesure avant et après"] },
+    { axis: "disc", q: "À quelle fréquence l'équipe parle-t-elle directement à des utilisateurs ?", a: ["Presque jamais", "Quelques fois par an", "Chaque mois", "Chaque semaine"] },
+    { axis: "disc", q: "Avant de développer, testez-vous l'idée (maquette, prototype, test) ?", a: ["Non, on développe directement", "Pour les gros projets seulement", "Le plus souvent", "Toujours, c'est notre méthode"] },
+    { axis: "deliv", q: "Les rôles produit, design et tech sont-ils clairement répartis ?", a: ["Non, tout le monde fait un peu de tout", "Les rôles existent mais se chevauchent", "Oui, dans la plupart des équipes", "Oui, avec des rituels partagés qui fonctionnent"] },
+    { axis: "deliv", q: "Votre équipe livre-t-elle à un rythme prévisible ?", a: ["Non, les délais glissent souvent", "Ça dépend des périodes", "Plutôt oui", "Oui, et on sait le dire aux métiers"] },
+    { axis: "ia", q: "Où en êtes-vous avec l'IA dans votre produit ?", a: ["Pas encore de sujet", "Des idées, pas de cas d'usage choisi", "Un ou deux cas d'usage en test", "Des fonctionnalités IA en production"] },
+    { axis: "ia", q: "Et dans la façon de travailler de l'équipe produit ?", a: ["Peu ou pas d'usage", "Usages individuels, sans cadre", "Quelques pratiques partagées", "Outils et règles communs, avec formation"] }
+  ];
+  var STAGES = [
+    { max: 8, name: "Fondations", text: "Les bases du produit sont encore à poser : objectifs, contact utilisateur, rôles." },
+    { max: 16, name: "Structuration", text: "Les pratiques existent, mais restent inégales d'une équipe à l'autre." },
+    { max: 24, name: "Accélération", text: "L'équipe est solide : le levier est de passer à l'échelle et d'intégrer l'IA." }
+  ];
+
+  var root = document.getElementById("quiz");
+  var answers = [];
+  var i = 0;
+
+  function el(tag, attrs, text) {
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function renderQuestion() {
+    root.innerHTML = "";
+    var item = QUESTIONS[i];
+    var bar = el("div", { class: "progress", role: "progressbar", "aria-valuemin": "0", "aria-valuemax": String(QUESTIONS.length), "aria-valuenow": String(i) });
+    var fill = el("span"); fill.style.width = (i / QUESTIONS.length * 100) + "%"; bar.appendChild(fill);
+    root.appendChild(bar);
+    root.appendChild(el("span", { class: "axis" }, "Question " + (i + 1) + " sur " + QUESTIONS.length + " · " + AXES[item.axis].label));
+    root.appendChild(el("p", { class: "q" }, item.q));
+    var list = el("div", { class: "answers" });
+    item.a.forEach(function (label, score) {
+      var b = el("button", { type: "button", id: "q" + i + "a" + score }, label);
+      b.addEventListener("click", function () { answers[i] = score; i += 1; i < QUESTIONS.length ? renderQuestion() : renderResult(); });
+      list.appendChild(b);
+    });
+    root.appendChild(list);
+    if (i > 0) {
+      var back = el("button", { type: "button", class: "ghost", id: "back" }, "← Question précédente");
+      back.addEventListener("click", function () { i -= 1; renderQuestion(); });
+      root.appendChild(back);
+    }
+  }
+
+  function renderResult() {
+    root.innerHTML = "";
+    var totals = {}; Object.keys(AXES).forEach(function (k) { totals[k] = 0; });
+    QUESTIONS.forEach(function (q, idx) { totals[q.axis] += answers[idx]; });
+    var total = answers.reduce(function (s, v) { return s + v; }, 0);
+    var stage = STAGES.filter(function (s) { return total <= s.max; })[0];
+    var weakest = Object.keys(totals).sort(function (a, b) { return totals[a] - totals[b]; })[0];
+
+    root.appendChild(el("span", { class: "axis" }, "Votre résultat · " + total + " / 24"));
+    root.appendChild(el("p", { class: "stage" }, "Stade : " + stage.name));
+    root.appendChild(el("p", null, stage.text));
+
+    var bars = el("div", { class: "bars" });
+    Object.keys(AXES).forEach(function (k) {
+      var row = el("div", { class: "bar" });
+      row.appendChild(el("span", null, AXES[k].label));
+      var track = el("div", { class: "track" }); var f = el("div", { class: "fill" });
+      f.style.width = (totals[k] / 6 * 100) + "%"; track.appendChild(f); row.appendChild(track);
+      row.appendChild(el("span", { class: "val" }, totals[k] + "/6"));
+      bars.appendChild(row);
+    });
+    root.appendChild(bars);
+
+    var reco = el("div", { class: "reco" });
+    reco.appendChild(el("span", { class: "axis" }, "Axe à travailler en premier : " + AXES[weakest].label));
+    reco.appendChild(el("p", null, "Expertise Yeita : " + AXES[weakest].expertise));
+    reco.appendChild(el("p", null, "Pour démarrer : " + AXES[weakest].next));
+    root.appendChild(reco);
+
+    var row2 = el("div", { class: "row" });
+    var cta = el("button", { type: "button", class: "solid", id: "cta" }, "Prendre rendez-vous · " + AXES[weakest].project);
+    var msg = el("p", { class: "note", id: "cta-msg" });
+    msg.hidden = true;
+    cta.addEventListener("click", function () { msg.hidden = false; msg.textContent = "Dans la version finale, ce bouton ouvre votre agenda avec le type de projet « " + AXES[weakest].project + " » déjà choisi."; });
+    var again = el("button", { type: "button", class: "ghost", id: "again" }, "Recommencer");
+    again.addEventListener("click", function () { answers = []; i = 0; renderQuestion(); });
+    row2.appendChild(cta); row2.appendChild(again);
+    root.appendChild(row2);
+    root.appendChild(msg);
+  }
+
+  renderQuestion();
+})();
+</script>
+
+</body>
+</html>

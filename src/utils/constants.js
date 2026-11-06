@@ -86,6 +86,13 @@ export const PRODUCT_SECTION = {
   listTitle: "Parcours",
   experiences: [
     {
+      id: 0,
+      role: "Cofondatrice",
+      org: "doted.",
+      period: "depuis 2024",
+      summary: "Une vingtaine d'interviews utilisateurs pour choisir les fonctionnalités et leur mise en avant, gestion de projet et design.",
+    },
+    {
       id: 1,
       role: "Cheffe de produit",
       org: "Flint Media",

@@ -25,9 +25,9 @@ export const FORMSPREE_ENDPOINT = "https://formspree.io/f/YOUR_FORM_ID";
 export const HERO_TEXT = {
   title: "RYZLANE●",
   // Positionnement : identique au titre LinkedIn et au CV
-  role: "Produit & communication digitale",
+  role: "Product Owner · Product Builder",
   baseline: "Un seul cerveau, mille fenêtres",
-  repeatedText: `Bienvenue dans ma tête : c'est un joyeux fouillis. Mon métier, c'est de faire le lien entre ceux qui construisent un produit et ceux qui l'utilisent. J'ai été Product Owner, cheffe de produit, chargée de communication, et je code un peu. Bref, un couteau suisse qui sait où il plante sa lame.`,
+  repeatedText: `Bienvenue dans ma tête : c'est un joyeux fouillis. Mon métier, c'est de faire le lien entre ceux qui construisent un produit et ceux qui l'utilisent. J'ai été Product Owner et cheffe de produit, j'ai cofondé doted., et je prototype mes idées avec l'IA. Bref, un couteau suisse qui sait où il plante sa lame.`,
   // Mettre à null pour masquer le badge de disponibilité
   availability: "Ouverte aux opportunités · Paris, hybride ou à distance",
 };
@@ -109,35 +109,6 @@ export const PRODUCT_SECTION = {
   ],
 };
 
-export const COMMUNITY_SECTION = {
-  id: "communication",
-  title: "Faire parler, faire vivre",
-  description: `Stratégie de contenus, réseaux sociaux, influence : j'aime trouver le bon format pour la bonne audience, de l'idée jusqu'au montage vidéo.`,
-  listTitle: "Parcours",
-  experiences: [
-    {
-      id: 1,
-      role: "Influence Manager & Content Creator",
-      org: "Editions Goutte d'Or",
-      period: "2026",
-      summary: "Stratégie de publication Instagram et LinkedIn, suivi d'influenceurs, vidéos courtes de la captation au montage.",
-    },
-    {
-      id: 2,
-      role: "Brand & Communication",
-      org: "Ignition Program",
-      period: "2022 – 2023",
-      summary: "Animation des réseaux sociaux, articles de blog, analyse des retombées.",
-    },
-    {
-      id: 3,
-      role: "Éditorial",
-      org: "doted.",
-      period: "depuis 2024",
-      summary: "Ligne éditoriale et animation du compte Instagram @hellodoted.",
-    },
-  ],
-};
 
 // ============================================
 // SECTION DESIGN
@@ -233,7 +204,6 @@ export const ENTREPRENEURIAT_SECTION = {
 export const NAV_LINKS = [
   { id: "entrepreneuriat", label: "Entrepreneuriat", href: "#entrepreneuriat" },
   { id: "produit", label: "Produit", href: "#produit" },
-  { id: "communication", label: "Communication", href: "#communication" },
   { id: "design", label: "Design", href: "#design" },
   { id: "developpement", label: "Développement", href: "#developpement" },
   { id: "ecriture", label: "Écriture", href: "#ecriture" },

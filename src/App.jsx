@@ -9,7 +9,7 @@ import DevSkills from './components/DevSkills'
 import WritingSection from './components/WritingSection'
 import PageTransition from './components/PageTransition'
 import FloatingContact from './components/ScrollToTop'
-import { PRODUCT_SECTION, COMMUNITY_SECTION } from './utils/constants'
+import { PRODUCT_SECTION } from './utils/constants'
 
 // Ordre des sections : du plus récent / différenciant au plus secondaire.
 // Garder NAV_LINKS (constants.js) dans le même ordre.
@@ -23,7 +23,6 @@ function App() {
         <PersonalitySection />
         <EntrepreneuriatSection />
         <ExperienceSection data={PRODUCT_SECTION} />
-        <ExperienceSection data={COMMUNITY_SECTION} />
         <DesignSkills />
         <DevSkills />
         <WritingSection />

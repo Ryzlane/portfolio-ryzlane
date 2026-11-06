@@ -27,7 +27,7 @@ export const HERO_TEXT = {
   // Positionnement : identique au titre LinkedIn et au CV
   role: "Product Owner · Product Builder",
   baseline: "Un seul cerveau, mille fenêtres",
-  repeatedText: `Bienvenue dans ma tête : c'est un joyeux fouillis. Mon métier, c'est de faire le lien entre ceux qui construisent un produit et ceux qui l'utilisent. J'ai été Product Owner et cheffe de produit, j'ai cofondé doted., et je prototype mes idées avec l'IA. Bref, un couteau suisse qui sait où il plante sa lame.`,
+  repeatedText: `Bienvenue dans ma tête : c'est un joyeux fouillis. Mon métier, c'est de faire le lien entre ceux qui construisent un produit et ceux qui l'utilisent. J'ai été Product Owner et cheffe de produit, j'ai cofondé doted., et je prototype mes idées avec l'IA. Bref, je parle trois langues : dev, design et utilisateur.`,
   // Mettre à null pour masquer le badge de disponibilité
   availability: "Ouverte aux opportunités · Paris, hybride ou à distance",
 };
@@ -82,7 +82,7 @@ export const SURVEY_AXES = [
 export const PRODUCT_SECTION = {
   id: "produit",
   title: "Du besoin à la mise en ligne",
-  description: `Faire avancer un produit, c'est traduire les besoins des utilisateurs en spécifications claires, prioriser avec l'équipe technique et mesurer ce qui fonctionne. C'est ce que j'ai fait en start-up, souvent avec une casquette de couteau suisse.`,
+  description: `Faire avancer un produit, c'est traduire les besoins des utilisateurs en spécifications claires, prioriser avec l'équipe technique et mesurer ce qui fonctionne. C'est ce que j'ai fait en start-up, et ce que je continue de faire avec doted.`,
   listTitle: "Parcours",
   experiences: [
     {

@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Test JobIRL, résultat immédiat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap">
+<style>
+/* Prototype aux couleurs de JobIRL : bleu marine, cyan, jaune, boutons en bulle. Thème clair, comme leur site. */
+:root {
+  --navy: #1b2888;
+  --cyan: #00cdfd;
+  --yellow: #ffd700;
+  --sky: #def6fe;
+  --white: #ffffff;
+  --muted: #5a6290;
+  --line: #d6dcf2;
+  --font: "Montserrat", Arial, Helvetica, sans-serif;
+  color-scheme: light;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--sky); color: var(--navy); font-family: var(--font); font-size: 15px; line-height: 1.5; }
+[hidden] { display: none !important; }
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 24px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 14px; }
+.tag { justify-self: start; background: var(--navy); color: var(--yellow); font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; }
+.card { background: var(--white); border-radius: 24px; padding: clamp(18px, 4vw, 32px); display: grid; gap: 18px; box-shadow: 0 6px 24px rgba(27, 40, 136, .08); }
+h1, h2 { margin: 0; font-weight: 800; line-height: 1.15; text-wrap: balance; }
+h1 { font-size: clamp(22px, 4vw, 28px); text-align: center; }
+h2 { font-size: 20px; }
+.under { box-shadow: inset 0 -0.35em 0 var(--cyan); }
+p { margin: 0; }
+.progress { height: 8px; background: #ececf2; border-radius: 999px; overflow: hidden; }
+.progress span { display: block; height: 100%; width: 0; background: var(--cyan); transition: width .25s; }
+.count { text-align: center; font-size: 14px; }
+.hint { text-align: center; font-size: 14px; }
+.pair { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.side { display: grid; gap: 12px; align-content: start; }
+.side .label { font-weight: 700; min-height: 3.2em; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.emojis { display: flex; justify-content: center; gap: 6px; }
+.emojis button { font-size: 30px; line-height: 1; background: none; border: 2px solid transparent; border-radius: 999px; padding: 6px; cursor: pointer; }
+.emojis button:hover { border-color: var(--cyan); }
+.bubble { font: inherit; font-weight: 700; font-size: 15px; background: var(--yellow); color: var(--navy); border: none; border-radius: 80px 80px 80px 4px; padding: 13px 22px; cursor: pointer; }
+.bubble.alt { background: var(--white); border: 2px solid var(--navy); }
+.link { font: inherit; font-size: 14px; background: none; border: none; color: var(--navy); text-decoration: underline; cursor: pointer; padding: 0; justify-self: center; }
+button:focus-visible { outline: 3px solid var(--cyan); outline-offset: 2px; }
+.profile { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { background: var(--sky); border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 14px; }
+.chip.main { background: var(--navy); color: var(--white); }
+.jobs { display: grid; gap: 12px; }
+.job { border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 10px; }
+.job .title { font-weight: 800; font-size: 16px; }
+.pro { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; background: var(--sky); border-radius: 14px; padding: 10px 12px; }
+.pro .who { display: flex; gap: 10px; align-items: center; min-width: 0; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--cyan); color: var(--navy); display: grid; place-items: center; font-weight: 800; flex: none; }
+.pro small { display: block; color: var(--muted); font-size: 12px; }
+.small { font-size: 13px; color: var(--muted); }
+.qs { display: grid; gap: 8px; }
+.qs label { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; cursor: pointer; }
+.qs input { margin-top: 3px; accent-color: var(--navy); }
+.preview { background: var(--sky); border-radius: 18px 18px 18px 4px; padding: 14px 16px; white-space: pre-line; }
+.row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; }
+.fake { display: grid; gap: 8px; }
+.fake div { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; color: var(--muted); }
+.note { font-size: 12px; color: var(--muted); text-align: center; }
+@media (max-width: 520px) { .pair { grid-template-columns: 1fr; } .side .label { min-height: 0; } }
+@media (prefers-reduced-motion: reduce) { .progress span { transition: none; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <span class="tag">Prototype de Ryzlane Arsac-Gothière pour JobIRL</span>
+  <div class="card" id="app" aria-live="polite"></div>
+  <p class="note">Version courte (6 questions au lieu de 25) pour montrer le parcours. Métiers et profils de pros donnés à titre d'exemple. Aucune donnée n'est enregistrée.</p>
+</main>
+<script>
+(function () {
+  // Six types RIASEC. Chaque question oppose deux activités, chacune liée à un type.
+  var TYPES = {
+    R: { name: "Réaliste", jobs: ["Technicien·ne de maintenance", "Menuisier·ère", "Mécanicien·ne auto"] },
+    I: { name: "Investigateur", jobs: ["Data analyst", "Technicien·ne de laboratoire", "Ingénieur·e R&D"] },
+    A: { name: "Artistique", jobs: ["UX designer", "Graphiste", "Vidéaste"] },
+    S: { name: "Social", jobs: ["Éducateur·rice spécialisé·e", "Infirmier·ère", "Conseiller·ère d'orientation"] },
+    E: { name: "Entreprenant", jobs: ["Chef·fe de projet", "Commercial·e", "Créateur·rice d'entreprise"] },
+    C: { name: "Conventionnel", jobs: ["Comptable", "Gestionnaire de paie", "Assistant·e RH"] }
+  };
+  var QUESTIONS = [
+    [["Réparer un vélo crevé", "R"], ["Écrire une courte histoire", "A"]],
+    [["Mener une expérience en cours de SVT", "I"], ["Organiser une vente pour le foyer du lycée", "E"]],
+    [["Aider un ami à réviser son contrôle", "S"], ["Ranger et classer les documents d'un projet", "C"]],
+    [["Construire une cabane ou un meuble", "R"], ["Animer un débat en classe", "S"]],
+    [["Dessiner l'affiche d'un événement", "A"], ["Tenir le budget d'une sortie de classe", "C"]],
+    [["Comprendre comment marche une appli", "I"], ["Convaincre des amis de te suivre dans un projet", "E"]]
+  ];
+  var PROS = ["Inès", "Karim", "Léa", "Mamadou", "Chloé", "Yanis"];
+  var QUESTIONS_TO_PRO = [
+    "À quoi ressemble une journée type ?",
+    "Quelles études as-tu faites ?",
+    "Qu'est-ce que tu aimes le moins dans ton métier ?",
+    "Comment as-tu trouvé ton premier stage ?"
+  ];
+  var app = document.getElementById("app");
+  var scores, step, chosenJob, chosenPro;
+
+  function el(tag, attrs, text) {
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function reset() { scores = { R: 0, I: 0, A: 0, S: 0, E: 0, C: 0 }; step = 0; renderQuestion(); }
+
+  function renderQuestion() {
+    app.innerHTML = "";
+    var h = el("h1"); h.appendChild(document.createTextNode("Qui es-")); h.appendChild(el("span", { class: "under" }, "tu ?")); app.appendChild(h);
+    var bar = el("div", { class: "progress" }); var fill = el("span"); fill.style.width = (step / QUESTIONS.length * 100) + "%"; bar.appendChild(fill); app.appendChild(bar);
+    app.appendChild(el("p", { class: "count" }, (step + 1) + " / " + QUESTIONS.length));
+    app.appendChild(el("p", { class: "hint" }, "Choisis l'activité que tu préfères et indique à quel point."));
+    var pair = el("div", { class: "pair" });
+    QUESTIONS[step].forEach(function (opt, sideIdx) {
+      var side = el("div", { class: "side" });
+      side.appendChild(el("p", { class: "label" }, opt[0]));
+      var em = el("div", { class: "emojis" });
+      var faces = sideIdx === 0 ? [["😍", 3], ["😀", 2], ["🙂", 1]] : [["🙂", 1], ["😀", 2], ["😍", 3]];
+      faces.forEach(function (f) {
+        var b = el("button", { type: "button", id: "q" + step + "s" + sideIdx + "v" + f[1], "aria-label": opt[0] + " : intensité " + f[1] + " sur 3" }, f[0]);
+        b.addEventListener("click", function () { scores[opt[1]] += f[1]; step += 1; step < QUESTIONS.length ? renderQuestion() : renderResult(); });
+        em.appendChild(b);
+      });
+      side.appendChild(em); pair.appendChild(side);
+    });
+    app.appendChild(pair);
+  }
+
+  function topTypes() {
+    return Object.keys(scores).sort(function (a, b) { return scores[b] - scores[a]; }).slice(0, 2);
+  }
+
+  function renderResult() {
+    app.innerHTML = "";
+    var top = topTypes();
+    app.appendChild(el("h2", null, "Ton profil est prêt"));
+    var prof = el("div", { class: "profile" });
+    prof.appendChild(el("span", { class: "chip main" }, TYPES[top[0]].name));
+    prof.appendChild(el("span", { class: "chip" }, TYPES[top[1]].name));
+    app.appendChild(prof);
+    app.appendChild(el("p", null, "Voici 3 métiers qui pourraient te plaire, et des pros prêts à t'en parler."));
+    var jobs = el("div", { class: "jobs" });
+    var list = TYPES[top[0]].jobs.slice(0, 2).concat(TYPES[top[1]].jobs.slice(0, 1));
+    list.forEach(function (job, i) {
+      var card = el("div", { class: "job" });
+      card.appendChild(el("p", { class: "title" }, job));
+      var pro = el("div", { class: "pro" });
+      var who = el("div", { class: "who" });
+      var name = PROS[(i + top[0].charCodeAt(0)) % PROS.length];
+      who.appendChild(el("span", { class: "avatar", "aria-hidden": "true" }, name[0]));
+      var txt = el("div"); txt.appendChild(el("span", null, name));
+      txt.appendChild(el("small", null, job + " · profil d'exemple")); who.appendChild(txt);
+      pro.appendChild(who);
+      var b = el("button", { type: "button", class: "bubble", id: "write" + i }, "Écrire à " + name);
+      b.addEventListener("click", function () { chosenJob = job; chosenPro = name; renderMessage(); });
+      pro.appendChild(b); card.appendChild(pro); jobs.appendChild(card);
+    });
+    app.appendChild(jobs);
+    app.appendChild(el("p", { class: "small" }, "Aujourd'hui, ce résultat arrive par email après une préinscription. Ici, il s'affiche tout de suite, et l'inscription n'est demandée qu'au moment d'écrire à un pro."));
+    var again = el("button", { type: "button", class: "link", id: "restart" }, "Refaire le test");
+    again.addEventListener("click", reset); app.appendChild(again);
+  }
+
+  function renderMessage() {
+    app.innerHTML = "";
+    app.appendChild(el("h2", null, "Ton premier message à " + chosenPro));
+    app.appendChild(el("p", null, "Coche jusqu'à 3 questions. On s'occupe de la formule de politesse."));
+    var qs = el("div", { class: "qs" });
+    var preview = el("p", { class: "preview", id: "preview" });
+    function update() {
+      var picked = [].slice.call(qs.querySelectorAll("input:checked")).map(function (i) { return i.value; });
+      [].slice.call(qs.querySelectorAll("input")).forEach(function (i) { i.disabled = !i.checked && picked.length >= 3; });
+      preview.textContent = "Bonjour " + chosenPro + ",\nJ'ai fait le test JobIRL et le métier de " + chosenJob.toLowerCase() + " m'intéresse." +
+        (picked.length ? "\n" + picked.map(function (q) { return "• " + q; }).join("\n") : "\n(choisis tes questions)") + "\nMerci beaucoup !";
+      send.disabled = picked.length === 0;
+    }
+    QUESTIONS_TO_PRO.forEach(function (q, i) {
+      var lab = el("label", { for: "pq" + i });
+      var cb = el("input", { type: "checkbox", id: "pq" + i, value: q });
+      cb.addEventListener("change", update);
+      lab.appendChild(cb); lab.appendChild(el("span", null, q)); qs.appendChild(lab);
+    });
+    app.appendChild(qs);
+    app.appendChild(preview);
+    var row = el("div", { class: "row" });
+    var back = el("button", { type: "button", class: "bubble alt", id: "back" }, "Retour");
+    back.addEventListener("click", renderResult);
+    var send = el("button", { type: "button", class: "bubble", id: "send" }, "Envoyer mon message");
+    send.addEventListener("click", renderSignup);
+    row.appendChild(back); row.appendChild(send); app.appendChild(row);
+    update();
+  }
+
+  function renderSignup() {
+    app.innerHTML = "";
+    app.appendChild(el("h2", null, "Dernière étape pour envoyer ton message"));
+    app.appendChild(el("p", null, "Crée ton compte : " + chosenPro + " pourra te répondre, et tu retrouveras ton profil et tes métiers."));
+    var f = el("div", { class: "fake", "aria-hidden": "true" });
+    ["Ton prénom", "Ton email", "Ton âge"].forEach(function (t) { f.appendChild(el("div", null, t)); });
+    app.appendChild(f);
+    app.appendChild(el("p", { class: "small" }, "Maquette : dans la vraie version, c'est ici que se fait l'inscription. Le jeune a une raison concrète de la faire : son message est prêt."));
+    var row = el("div", { class: "row" });
+    var back = el("button", { type: "button", class: "bubble alt", id: "back2" }, "Retour au message");
+    back.addEventListener("click", renderMessage);
+    var again = el("button", { type: "button", class: "link", id: "restart2" }, "Recommencer le parcours");
+    again.addEventListener("click", reset);
+    row.appendChild(back); row.appendChild(again); app.appendChild(row);
+  }
+
+  reset();
+})();
+</script>
+</body>
+</html>

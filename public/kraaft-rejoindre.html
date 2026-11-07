@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Rejoindre son équipe, prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap">
+<style>
+/* Prototype non officiel, inspiré de l'app mobile Kraaft (Open Sans, bleu #0064ef, fond #f3f3f7).
+   Un écran à la fois dans un cadre de téléphone ; la navigation est gérée par showScreen(). */
+:root {
+  --blue: #0064ef;
+  --blue-btn: #2962e6;
+  --green: #4faa9f;
+  --yellow: #fec627;
+  --bg: #f3f3f7;
+  --card: #ffffff;
+  --ink: #111111;
+  --muted: #6b6b70;
+  --line: #e2e2e8;
+  --font: "Open Sans", Arial, Helvetica, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #e9ebf2; color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.45; }
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; }
+
+.page { max-width: 980px; margin: 0 auto; padding: 20px 16px 32px; display: grid; gap: 20px; justify-items: center; }
+.tag { background: var(--ink); color: var(--yellow); font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; }
+
+/* Cadre de téléphone : pleine largeur sur mobile, cadre visible au-delà */
+.phone { width: 100%; max-width: 390px; height: 760px; max-height: calc(100vh - 90px); min-height: 600px;
+  background: var(--bg); border-radius: 36px; border: 10px solid #1a1a1a; overflow: hidden; position: relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,.18); }
+@media (max-width: 440px) {
+  .page { padding: 12px 0 24px; }
+  .phone { border: 0; border-radius: 0; box-shadow: none; max-height: none; height: calc(100vh - 60px); }
+}
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 28px 20px 20px; overflow-y: auto; }
+.screen.white { background: var(--card); }
+
+.top { display: flex; align-items: center; justify-content: space-between; min-height: 32px; margin-bottom: 8px; }
+.icon-btn { background: none; border: 0; padding: 6px; cursor: pointer; display: inline-flex; border-radius: 10px; }
+.icon-btn:focus-visible, .choice:focus-visible, .btn:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
+
+h1 { font-size: 26px; line-height: 1.2; margin: 0 0 6px; font-weight: 700; }
+.sub { color: var(--muted); margin: 0 0 22px; font-size: 16px; }
+.check { width: 84px; height: 84px; border-radius: 50%; background: var(--green); display: grid; place-items: center; margin: 70px auto 60px; }
+
+.choice { width: 100%; text-align: left; background: var(--card); border: 0; border-radius: 12px; padding: 16px 14px;
+  display: grid; grid-template-columns: 30px 1fr 16px; gap: 12px; align-items: center; cursor: pointer; margin-bottom: 14px; }
+.choice strong { display: block; font-size: 16px; line-height: 1.3; }
+.choice span { color: var(--muted); font-size: 14px; }
+
+.block { background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 14px; }
+.block h2 { font-size: 16px; margin: 0 0 4px; }
+.block p { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+.btn { width: 100%; border: 0; border-radius: 10px; padding: 13px 14px; font-weight: 600; font-size: 15px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn.primary { background: var(--blue-btn); color: #fff; }
+.btn.ghost { background: #eef3fe; color: var(--blue); }
+.btn + .btn { margin-top: 8px; }
+.field { width: 100%; border: 1.5px solid var(--line); border-radius: 10px; padding: 12px; font: inherit; font-size: 14px; margin-bottom: 10px; color: var(--ink); background: #fff; }
+.found { display: flex; gap: 10px; align-items: center; background: #ecf7f5; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-size: 14px; }
+.avatar { width: 36px; height: 36px; border-radius: 50%; background: #e7efff; display: grid; place-items: center; font-size: 18px; flex: none; }
+.help { margin-top: auto; text-align: center; font-size: 13px; color: var(--muted); padding-top: 10px; }
+.help a { color: var(--blue); font-weight: 600; text-decoration: none; }
+
+/* Aperçu du SMS prérempli */
+.sms { background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+.sms .to { font-size: 13px; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 12px; }
+.bubble { margin-left: auto; max-width: 88%; background: #1f8cff; color: #fff; border-radius: 18px 18px 4px 18px; padding: 10px 13px; font-size: 14px; }
+
+/* Liste de conversations d'arrivée */
+.conv { display: flex; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.conv b { display: block; font-size: 15px; }
+.conv small { color: var(--muted); font-size: 13px; }
+.toast { background: var(--ink); color: #fff; border-radius: 12px; padding: 12px 14px; font-size: 14px; margin-bottom: 14px; }
+
+/* Notes de lecture à côté du téléphone */
+.notes { width: 100%; max-width: 390px; background: #fff; border-radius: 14px; padding: 16px; font-size: 14px; }
+.notes h3 { margin: 0 0 6px; font-size: 15px; }
+.notes ol { margin: 0; padding-left: 18px; }
+.notes li { margin-bottom: 6px; }
+.notes .step { font-weight: 700; color: var(--blue); }
+@media (min-width: 900px) {
+  .page { grid-template-columns: 390px 320px; justify-content: center; align-items: start; }
+  .tag { grid-column: 1 / -1; }
+  .notes { position: sticky; top: 20px; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <span class="tag">Prototype non officiel · proposition de Ryzlane Arsac-Gothière pour Kraaft</span>
+
+  <div class="phone" aria-live="polite">
+
+    <!-- Écran 1 : l'écran actuel « Bienvenue sur Kraaft ! » (inchangé) -->
+    <section class="screen" data-screen="welcome">
+      <div class="top"><span aria-hidden="true"></span></div>
+      <div class="check" aria-hidden="true">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+      </div>
+      <h1>Bienvenue sur Kraaft !</h1>
+      <p class="sub">On y est presque</p>
+      <button class="choice" type="button" data-go="welcome" aria-disabled="true" title="Hors du périmètre du prototype">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#e8b31c" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6M16 8.5l1.6 1.6L21 6.7"/></svg>
+        <div><strong>Je suis le/la 1er/1ère à utiliser Kraaft</strong><span>Découvre Kraaft gratuitement et invite ton équipe pour collaborer !</span></div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <button class="choice" type="button" data-go="join">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0064ef" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6 1.6 0 3 .5 4 1.5M15 17h6m-2.5-2.5L21 17l-2.5 2.5"/></svg>
+        <div><strong>Mes collègues utilisent déjà Kraaft</strong><span>Je veux les rejoindre pour échanger avec eux.</span></div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4"><path d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </section>
+
+    <!-- Écran 2 : la proposition, un écran d'action au lieu de l'article d'aide -->
+    <section class="screen" data-screen="join" hidden>
+      <div class="top">
+        <button class="icon-btn" type="button" data-go="welcome" aria-label="Retour">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+      </div>
+      <h1>Rejoindre ton équipe</h1>
+      <p class="sub">Pas besoin de fermer l'app, on s'en occupe ici.</p>
+
+      <div class="block">
+        <h2>🔗 J'ai reçu un lien</h2>
+        <p>Par SMS ou par e-mail, envoyé par un collègue ou par Kraaft.</p>
+        <div data-link-empty>
+          <button class="btn primary" type="button" data-action="paste">Coller mon lien</button>
+        </div>
+        <div data-link-filled hidden>
+          <input class="field" type="text" value="https://kraaft.co/join/chantiers-dupont" aria-label="Lien d'invitation" readonly>
+          <div class="found"><span class="avatar" aria-hidden="true">👷</span><span><b>Chantiers Dupont</b><br>Équipe trouvée · 12 membres</span></div>
+          <button class="btn primary" type="button" data-go="joined">Rejoindre Chantiers Dupont</button>
+        </div>
+      </div>
+
+      <div class="block">
+        <h2>🙋 Je n'ai pas de lien</h2>
+        <p>Ton chef de chantier peut t'ajouter avec ton numéro.</p>
+        <button class="btn ghost" type="button" data-go="ask">Demander à mon chef</button>
+      </div>
+
+      <p class="help">Toujours bloqué ? <a href="tel:0184606468">Appelle-nous au 01 84 60 64 68</a></p>
+    </section>
+
+    <!-- Écran 3 : le SMS prérempli pour le chef -->
+    <section class="screen" data-screen="ask" hidden>
+      <div class="top">
+        <button class="icon-btn" type="button" data-go="join" aria-label="Retour">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg>
+        </button>
+      </div>
+      <h1>Demande à ton chef</h1>
+      <p class="sub">Le message est prêt, tu n'as plus qu'à l'envoyer.</p>
+      <div class="sms">
+        <div class="to">À : ton chef de chantier</div>
+        <div class="bubble">Salut, c'est Riiku. Tu peux m'ajouter dans l'équipe sur Kraaft ? Mon numéro : 06 12 34 56 78. Merci !</div>
+      </div>
+      <button class="btn primary" type="button" data-go="waiting">Envoyer par SMS</button>
+      <button class="btn ghost" type="button" data-go="waiting">Envoyer par WhatsApp</button>
+      <p class="help">Exemple fictif : prénom et numéro remplis à partir du compte.</p>
+    </section>
+
+    <!-- Écran 4 : l'attente, sans cul-de-sac -->
+    <section class="screen" data-screen="waiting" hidden>
+      <div class="top"><span aria-hidden="true"></span></div>
+      <div class="check" aria-hidden="true" style="background:#e7efff">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0064ef" stroke-width="2.2" stroke-linecap="round"><path d="M4 6h16v10H8l-4 3z"/></svg>
+      </div>
+      <h1>Demande envoyée</h1>
+      <p class="sub">Dès que ton chef t'ajoute, tu arrives directement dans ton équipe. On t'envoie une notification.</p>
+      <button class="btn ghost" type="button" data-go="joined">Simuler : mon chef m'a ajouté</button>
+      <p class="help">Pas de réponse ? <a href="#" data-go="ask">Relancer mon chef</a></p>
+    </section>
+
+    <!-- Écran 5 : l'arrivée dans l'équipe -->
+    <section class="screen white" data-screen="joined" hidden>
+      <div class="top"><h1 style="margin:0">Conversations</h1></div>
+      <div class="toast">👋 Bienvenue dans l'équipe Chantiers Dupont !</div>
+      <div class="conv"><span class="avatar" aria-hidden="true">🏠</span><span><b>Tout le monde</b><small>Riiku a rejoint l'équipe</small></span></div>
+      <div class="conv"><span class="avatar" aria-hidden="true">👷</span><span><b>Chantier Rue La Fayette</b><small>Jeanne : Photos du coulage envoyées</small></span></div>
+      <div class="conv"><span class="avatar" aria-hidden="true">🏗️</span><span><b>Résidence Les Tilleuls</b><small>Lucas : Plan mis à jour dans le dossier</small></span></div>
+      <button class="btn ghost" type="button" data-action="restart" style="margin-top:auto">Recommencer le parcours</button>
+    </section>
+  </div>
+
+  <aside class="notes">
+    <h3>Ce que le prototype change</h3>
+    <ol>
+      <li><span class="step">Aujourd'hui :</span> « Mes collègues utilisent déjà Kraaft » ouvre un article d'aide, qui conseille de fermer l'app et de recommencer avec le lien.</li>
+      <li><span class="step">Proposition :</span> un écran d'action. On colle son lien, ou on demande à son chef de l'ajouter, sans quitter l'app.</li>
+      <li><span class="step">Plus de cul-de-sac :</span> la demande au chef est déjà rédigée, et l'attente mène directement à l'équipe.</li>
+    </ol>
+  </aside>
+</main>
+
+<script>
+// Navigation : un seul écran visible à la fois, repéré par data-screen.
+const screens = document.querySelectorAll('[data-screen]');
+function showScreen(name) {
+  screens.forEach((s) => { s.hidden = s.dataset.screen !== name; });
+  const active = document.querySelector(`[data-screen="${name}"]`);
+  if (active) { active.scrollTop = 0; const first = active.querySelector('button, a'); if (first) first.focus({ preventScroll: true }); }
+}
+
+// Réinitialise l'état du bloc « J'ai reçu un lien ».
+function resetLink() {
+  document.querySelector('[data-link-empty]').hidden = false;
+  document.querySelector('[data-link-filled]').hidden = true;
+}
+
+document.addEventListener('click', (event) => {
+  const target = event.target.closest('[data-go], [data-action]');
+  if (!target) return;
+  event.preventDefault();
+  if (target.getAttribute('aria-disabled') === 'true') return;
+
+  const action = target.dataset.action;
+  if (action === 'paste') {
+    // Simule le collage du lien reçu par SMS et la détection de l'équipe.
+    document.querySelector('[data-link-empty]').hidden = true;
+    document.querySelector('[data-link-filled]').hidden = false;
+    return;
+  }
+  if (action === 'restart') { resetLink(); showScreen('welcome'); return; }
+  showScreen(target.dataset.go);
+});
+</script>
+</body>
+</html>

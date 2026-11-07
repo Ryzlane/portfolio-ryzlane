@@ -153,7 +153,6 @@ button.tile { cursor: pointer; }
 .lead { color: var(--teal); font-weight: 800; font-size: 18px; line-height: 1.3; margin: 0 0 12px; }
 ol.steps { margin: 0 0 12px; padding-left: 20px; font-size: 16px; }
 ol.steps li { margin-bottom: 8px; }
-.timer { font-size: 44px; font-weight: 800; text-align: center; color: #0b7f88; margin: 4px 0 10px; font-variant-numeric: tabular-nums; }
 .caution { font-size: 13px; color: #6b4b00; background: var(--cream); border-radius: 12px; padding: 10px 12px; margin: 0; }
 
 /* Notes de lecture */
@@ -299,8 +298,8 @@ ol.steps li { margin-bottom: 8px; }
       <div class="top"><button class="icon-btn" type="button" data-go="bad-3" aria-label="Retour"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2"><path d="M20 12H5m6-6l-6 6 6 6"/></svg></button><span></span></div>
       <div class="saved"><div class="square teal"><span class="ball teal md sad" aria-hidden="true"></span></div><span class="pill">Humeur enregistrée ✓</span></div>
       <h2 class="title">Avant d'aller plus loin</h2>
-      <p class="sub">La colère est forte en ce moment. Faisons-la redescendre, 2 minutes au choix&nbsp;:</p>
-      <button class="tile mint" type="button" data-go="temp"><span class="art" aria-hidden="true">🧊</span><small>Exercice · 2 min</small><b>Température : calmer le corps avec l'eau froide</b></button>
+      <p class="sub">La colère est forte en ce moment. Faisons-la redescendre, au choix&nbsp;:</p>
+      <button class="tile mint" type="button" data-go="temp"><span class="art" aria-hidden="true">🧊</span><small>Exercice · 3 min</small><b>Température : calmer le corps avec l'eau froide</b></button>
       <button class="tile blue" type="button" data-go="accept"><span class="art" aria-hidden="true">🌊</span><small>Exercice · 2 min</small><b>Acceptation radicale : arrêter de lutter</b></button>
       <p class="help">Si vous pensez à vous faire du mal&nbsp;: <a href="tel:3114">appelez le 3114</a>, 24 h/24, gratuit.</p>
     </section>
@@ -308,16 +307,14 @@ ol.steps li { margin-bottom: 8px; }
     <section class="screen" data-screen="temp" hidden>
       <div class="hero mint"><button class="icon-btn" type="button" data-go="bad-4" aria-label="Retour"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2"><path d="M20 12H5m6-6l-6 6 6 6"/></svg></button><span aria-hidden="true">🧊</span></div>
       <h1 class="ex-title">Température</h1>
-      <div class="meta">Exercice · 2 min</div>
-      <p class="lead">Calmer le système nerveux en quelques secondes</p>
+      <div class="meta">Exercice · 3 min</div>
+      <p class="lead">Calmer le système nerveux avec l'eau froide</p>
       <ol class="steps">
-        <li>Passez de l'eau très froide sur votre visage, ou prenez une douche froide.</li>
-        <li>Retenez doucement votre respiration pendant 30 secondes.</li>
+        <li>Prenez une douche froide pendant 2 à 3 minutes, ou passez de l'eau très froide sur votre visage.</li>
+        <li>Concentrez-vous sur la sensation du froid sur votre peau.</li>
         <li>Respirez lentement, en soufflant plus longtemps que vous n'inspirez.</li>
       </ol>
-      <div class="timer" data-timer>0:30</div>
-      <button class="btn small ghost" type="button" data-action="timer">Lancer les 30 secondes</button>
-      <p class="caution" style="margin-top:12px">Déconseillé en cas de problème cardiaque : demandez l'avis d'un médecin.</p>
+      <p class="caution">Déconseillé en cas de problème cardiaque : demandez l'avis d'un médecin.</p>
       <button class="btn push" type="button" data-go="after">J'ai terminé</button>
     </section>
 
@@ -339,7 +336,7 @@ ol.steps li { margin-bottom: 8px; }
       <div class="top"><span></span><span></span></div>
       <div class="saved"><div class="square mint" aria-hidden="true">✌️</div><span class="pill">Activité complétée ✓</span></div>
       <h2 class="title">Bravo d'avoir pris ce temps.</h2>
-      <p class="sub">L'exercice est ajouté à « Mes outils », pour le refaire en 2 minutes la prochaine fois.</p>
+      <p class="sub">L'exercice est ajouté à « Mes outils », pour le refaire en quelques minutes la prochaine fois.</p>
       <div class="tile orange"><span class="art" aria-hidden="true">☂️</span><small>Séance recommandée</small><b>Faire face à un coup de moins bien</b></div>
       <button class="btn push" type="button" data-action="restart">Terminer</button>
     </section>
@@ -359,10 +356,8 @@ ol.steps li { margin-bottom: 8px; }
 // Navigation : un seul écran visible à la fois, repéré par data-screen.
 const screens = document.querySelectorAll('[data-screen]');
 let scenario = 'good';
-let timerId = null;
 
 function showScreen(name) {
-  stopTimer();
   screens.forEach((s) => { s.hidden = s.dataset.screen !== name; });
   const active = document.querySelector(`[data-screen="${name}"]`);
   if (active) {
@@ -371,23 +366,6 @@ function showScreen(name) {
     const title = active.querySelector('h1, h2');
     if (title) { title.setAttribute('tabindex', '-1'); title.focus({ preventScroll: true }); }
   }
-}
-
-// Minuteur de l'exercice Température : 30 secondes, relançable.
-function stopTimer() {
-  if (timerId) { clearInterval(timerId); timerId = null; }
-  const el = document.querySelector('[data-timer]');
-  if (el) el.textContent = '0:30';
-}
-function startTimer() {
-  stopTimer();
-  const el = document.querySelector('[data-timer]');
-  let left = 30;
-  timerId = setInterval(() => {
-    left -= 1;
-    el.textContent = left > 0 ? `0:${String(left).padStart(2, '0')}` : 'C\'est fait ✓';
-    if (left <= 0) { clearInterval(timerId); timerId = null; }
-  }, 1000);
 }
 
 // Remet à zéro les petits états (note ajoutée, habitude cochée).
@@ -418,7 +396,6 @@ document.addEventListener('click', (event) => {
   }
   const action = target.dataset.action;
   if (action === 'note') { document.querySelector('[data-noted]').hidden = false; return; }
-  if (action === 'timer') { startTimer(); return; }
   if (action === 'restart') { setScenario(scenario); return; }
   showScreen(target.dataset.go);
 });

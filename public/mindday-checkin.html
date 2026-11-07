@@ -7,22 +7,27 @@
 <title>Après le check-in, prototype</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;600;700;800&display=swap">
 <style>
-/* Prototype non officiel, inspiré de l'app MindDay (turquoise #18b7c2, orange #ff854f, jaune #ffbf1c).
-   Un écran visible à la fois dans un cadre de téléphone ; navigation gérée par showScreen(). */
+/* Prototype non officiel, calqué sur le check-in d'humeur de l'app MindDay (couleurs relevées sur l'app).
+   Les 3 premiers écrans reproduisent l'existant en statique ; les suivants sont la proposition.
+   Navigation : un écran visible à la fois, géré par showScreen(). */
 :root {
   --teal: #18b7c2;
-  --teal-soft: #bfeaed;
+  --teal-mid: #74d4da;
+  --teal-pale: #bae9ed;
   --teal-bg: #eefafb;
-  --orange: #ff854f;
-  --orange-bg: #ffeee6;
-  --coral: #fe6d73;
   --yellow: #ffbf1c;
-  --cream: #fff4dd;
+  --yellow-mood: #f9da85;
+  --yellow-ball: #f5c148;
+  --yellow-track: #fcedc0;
+  --cream: #fff5dd;
+  --amber: #ffa800;
+  --orange: #ff854f;
+  --coral: #fe6d73;
   --ink: #111111;
   --muted: #6b6f76;
-  --line: #e6e8ec;
+  --line: #e4e6ea;
   --font: "Figtree", Arial, Helvetica, sans-serif;
   color-scheme: light;
 }
@@ -30,90 +35,126 @@
 body { margin: 0; background: #e8eef0; color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.45; }
 [hidden] { display: none !important; }
 button { font: inherit; color: inherit; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--amber); outline-offset: 2px; }
 
-.page { max-width: 980px; margin: 0 auto; padding: 20px 16px 32px; display: grid; gap: 20px; justify-items: center; }
+.page { max-width: 980px; margin: 0 auto; padding: 20px 16px 32px; display: grid; gap: 16px; justify-items: center; }
 .tag { background: var(--ink); color: var(--yellow); font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; text-align: center; }
+.switch { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.switch button { border: 2px solid var(--teal); background: #fff; color: #0b7f88; border-radius: 999px; padding: 8px 16px; font-weight: 700; cursor: pointer; }
+.switch button[aria-pressed="true"] { background: var(--teal); color: #fff; }
 
 /* Cadre de téléphone : pleine largeur sur mobile, cadre visible au-delà */
-.phone { width: 100%; max-width: 390px; height: 780px; max-height: calc(100vh - 90px); min-height: 600px;
+.phone { width: 100%; max-width: 390px; height: 800px; max-height: calc(100vh - 120px); min-height: 620px;
   background: #fff; border-radius: 36px; border: 10px solid #1a1a1a; overflow: hidden; position: relative;
   box-shadow: 0 20px 50px rgba(0,0,0,.18); }
 @media (max-width: 440px) {
   .page { padding: 12px 0 24px; }
-  .phone { border: 0; border-radius: 0; box-shadow: none; max-height: none; height: calc(100vh - 60px); }
+  .phone { border: 0; border-radius: 0; box-shadow: none; max-height: none; height: calc(100vh - 110px); }
 }
-.screen { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 26px 20px 20px; overflow-y: auto; }
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 22px 22px 20px; overflow-y: auto; }
 .screen > * { flex-shrink: 0; }
-.screen.teal { background: var(--teal-bg); }
-
-.top { display: flex; align-items: center; justify-content: space-between; min-height: 32px; margin-bottom: 6px; }
+.top { display: flex; align-items: center; justify-content: space-between; min-height: 34px; }
 .icon-btn { background: none; border: 0; padding: 6px; cursor: pointer; display: inline-flex; border-radius: 10px; }
-button:focus-visible, a:focus-visible { outline: 3px solid var(--yellow); outline-offset: 2px; }
-h1 { font-size: 24px; line-height: 1.2; margin: 0 0 6px; font-weight: 800; }
-h1:focus { outline: none; }
-h2 { font-size: 17px; margin: 0 0 6px; font-weight: 800; }
-.sub { color: var(--muted); margin: 0 0 18px; }
-.center { text-align: center; }
+h1 { margin: 0; }
+h1:focus, h2:focus { outline: none; }
 
-/* Choix du scénario */
-.scenario { width: 100%; text-align: left; border: 2px solid var(--line); background: #fff; border-radius: 18px; padding: 16px;
-  cursor: pointer; display: grid; grid-template-columns: 56px 1fr; gap: 14px; align-items: center; margin-bottom: 14px; }
-.scenario strong { display: block; font-size: 17px; }
-.scenario span { color: var(--muted); font-size: 14px; }
-.ball { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; position: relative; }
-.ball::after { content: ""; width: 18px; height: 9px; border: 3px solid #fff; border-top: 0; border-radius: 0 0 18px 18px; margin-top: 6px; }
-.ball.good { background: var(--yellow); }
-.ball.bad { background: var(--coral); }
-.ball.bad::after { border: 3px solid #fff; border-bottom: 0; border-radius: 18px 18px 0 0; margin-top: 14px; }
-.ball.big { width: 92px; height: 92px; margin: 6px auto 12px; }
-.ball.big::after { width: 30px; height: 14px; }
+/* Boule d'humeur (sourire ou bouche triste) */
+.ball { border-radius: 50%; position: relative; display: grid; place-items: center; }
+.ball::after { content: ""; border: 3px solid #fff; border-top: 0; border-radius: 0 0 40px 40px; }
+.ball.sad::after { border: 3px solid #fff; border-bottom: 0; border-radius: 40px 40px 0 0; }
+.ball.yellow { background: var(--yellow-ball); box-shadow: inset -12px -10px 0 rgba(0,0,0,.06); }
+.ball.teal { background: var(--teal); box-shadow: inset -12px -10px 0 rgba(0,0,0,.08); }
+.ball.lg { width: 150px; height: 150px; }
+.ball.lg::after { width: 34px; height: 12px; margin: -8px 0 0 -10px; }
+.ball.lg.sad::after { width: 52px; height: 20px; margin: -14px 0 0 30px; }
+.ball.md { width: 86px; height: 86px; }
+.ball.md::after { width: 20px; height: 8px; margin-top: -6px; }
+.ball.md.sad::after { width: 32px; height: 12px; margin: -10px 0 0 16px; }
+.ball.sm { width: 76px; height: 76px; }
+.ball.sm::after { width: 18px; height: 7px; margin-top: -6px; }
+.ball.sm.sad::after { width: 28px; height: 11px; margin: -10px 0 0 14px; }
 
-.pill { display: inline-block; background: var(--cream); color: #c98900; font-weight: 700; padding: 6px 14px; border-radius: 999px; margin: 0 auto 14px; }
-.pill.teal { background: var(--teal-soft); color: #0b7f88; }
+/* Écran 1 : humeur, plein écran coloré, curseur figé */
+.mood { color: #fff; text-align: center; }
+.mood.good { background: var(--yellow-mood); }
+.mood.bad { background: var(--teal-mid); }
+.mood h1 { font-weight: 300; font-size: 34px; line-height: 1.15; margin: 10px 0 24px; }
+.halo { width: 220px; height: 210px; border-radius: 48% 52% 46% 54%; margin: 6px auto 18px; display: grid; place-items: center; background: rgba(255,255,255,.22); position: relative; }
+.halo i { position: absolute; width: 10px; height: 10px; border-radius: 50%; background: #fff7df; }
+.mood .value { font-size: 26px; font-weight: 800; margin-bottom: 16px; }
+.track { height: 52px; border-radius: 999px; position: relative; }
+.mood.good .track { background: var(--yellow-track); }
+.mood.bad .track { background: var(--teal-pale); }
+.knob { position: absolute; top: 4px; width: 44px; height: 44px; border-radius: 50%; background: #fff; }
+.ends { display: flex; justify-content: space-between; font-size: 12px; font-weight: 800; margin-top: 10px; letter-spacing: .03em; }
+.frozen { font-size: 12px; opacity: .85; margin-top: 6px; }
 
-/* Cartes */
-.card { border-radius: 18px; padding: 16px; margin-bottom: 14px; background: #fff; border: 1.5px solid var(--line); }
-.card.teal { background: var(--teal-bg); border-color: transparent; }
-.card.cream { background: var(--cream); border-color: transparent; }
-.card.orange { background: var(--orange-bg); border-color: transparent; }
+.btn { width: 100%; border: 0; border-radius: 999px; padding: 16px; font-weight: 800; font-size: 17px; cursor: pointer; color: #fff; background: var(--teal); }
+.btn.yellow { background: var(--yellow-ball); }
+.btn.ghost { background: #fff; color: #0b7f88; border: 2px solid var(--teal-pale); }
+.btn.small { padding: 11px; font-size: 15px; }
+.push { margin-top: auto; padding-top: 14px; }
+
+/* Écrans 2 et 3 : émotions et causes */
+.head { text-align: center; margin: 4px 0 18px; }
+.head .ball { margin: 0 auto 10px; }
+.head .t { font-size: 24px; }
+.head .s { font-size: 18px; color: #333; }
+.q { font-weight: 800; font-size: 17px; margin: 0 0 14px; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip { border: 1.5px solid var(--line); border-radius: 999px; padding: 9px 14px; font-size: 16px; background: #fff; }
+.chip.on-teal { background: var(--teal-pale); border-color: var(--teal-pale); }
+.chip.on-yellow { background: #ffd977; border-color: #ffd977; }
+
+/* Écran proposition : style « Humeur enregistrée » */
+.saved { text-align: center; margin: 6px 0 14px; }
+.square { width: 170px; height: 150px; border-radius: 22px 22px 0 0; margin: 0 auto; display: grid; place-items: center; }
+.square.yellow { background: #ffd977; }
+.square.teal { background: var(--teal-mid); }
+.square.mint { background: var(--teal-pale); font-size: 64px; }
+.pill { display: inline-block; background: var(--cream); color: var(--amber); font-weight: 800; padding: 12px 22px; border-radius: 999px; margin-top: -4px; }
+.title { font-size: 24px; font-weight: 800; text-align: center; margin: 8px 0 4px; }
+.sub { text-align: center; color: #333; font-size: 16px; margin: 0 0 16px; }
+.card { border-radius: 18px; padding: 16px; margin-bottom: 12px; }
+.card.cream { background: var(--cream); }
+.card.line { border: 1.5px solid var(--line); }
 .card p { margin: 0 0 12px; color: #3a3e44; font-size: 14px; }
-.label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; color: #0b7f88; margin-bottom: 6px; display: block; }
-.label.orange { color: #d65a22; }
-
-.btn { width: 100%; border: 0; border-radius: 999px; padding: 14px; font-weight: 800; font-size: 16px; cursor: pointer; background: var(--teal); color: #fff; }
-.btn.orange { background: var(--orange); }
-.btn.ghost { background: #fff; color: #0b7f88; border: 2px solid var(--teal-soft); }
-.btn + .btn { margin-top: 8px; }
-.push { margin-top: auto; padding-top: 12px; }
-
-/* Habitudes */
-.habit { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
-.habit b { font-size: 15px; }
+.label { font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #0b7f88; display: block; margin-bottom: 6px; }
+.done { margin: 10px 0 0 !important; font-weight: 700; color: #0b7f88 !important; }
+.habit { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .toggle { display: flex; gap: 6px; }
-.chip { white-space: nowrap; border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 13px; cursor: pointer; }
-.chip[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff; }
+.tchip { white-space: nowrap; border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font-weight: 700; font-size: 13px; cursor: pointer; }
+.tchip[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff; }
 .week { display: flex; gap: 6px; margin-top: 10px; }
 .week span { width: 30px; height: 30px; border-radius: 50%; border: 2px dashed #c9cdd3; display: grid; place-items: center; font-size: 11px; color: var(--muted); }
-.week span.done { background: var(--teal); border: 0; color: #fff; }
+.week span.ok { background: var(--teal); border: 0; color: #fff; }
 
-/* Exercices */
-.choice { width: 100%; text-align: left; background: #fff; border: 2px solid var(--line); border-radius: 16px; padding: 14px; cursor: pointer;
-  display: grid; grid-template-columns: 44px 1fr; gap: 12px; align-items: center; margin-bottom: 10px; }
-.choice .emoji { font-size: 28px; text-align: center; }
-.choice strong { display: block; font-size: 16px; }
-.choice span { color: var(--muted); font-size: 13px; }
-ol.steps { margin: 0 0 14px; padding-left: 20px; }
-ol.steps li { margin-bottom: 8px; }
-.timer { font-size: 44px; font-weight: 800; text-align: center; color: #0b7f88; margin: 6px 0 10px; font-variant-numeric: tabular-nums; }
-.caution { font-size: 13px; color: #6b4b00; background: var(--cream); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; }
-.help { font-size: 13px; color: var(--muted); text-align: center; margin: 12px 0 0; }
+/* Cartes illustrées, comme « Séance recommandée » dans l'app */
+.tile { border-radius: 20px; overflow: hidden; margin-bottom: 12px; min-height: 150px; display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 16px; color: #fff; position: relative; text-align: left; border: 0; width: 100%; cursor: default; }
+button.tile { cursor: pointer; }
+.tile .art { position: absolute; top: 14px; right: 18px; font-size: 64px; line-height: 1; }
+.tile small { align-self: flex-start; background: #fff; color: var(--teal); font-weight: 800; font-size: 13px; padding: 5px 10px; border-radius: 6px; margin-bottom: 8px; position: relative; }
+.tile b { font-size: 20px; line-height: 1.2; position: relative; text-shadow: 0 1px 6px rgba(0,0,0,.25); }
+.tile.blue { background: linear-gradient(180deg, #bfeaed 0%, #6c9ea4 100%); }
+.tile.orange { background: linear-gradient(180deg, #ff9f73 0%, #b45a35 100%); }
+.tile.yellow { background: linear-gradient(180deg, #ffd35e 0%, #c48a00 100%); }
+.tile.mint { background: linear-gradient(180deg, #74d4da 0%, #157f88 100%); }
+.help { font-size: 13px; color: var(--muted); text-align: center; margin: 4px 0 0; }
 .help a { color: #0b7f88; font-weight: 700; }
 
-.session { border-radius: 18px; overflow: hidden; background: var(--yellow); color: #fff; padding: 18px 16px; margin-bottom: 14px; min-height: 120px;
-  display: flex; flex-direction: column; justify-content: flex-end; }
-.session.orange { background: var(--orange); }
-.session small { background: #fff; color: #0b7f88; font-weight: 800; font-size: 12px; padding: 4px 8px; border-radius: 6px; align-self: flex-start; margin-bottom: 8px; }
-.session b { font-size: 19px; line-height: 1.2; }
+/* Écran exercice : style fiche de séance */
+.hero { margin: -22px -22px 16px; height: 180px; display: grid; place-items: center; font-size: 80px; position: relative; }
+.hero.mint { background: var(--teal-mid); }
+.hero.blue { background: #bfeaed; }
+.hero .icon-btn { position: absolute; top: 18px; left: 14px; }
+.ex-title { font-size: 30px; font-weight: 400; line-height: 1.15; margin: 0 0 4px; }
+.meta { color: var(--muted); font-weight: 700; margin-bottom: 12px; }
+.lead { color: var(--teal); font-weight: 800; font-size: 18px; line-height: 1.3; margin: 0 0 12px; }
+ol.steps { margin: 0 0 12px; padding-left: 20px; font-size: 16px; }
+ol.steps li { margin-bottom: 8px; }
+.timer { font-size: 44px; font-weight: 800; text-align: center; color: #0b7f88; margin: 4px 0 10px; font-variant-numeric: tabular-nums; }
+.caution { font-size: 13px; color: #6b4b00; background: var(--cream); border-radius: 12px; padding: 10px 12px; margin: 0; }
 
 /* Notes de lecture */
 .notes { width: 100%; max-width: 390px; background: #fff; border-radius: 14px; padding: 16px; font-size: 14px; }
@@ -123,7 +164,7 @@ ol.steps li { margin-bottom: 8px; }
 .notes .step { font-weight: 800; color: #0b7f88; }
 @media (min-width: 900px) {
   .page { grid-template-columns: 390px 330px; justify-content: center; align-items: start; }
-  .tag { grid-column: 1 / -1; }
+  .tag, .switch { grid-column: 1 / -1; }
   .notes { position: sticky; top: 20px; }
 }
 </style>
@@ -131,144 +172,186 @@ ol.steps li { margin-bottom: 8px; }
 <body>
 <main class="page">
   <span class="tag">Prototype non officiel · proposition de Ryzlane Arsac-Gothière pour MindDay</span>
+  <div class="switch" role="group" aria-label="Scénario">
+    <button type="button" data-scenario="good" aria-pressed="true">Scénario : Plutôt bien</button>
+    <button type="button" data-scenario="bad" aria-pressed="false">Scénario : Très mal</button>
+  </div>
 
   <div class="phone" aria-live="polite">
 
-    <!-- Écran 0 : choix du scénario de check-in -->
-    <section class="screen" data-screen="start">
-      <div class="top"><span aria-hidden="true"></span></div>
+    <!-- ===== Scénario « Plutôt bien » : écrans existants (statiques) ===== -->
+    <section class="screen mood good" data-screen="good-1">
+      <div class="top"><span></span><span aria-hidden="true">✕</span></div>
       <h1>Comment allez-vous aujourd'hui&nbsp;?</h1>
-      <p class="sub">Choisissez un scénario pour voir ce que l'app propose juste après le check-in.</p>
-      <button class="scenario" type="button" data-go="good">
-        <span class="ball good" aria-hidden="true"></span>
-        <div><strong>Plutôt bien</strong><span>Courage · lié au travail</span></div>
-      </button>
-      <button class="scenario" type="button" data-go="bad">
-        <span class="ball bad" aria-hidden="true"></span>
-        <div><strong>Très mal</strong><span>Colère · lié au travail</span></div>
-      </button>
+      <div class="halo" aria-hidden="true">
+        <i style="top:-18px;left:20px"></i><i style="top:30px;right:-16px"></i><i style="bottom:-8px;left:-14px;width:16px;height:16px"></i><i style="bottom:30px;right:8px;width:7px;height:7px"></i>
+        <span class="ball yellow lg"></span>
+      </div>
+      <div class="value">Plutôt bien</div>
+      <div class="track" aria-hidden="true"><span class="knob" style="left:62%"></span></div>
+      <div class="ends"><span>TRÈS MAL</span><span>TRÈS BIEN</span></div>
+      <button class="btn yellow push" type="button" data-go="good-2">Continuer</button>
     </section>
 
-    <!-- Branche 1 : ça va, on félicite et on ancre -->
-    <section class="screen teal" data-screen="good" hidden>
+    <section class="screen" data-screen="good-2" hidden>
       <div class="top">
-        <button class="icon-btn" type="button" data-go="start" aria-label="Retour">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg>
-        </button>
+        <button class="icon-btn" type="button" data-go="good-1" aria-label="Retour"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2"><path d="M20 12H5m6-6l-6 6 6 6"/></svg></button>
+        <span aria-hidden="true">✕</span>
       </div>
-      <span class="ball good big" aria-hidden="true"></span>
-      <div class="center"><span class="pill">Humeur enregistrée</span></div>
-      <h1 class="center">Une bonne journée, ça se note&nbsp;!</h1>
-      <p class="sub center">Prenez 2 minutes pour l'ancrer.</p>
+      <div class="head"><h1 class="t">Plutôt bien</h1></div>
+      <p class="q">Quelle(s) émotion(s) principale(s) ressentez-vous&nbsp;?</p>
+      <div class="chips">
+        <span class="chip">😁 Bonheur</span><span class="chip">😄 Joie</span><span class="chip">🤩 Optimisme</span>
+        <span class="chip">😍 Passion</span><span class="chip">😎 Fierté</span><span class="chip">🙏 Gratitude</span>
+        <span class="chip on-teal">💪 Courage</span><span class="chip">💆 Apaisement</span><span class="chip">😃 Confiance</span><span class="chip">🙂 Calme</span>
+      </div>
+      <button class="btn push" type="button" data-go="good-3">Continuer</button>
+    </section>
 
+    <section class="screen" data-screen="good-3" hidden>
+      <div class="top">
+        <button class="icon-btn" type="button" data-go="good-2" aria-label="Retour"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2"><path d="M20 12H5m6-6l-6 6 6 6"/></svg></button>
+        <span aria-hidden="true">✕</span>
+      </div>
+      <div class="head"><span class="ball yellow sm" aria-hidden="true"></span><h1 class="t">Plutôt bien</h1><div class="s">Courage</div></div>
+      <p class="q">Savez-vous ce qui vous procure cette ou ces émotions&nbsp;?</p>
+      <div class="chips">
+        <span class="chip">🕊️ Moi-même</span><span class="chip on-yellow">💼 Travail</span><span class="chip">❤️ Amour</span>
+        <span class="chip">👪 Famille</span><span class="chip">🤝 Amis</span><span class="chip">💤 Sommeil</span><span class="chip">🩺 Santé</span>
+        <span class="chip">🏋️ Activité physique</span><span class="chip">💶 Finances</span>
+      </div>
+      <button class="btn push" type="button" data-go="good-4">Continuer</button>
+    </section>
+
+    <!-- ===== Scénario « Plutôt bien » : la proposition ===== -->
+    <section class="screen" data-screen="good-4" hidden>
+      <div class="top"><button class="icon-btn" type="button" data-go="good-3" aria-label="Retour"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2"><path d="M20 12H5m6-6l-6 6 6 6"/></svg></button><span></span></div>
+      <div class="saved"><div class="square yellow"><span class="ball yellow md" aria-hidden="true"></span></div><span class="pill">Humeur enregistrée ✓</span></div>
+      <h2 class="title">Une belle journée&nbsp;!</h2>
+      <p class="sub">Prenez 2 minutes pour l'ancrer.</p>
       <div class="card cream">
-        <span class="label">Ancrer ce qui va bien · 2 min</span>
-        <p>Qu'est-ce qui vous a donné du courage au travail aujourd'hui ? Notez-le dans vos « 5 choses positives ».</p>
-        <button class="btn" type="button" data-action="note">Noter maintenant</button>
-        <p data-noted hidden style="margin:10px 0 0;font-weight:700;color:#0b7f88">✓ Ajouté à vos 5 choses positives</p>
+        <span class="label">5 choses positives · 2 min</span>
+        <p>Qu'est-ce qui vous a donné du courage au travail aujourd'hui&nbsp;?</p>
+        <button class="btn small" type="button" data-action="note">Le noter</button>
+        <p class="done" data-noted hidden>✓ Ajouté à vos 5 choses positives</p>
       </div>
-
-      <div class="card">
+      <div class="card line">
         <span class="label">Votre habitude · choisie à l'inscription</span>
         <div class="habit">
           <b>🏃 Faire plus de sport</b>
           <div class="toggle" role="group" aria-label="Sport aujourd'hui">
-            <button class="chip" type="button" data-habit="yes" aria-pressed="false">Fait</button>
-            <button class="chip" type="button" data-habit="no" aria-pressed="false">Pas encore</button>
+            <button class="tchip" type="button" data-habit="yes" aria-pressed="false">Fait</button>
+            <button class="tchip" type="button" data-habit="no" aria-pressed="false">Pas encore</button>
           </div>
         </div>
-        <div class="week" aria-label="Cette semaine">
-          <span class="done">L</span><span>M</span><span class="done">M</span><span>J</span><span>V</span><span data-today>S</span><span>D</span>
-        </div>
+        <div class="week" aria-label="Cette semaine"><span class="ok">L</span><span>M</span><span class="ok">M</span><span>J</span><span>V</span><span data-today>S</span><span>D</span></div>
       </div>
-
-      <div class="session"><small>Pour garder l'élan</small><b>Développer son optimisme</b></div>
-      <button class="btn ghost push" type="button" data-action="restart">Changer de scénario</button>
+      <div class="tile yellow"><span class="art" aria-hidden="true">✨</span><small>Pour garder l'élan</small><b>Développer son optimisme</b></div>
+      <button class="btn push" type="button" data-action="restart">Terminer</button>
     </section>
 
-    <!-- Branche 2 : émotion forte, d'abord faire redescendre -->
-    <section class="screen" data-screen="bad" hidden>
-      <div class="top">
-        <button class="icon-btn" type="button" data-go="start" aria-label="Retour">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg>
-        </button>
+    <!-- ===== Scénario « Très mal » : écrans existants (statiques) ===== -->
+    <section class="screen mood bad" data-screen="bad-1" hidden>
+      <div class="top"><span></span><span aria-hidden="true">✕</span></div>
+      <h1>Comment vous êtes-vous senti(e)&nbsp;?</h1>
+      <div class="halo" aria-hidden="true">
+        <i style="top:-18px;left:20px"></i><i style="top:30px;right:-16px"></i><i style="bottom:-8px;left:-14px;width:16px;height:16px"></i><i style="bottom:30px;right:8px;width:7px;height:7px"></i>
+        <span class="ball teal lg sad"></span>
       </div>
-      <span class="ball bad big" aria-hidden="true"></span>
-      <div class="center"><span class="pill teal">Humeur enregistrée</span></div>
-      <h1 class="center">C'est une journée difficile.</h1>
-      <p class="sub center">Avant toute séance, faisons redescendre l'émotion. 2 minutes, au choix :</p>
-
-      <button class="choice" type="button" data-go="temp">
-        <span class="emoji" aria-hidden="true">🧊</span>
-        <div><strong>Température</strong><span>L'eau froide calme le corps en quelques secondes</span></div>
-      </button>
-      <button class="choice" type="button" data-go="accept">
-        <span class="emoji" aria-hidden="true">🌊</span>
-        <div><strong>Acceptation radicale</strong><span>Arrêter de lutter contre ce qui est déjà là</span></div>
-      </button>
-
-      <p class="help push">Si vous pensez à vous faire du mal : <a href="tel:3114">appelez le 3114</a>, 24 h/24, gratuit.</p>
+      <div class="value">Très mal</div>
+      <div class="track" aria-hidden="true"><span class="knob" style="left:4px"></span></div>
+      <div class="ends"><span>TRÈS MAL</span><span>TRÈS BIEN</span></div>
+      <button class="btn push" type="button" data-go="bad-2">Continuer</button>
     </section>
 
-    <!-- Exercice : Température -->
-    <section class="screen teal" data-screen="temp" hidden>
+    <section class="screen" data-screen="bad-2" hidden>
       <div class="top">
-        <button class="icon-btn" type="button" data-go="bad" aria-label="Retour">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg>
-        </button>
-        <span class="label" style="margin:0">Exercice TCD · 2 min</span>
+        <button class="icon-btn" type="button" data-go="bad-1" aria-label="Retour"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2"><path d="M20 12H5m6-6l-6 6 6 6"/></svg></button>
+        <span aria-hidden="true">✕</span>
       </div>
-      <h1>🧊 Température</h1>
+      <div class="head"><span class="ball teal sm sad" aria-hidden="true"></span><h1 class="t">Très mal</h1></div>
+      <p class="q">Quelle(s) émotion(s) principale(s) avez-vous ressentie(s)&nbsp;?</p>
+      <div class="chips">
+        <span class="chip">😔 Tristesse</span><span class="chip">😰 Anxiété</span><span class="chip">😱 Peur</span><span class="chip">😤 Frustration</span>
+        <span class="chip">😠 Irritation</span><span class="chip">😵 Épuisement</span><span class="chip">😨 Stress</span><span class="chip">😢 Déception</span>
+        <span class="chip">🙄 Inquiétude</span><span class="chip on-teal">😡 Colère</span><span class="chip">🥺 Solitude</span>
+      </div>
+      <button class="btn push" type="button" data-go="bad-3">Continuer</button>
+    </section>
+
+    <section class="screen" data-screen="bad-3" hidden>
+      <div class="top">
+        <button class="icon-btn" type="button" data-go="bad-2" aria-label="Retour"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2"><path d="M20 12H5m6-6l-6 6 6 6"/></svg></button>
+        <span aria-hidden="true">✕</span>
+      </div>
+      <div class="head"><span class="ball teal sm sad" aria-hidden="true"></span><h1 class="t">Très mal</h1><div class="s">Colère</div></div>
+      <p class="q">Savez-vous ce qui vous a procuré cette / ces émotions&nbsp;?</p>
+      <div class="chips">
+        <span class="chip">🕊️ Moi-même</span><span class="chip on-yellow">💼 Travail</span><span class="chip">❤️ Amour</span>
+        <span class="chip">👪 Famille</span><span class="chip">🤝 Amis</span><span class="chip">💤 Sommeil</span><span class="chip">🩺 Santé</span>
+        <span class="chip">🏋️ Activité physique</span><span class="chip">💶 Finances</span>
+      </div>
+      <button class="btn push" type="button" data-go="bad-4">Continuer</button>
+    </section>
+
+    <!-- ===== Scénario « Très mal » : la proposition ===== -->
+    <section class="screen" data-screen="bad-4" hidden>
+      <div class="top"><button class="icon-btn" type="button" data-go="bad-3" aria-label="Retour"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2"><path d="M20 12H5m6-6l-6 6 6 6"/></svg></button><span></span></div>
+      <div class="saved"><div class="square teal"><span class="ball teal md sad" aria-hidden="true"></span></div><span class="pill">Humeur enregistrée ✓</span></div>
+      <h2 class="title">Avant d'aller plus loin</h2>
+      <p class="sub">La colère est forte en ce moment. Faisons-la redescendre, 2 minutes au choix&nbsp;:</p>
+      <button class="tile mint" type="button" data-go="temp"><span class="art" aria-hidden="true">🧊</span><small>Exercice · 2 min</small><b>Température : calmer le corps avec l'eau froide</b></button>
+      <button class="tile blue" type="button" data-go="accept"><span class="art" aria-hidden="true">🌊</span><small>Exercice · 2 min</small><b>Acceptation radicale : arrêter de lutter</b></button>
+      <p class="help">Si vous pensez à vous faire du mal&nbsp;: <a href="tel:3114">appelez le 3114</a>, 24 h/24, gratuit.</p>
+    </section>
+
+    <section class="screen" data-screen="temp" hidden>
+      <div class="hero mint"><button class="icon-btn" type="button" data-go="bad-4" aria-label="Retour"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2"><path d="M20 12H5m6-6l-6 6 6 6"/></svg></button><span aria-hidden="true">🧊</span></div>
+      <h1 class="ex-title">Température</h1>
+      <div class="meta">Exercice · 2 min</div>
+      <p class="lead">Calmer le système nerveux en quelques secondes</p>
       <ol class="steps">
         <li>Passez de l'eau très froide sur votre visage, ou prenez une douche froide.</li>
         <li>Retenez doucement votre respiration pendant 30 secondes.</li>
         <li>Respirez lentement, en soufflant plus longtemps que vous n'inspirez.</li>
       </ol>
       <div class="timer" data-timer>0:30</div>
-      <button class="btn" type="button" data-action="timer">Lancer les 30 secondes</button>
-      <p class="caution push">Déconseillé en cas de problème cardiaque ou de rythme cardiaque lent : demandez l'avis d'un médecin.</p>
-      <button class="btn orange" type="button" data-go="after">Je me sens un peu plus calme</button>
+      <button class="btn small ghost" type="button" data-action="timer">Lancer les 30 secondes</button>
+      <p class="caution" style="margin-top:12px">Déconseillé en cas de problème cardiaque : demandez l'avis d'un médecin.</p>
+      <button class="btn push" type="button" data-go="after">J'ai terminé</button>
     </section>
 
-    <!-- Exercice : Acceptation radicale -->
-    <section class="screen teal" data-screen="accept" hidden>
-      <div class="top">
-        <button class="icon-btn" type="button" data-go="bad" aria-label="Retour">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.4"><path d="M15 5l-7 7 7 7"/></svg>
-        </button>
-        <span class="label" style="margin:0">Exercice TCD · 2 min</span>
-      </div>
-      <h1>🌊 Acceptation radicale</h1>
+    <section class="screen" data-screen="accept" hidden>
+      <div class="hero blue"><button class="icon-btn" type="button" data-go="bad-4" aria-label="Retour"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2"><path d="M20 12H5m6-6l-6 6 6 6"/></svg></button><span aria-hidden="true">🌊</span></div>
+      <h1 class="ex-title">Acceptation radicale</h1>
+      <div class="meta">Exercice · 2 min</div>
+      <p class="lead">Accepter n'est pas approuver</p>
       <ol class="steps">
         <li>Remarquez ce qui se passe, sans le juger : « je suis en colère ».</li>
-        <li>Dites-vous : « c'est comme ça, en ce moment ». Accepter n'est pas approuver.</li>
+        <li>Dites-vous : « c'est comme ça, en ce moment ».</li>
         <li>Relâchez les épaules, les mains, la mâchoire.</li>
         <li>Choisissez la prochaine petite action, une seule.</li>
       </ol>
-      <button class="btn orange push" type="button" data-go="after">Je me sens un peu plus calme</button>
+      <button class="btn push" type="button" data-go="after">J'ai terminé</button>
     </section>
 
-    <!-- Après l'exercice : la séance vidéo arrive ensuite -->
     <section class="screen" data-screen="after" hidden>
-      <div class="top"><span aria-hidden="true"></span></div>
-      <div class="center"><span class="pill teal">Exercice terminé</span></div>
-      <h1 class="center">Bravo d'avoir pris ce temps.</h1>
-      <p class="sub center">Quand vous serez prêt(e), cette séance peut vous aider à comprendre ce qui s'est passé.</p>
-      <div class="session orange"><small>Séance recommandée · 15 min</small><b>Faire face à un coup de moins bien</b></div>
-      <div class="card">
-        <span class="label orange">Gardez-le sous la main</span>
-        <p>L'exercice est enregistré dans « Mes outils », pour le refaire sans relancer de vidéo.</p>
-      </div>
-      <button class="btn ghost push" type="button" data-action="restart">Changer de scénario</button>
+      <div class="top"><span></span><span></span></div>
+      <div class="saved"><div class="square mint" aria-hidden="true">✌️</div><span class="pill">Activité complétée ✓</span></div>
+      <h2 class="title">Bravo d'avoir pris ce temps.</h2>
+      <p class="sub">L'exercice est ajouté à « Mes outils », pour le refaire en 2 minutes la prochaine fois.</p>
+      <div class="tile orange"><span class="art" aria-hidden="true">☂️</span><small>Séance recommandée</small><b>Faire face à un coup de moins bien</b></div>
+      <button class="btn push" type="button" data-action="restart">Terminer</button>
     </section>
   </div>
 
   <aside class="notes">
-    <h3>Ce que le prototype change</h3>
+    <h3>Comment lire le prototype</h3>
     <ol>
-      <li><span class="step">Aujourd'hui :</span> « Plutôt bien, Courage, Travail » mène à une séance « Réagir face aux discriminations au travail ».</li>
-      <li><span class="step">Si ça va :</span> on félicite, on ancre en 2 minutes et on suit l'habitude choisie à l'inscription.</li>
-      <li><span class="step">Si une émotion est forte :</span> d'abord un exercice TCD de 2 minutes pour faire redescendre, ensuite la séance vidéo.</li>
+      <li><span class="step">Écrans 1 à 3 :</span> le check-in actuel de MindDay, reproduit à l'identique (curseur figé).</li>
+      <li><span class="step">Aujourd'hui, ensuite :</span> « Plutôt bien, Courage, Travail » mène à « Réagir face aux discriminations au travail ».</li>
+      <li><span class="step">Si ça va :</span> on félicite, on ancre en 2 minutes, on suit l'habitude choisie à l'inscription.</li>
+      <li><span class="step">Si l'émotion est forte :</span> d'abord un exercice de TCD lié à l'émotion, ensuite la séance vidéo.</li>
     </ol>
   </aside>
 </main>
@@ -276,6 +359,7 @@ ol.steps li { margin-bottom: 8px; }
 <script>
 // Navigation : un seul écran visible à la fois, repéré par data-screen.
 const screens = document.querySelectorAll('[data-screen]');
+let scenario = 'good';
 let timerId = null;
 
 function showScreen(name) {
@@ -284,8 +368,8 @@ function showScreen(name) {
   const active = document.querySelector(`[data-screen="${name}"]`);
   if (active) {
     active.scrollTop = 0;
-    // Le focus va sur le titre (lecteurs d'écran) sans contour visible sur un bouton.
-    const title = active.querySelector('h1');
+    // Focus sur le titre de l'écran (lecteurs d'écran), sans contour sur un bouton.
+    const title = active.querySelector('h1, h2');
     if (title) { title.setAttribute('tabindex', '-1'); title.focus({ preventScroll: true }); }
   }
 }
@@ -307,28 +391,36 @@ function startTimer() {
   }, 1000);
 }
 
-// Réinitialise les petits états des écrans (note ajoutée, habitude cochée).
+// Remet à zéro les petits états (note ajoutée, habitude cochée).
 function resetState() {
   document.querySelector('[data-noted]').hidden = true;
   document.querySelectorAll('[data-habit]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
-  document.querySelector('[data-today]').classList.remove('done');
+  document.querySelector('[data-today]').classList.remove('ok');
+}
+
+function setScenario(name) {
+  scenario = name;
+  document.querySelectorAll('[data-scenario]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.scenario === name)));
+  resetState();
+  showScreen(`${name}-1`);
 }
 
 document.addEventListener('click', (event) => {
-  const target = event.target.closest('[data-go], [data-action], [data-habit]');
+  const target = event.target.closest('[data-go], [data-action], [data-habit], [data-scenario]');
   if (!target) return;
   event.preventDefault();
 
+  if (target.dataset.scenario) { setScenario(target.dataset.scenario); return; }
   if (target.dataset.habit) {
     const done = target.dataset.habit === 'yes';
     document.querySelectorAll('[data-habit]').forEach((b) => b.setAttribute('aria-pressed', String(b === target)));
-    document.querySelector('[data-today]').classList.toggle('done', done);
+    document.querySelector('[data-today]').classList.toggle('ok', done);
     return;
   }
   const action = target.dataset.action;
   if (action === 'note') { document.querySelector('[data-noted]').hidden = false; return; }
   if (action === 'timer') { startTimer(); return; }
-  if (action === 'restart') { resetState(); showScreen('start'); return; }
+  if (action === 'restart') { setScenario(scenario); return; }
   showScreen(target.dataset.go);
 });
 </script>

@@ -152,6 +152,26 @@ button.item { width: 100%; text-align: left; font: inherit; color: inherit; curs
 .dhero { position: relative; height: 170px; border-radius: 20px; background: var(--peach-2); display: grid; place-items: center; font-size: 76px; margin-bottom: 16px; }
 .dhero .pill { position: absolute; top: 12px; right: 12px; background: #fff; margin: 0; }
 .desc { margin: 0 0 16px; color: #333; }
+.sec { font-family: var(--title); font-weight: 700; font-size: 18px; margin: 18px 0 8px; }
+.near { display: flex; align-items: center; gap: 12px; border: 1.5px solid var(--line); border-radius: 18px; padding: 10px 12px; }
+.near .thumb.sm, .thumb.sm { width: 60px; height: 60px; border-radius: 14px; font-size: 28px; }
+.near-txt { flex: 1; min-width: 0; }
+.near .mini { flex: none; }
+.near-txt b { font-family: var(--title); font-size: 16px; display: block; }
+.near-txt .l { color: #555; font-size: 13px; display: block; }
+.or { text-align: center; color: var(--muted); font-size: 14px; margin: 0; }
+ol.next { margin: 0 0 14px; padding-left: 20px; font-size: 15px; }
+ol.next li { margin-bottom: 6px; }
+ol.next li::marker { color: var(--orange); font-weight: 700; }
+.chat-empty { text-align: center; display: grid; gap: 6px; justify-items: center; margin: 40px 0 0; color: var(--muted); }
+.chat-empty b { color: var(--ink); font-family: var(--title); font-size: 19px; }
+.bubble-ico { width: 84px; height: 84px; border-radius: 50%; background: var(--peach); display: grid; place-items: center; font-size: 34px; margin-bottom: 8px; }
+.starters { display: grid; gap: 8px; justify-items: center; margin-top: 10px; }
+.thread { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.bubble { background: var(--orange); color: #fff; border-radius: 18px 18px 4px 18px; padding: 10px 14px; margin: 0; max-width: 85%; }
+.composer { display: flex; gap: 10px; margin-top: auto; padding: 12px 0 18px; position: sticky; bottom: -18px; background: #fff; }
+.composer input { flex: 1; border: 1.5px solid #d4d4d4; border-radius: 999px; padding: 13px 18px; font-size: 16px; }
+.send { width: 52px; height: 52px; border-radius: 50%; border: 0; background: var(--orange); display: grid; place-items: center; cursor: pointer; flex: none; }
 .mine-msg { background: var(--peach-2); border-radius: 14px; padding: 10px 12px; font-size: 14px; color: #5a4535; margin: 14px 0 0; }
 
 /* Note de lecture, hors maquette */
@@ -175,14 +195,62 @@ button.item { width: 100%; text-align: left; font: inherit; color: inherit; curs
 
   <div class="phone" aria-live="polite">
 
-    <!-- ===== Écran d'entrée : le premier geste suit le choix fait à l'inscription ===== -->
+    <!-- ===== Fin de l'inscription : d'abord ce qui existe près de chez soi, sans obligation de publier ===== -->
     <section class="screen intro" data-screen="start">
-      <div class="confetti" aria-hidden="true">🎉</div>
-      <h1>C'est parti&nbsp;! Proposez un temps de partage</h1>
-      <p>Vous nous avez dit vouloir partager des moments avec vos voisins. Commençons par là&nbsp;: un café, une balade ou une discussion, près de chez vous.</p>
+      <h1 style="margin-top:18px">Bienvenue, Ryzlane&nbsp;! Voici ce qui se passe près de chez vous</h1>
       <div class="from-you">D'après vos réponses à l'inscription&nbsp;: <b>Temps de partage</b> · <b>Mer. soir</b> · <b>Sam. après-midi</b></div>
+
+      <p class="sec">Rejoindre un événement</p>
+      <article class="near">
+        <span class="thumb sm" aria-hidden="true">🎲</span>
+        <span class="near-txt"><b>Goûter et jeux de société</b><span class="l">Sam. 14 nov., 15:00</span><span class="l">Saint-Denis · à 4 km · 10 participants</span></span>
+        <button class="mini" type="button" data-go="joined">Participer</button>
+      </article>
+
+      <p class="sec">Répondre à un voisin</p>
+      <article class="near">
+        <span class="thumb sm" aria-hidden="true">☕</span>
+        <span class="near-txt"><b>Un café pour papoter</b><span class="l">Mer. soir</span><span class="l">Pantin · à 3 km · Nadia M.</span></span>
+        <button class="mini" type="button" data-go="chat">Écrire</button>
+      </article>
+
+      <div class="actions" style="flex-direction:column; gap:6px">
+        <p class="or">Envie de proposer votre propre moment&nbsp;?</p>
+        <button class="btn ghost" type="button" data-go="what">Proposer un temps de partage</button>
+      </div>
+    </section>
+
+    <!-- ===== Participer à un événement ===== -->
+    <section class="screen intro" data-screen="joined" hidden>
+      <div class="confetti" aria-hidden="true">🎉</div>
+      <h1>Vous participez&nbsp;!</h1>
+      <p>Rendez-vous samedi 14 novembre à 15&nbsp;h, à Saint-Denis, pour un goûter et des jeux de société.</p>
+      <p>La discussion de l'événement est ouverte&nbsp;: vous pouvez dire bonjour aux autres participants avant d'y aller.</p>
+      <div class="reassure"><span aria-hidden="true">🙂</span><span>Vous pouvez venir seul·e&nbsp;: c'est tout le principe.</span></div>
       <div class="actions">
-        <button class="btn" type="button" data-go="what">Proposer un temps de partage</button>
+        <button class="btn" type="button" data-go="start">Retour à l'accueil</button>
+      </div>
+    </section>
+
+    <!-- ===== Écrire à un voisin (reprend la nouvelle messagerie de l'app) ===== -->
+    <section class="screen" data-screen="chat" hidden>
+      <div class="dtop" style="border-bottom-color:#e3e3e3">
+        <button class="icon-back" type="button" data-go="start" aria-label="Retour"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff9739" stroke-width="2" stroke-linecap="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg></button>
+        <h1>Nadia M.</h1>
+      </div>
+      <div class="chat-empty" data-chat-empty>
+        <span class="bubble-ico" aria-hidden="true">💬</span>
+        <b>C'est le début de votre échange</b>
+        <span>Pas sûr de quoi dire&nbsp;? Choisissez un sujet pour démarrer.</span>
+        <div class="starters">
+          <button class="chip" type="button" data-starter="Bonjour Nadia ! Votre café de mercredi soir me tente, vous êtes toujours partante ?">Dire bonjour 👋</button>
+          <button class="chip" type="button" data-starter="Bonjour Nadia, je peux venir mercredi soir. Où est-ce qu'on se retrouve ?">Poser une question 💬</button>
+        </div>
+      </div>
+      <div class="thread" data-thread></div>
+      <div class="composer">
+        <input type="text" data-msg placeholder="Écrire un message…" aria-label="Votre message">
+        <button class="send" type="button" data-action="send" aria-label="Envoyer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
       </div>
     </section>
 
@@ -192,11 +260,13 @@ button.item { width: 100%; text-align: left; font: inherit; color: inherit; curs
       <div class="progress"><span style="width:25%"></span></div>
       <p class="step-label">Étape 1 sur 4</p>
       <h1>Que proposez-vous&nbsp;?</h1>
+      <p class="hint">Vos choix d'inscription sont en premier, mais vous pouvez proposer autre chose.</p>
       <div class="options" data-group="activity">
         <button class="option" type="button" data-value="cafe" aria-pressed="false"><span class="ico" aria-hidden="true">☕</span><span><b>Un café</b><span class="sub">Discuter autour d'une boisson</span></span><span class="radio"></span></button>
         <button class="option" type="button" data-value="balade" aria-pressed="false"><span class="ico" aria-hidden="true">🚶</span><span><b>Une balade</b><span class="sub">Marcher et discuter dans le quartier</span></span><span class="radio"></span></button>
         <button class="option" type="button" data-value="jeux" aria-pressed="false"><span class="ico" aria-hidden="true">🎲</span><span><b>Un jeu de société</b><span class="sub">Cartes, dames, jeux simples</span></span><span class="radio"></span></button>
         <button class="option" type="button" data-value="langue" aria-pressed="false"><span class="ico" aria-hidden="true">🗣️</span><span><b>Pratiquer une langue</b><span class="sub">Français, anglais, arabe…</span></span><span class="radio"></span></button>
+        <button class="option" type="button" data-value="service" aria-pressed="false"><span class="ico" aria-hidden="true">🤝</span><span><b>Un service ou un objet</b><span class="sub">Lessive, impression, vêtements…</span></span><span class="radio"></span></button>
       </div>
       <div data-title-block hidden>
         <p class="field-label">Titre <small>modifiable</small></p>
@@ -296,7 +366,7 @@ button.item { width: 100%; text-align: left; font: inherit; color: inherit; curs
       <h1>Aperçu de votre proposition</h1>
       <article class="preview">
         <h2 data-p-title></h2>
-        <span class="pill">Temps de partage</span>
+        <span class="pill" data-p-cat>Temps de partage</span>
         <div class="facts">
           <div class="fact"><span class="i" aria-hidden="true">🗓️</span><span data-p-when></span></div>
           <div class="fact"><span class="i" aria-hidden="true">📍</span><span data-p-where></span></div>
@@ -314,7 +384,28 @@ button.item { width: 100%; text-align: left; font: inherit; color: inherit; curs
       </div>
       <div class="actions">
         <button class="btn ghost" type="button" data-go="describe">Retour</button>
-        <button class="btn" type="button" data-go="list">Publier</button>
+        <button class="btn" type="button" data-go="published">Publier</button>
+      </div>
+    </section>
+
+    <!-- ===== Après publication : ce qui va se passer ===== -->
+    <section class="screen intro" data-screen="published" hidden>
+      <div class="confetti" style="margin:26px 0 16px" aria-hidden="true">🎉</div>
+      <h1>C'est en ligne&nbsp;!</h1>
+      <article class="near" style="margin-bottom:18px">
+        <span class="thumb sm" data-pub-emoji aria-hidden="true">☕</span>
+        <span class="near-txt"><b data-pub-title></b><span class="l" data-pub-when></span><span class="l" data-pub-where></span></span>
+      </article>
+      <p class="field-label">Et maintenant&nbsp;?</p>
+      <ol class="next">
+        <li>Un voisin vous écrit&nbsp;: vous recevez une notification.</li>
+        <li>Vous fixez le jour ensemble dans la messagerie.</li>
+        <li>Vous vous retrouvez dans le lieu public choisi.</li>
+      </ol>
+      <div class="from-you">Pas de message au bout de 7 jours&nbsp;? On vous proposera de préciser votre annonce ou de rejoindre un événement près de chez vous.</div>
+      <div class="actions">
+        <button class="btn ghost" type="button" data-go="list">Voir la liste</button>
+        <button class="btn" type="button" data-go="mine">Mon annonce</button>
       </div>
     </section>
 
@@ -323,7 +414,6 @@ button.item { width: 100%; text-align: left; font: inherit; color: inherit; curs
       <div class="list-head"><h1>Entraide</h1></div>
       <div class="sheet">
         <div class="tabs" aria-hidden="true"><span class="on">Contributions</span><span>Demandes</span><span>Mes annonces</span></div>
-        <div class="done-banner">✓ Votre proposition est en ligne. Vous serez prévenu·e dès qu'un voisin vous écrit.</div>
         <button class="item new" type="button" data-go="mine" aria-label="Voir mon annonce">
           <span class="thumb" data-l-emoji aria-hidden="true">☕</span>
           <span><b data-l-title></b><span class="l" data-l-when></span><span class="l" data-l-where></span><span class="l">Aujourd'hui</span></span>
@@ -350,7 +440,7 @@ button.item { width: 100%; text-align: left; font: inherit; color: inherit; curs
         <h1>Contribution</h1>
       </div>
       <h2 class="dname" data-m-title></h2>
-      <div class="dhero" aria-hidden="true"><span data-m-emoji>☕</span><span class="pill">Temps de partage</span></div>
+      <div class="dhero" aria-hidden="true"><span data-m-emoji>☕</span><span class="pill" data-m-cat>Temps de partage</span></div>
       <div class="facts">
         <div class="fact"><span class="i" aria-hidden="true">🗓️</span><span data-m-when></span></div>
         <div class="fact"><span class="i" aria-hidden="true">📍</span><span data-m-where></span></div>
@@ -374,10 +464,10 @@ button.item { width: 100%; text-align: left; font: inherit; color: inherit; curs
     <span class="nbadge">Note de lecture · hors maquette</span>
     <h3>Ce que le prototype change</h3>
     <ol>
-      <li><span class="step">Le premier geste</span> suit le choix fait à l'inscription&nbsp;: ici, un temps de partage plutôt qu'un objet à donner.</li>
-      <li><span class="step">Étapes 1 à 3</span>&nbsp;: l'annonce se construit avec des choix (quoi, quand, où) au lieu d'une case vide. Les créneaux viennent des disponibilités du profil, et la distance part de «&nbsp;à pied&nbsp;».</li>
-      <li><span class="step">Étape 4</span>&nbsp;: une description est proposée à partir des réponses, modifiable. Une petite liste montre ce que l'annonce dit déjà.</li>
-      <li><span class="step">À la fin</span>&nbsp;: l'annonce publiée, à côté de deux annonces telles qu'elles apparaissent aujourd'hui dans l'app. Touchez la vôtre pour la revoir en détail.</li>
+      <li><span class="step">Après l'inscription</span>, l'app montre d'abord ce qui existe près de chez soi, selon ses choix&nbsp;: un événement à rejoindre, un voisin à qui répondre. Publier reste possible, jamais imposé.</li>
+      <li><span class="step">Si l'on propose soi-même</span>, l'annonce se construit avec des choix (quoi, quand, où) au lieu d'une case vide. Le choix de l'inscription oriente sans enfermer, et la distance part de «&nbsp;à pied&nbsp;».</li>
+      <li><span class="step">Étape 4</span>&nbsp;: une description est proposée à partir des réponses, modifiable.</li>
+      <li><span class="step">Après la publication</span>, un écran explique la suite, y compris ce qui se passe si personne n'écrit au bout de 7 jours.</li>
     </ol>
   </aside>
 </main>
@@ -389,6 +479,7 @@ const ACTIVITIES = {
   balade: { emoji: '🚶', title: 'Une balade dans le quartier', phrase: 'une balade pour discuter', place: 'parc' },
   jeux:   { emoji: '🎲', title: 'Une partie de jeux de société', phrase: 'une partie de jeux de société', place: 'mediatheque' },
   langue: { emoji: '🗣️', title: 'Pratiquer une langue en discutant', phrase: 'un moment pour pratiquer une langue', place: 'cafe' },
+  service: { emoji: '🤝', title: 'Un coup de main', phrase: 'un coup de main (un service ou un objet)', place: 'mediatheque', cat: 'Service ou objet' },
 };
 const SLOTS = {
   'lun-soir':  { short: 'Lun. soir', long: 'le lundi soir' },
@@ -467,6 +558,13 @@ function renderPreview() {
   $('[data-m-where]').textContent = whereShort;
   $('[data-m-distance]').textContent = DISTANCES[state.distance];
   $('[data-m-desc]').textContent = $('[data-desc]').value.trim();
+  const cat = a.cat || 'Temps de partage';
+  $('[data-p-cat]').textContent = cat;
+  $('[data-m-cat]').textContent = cat;
+  $('[data-pub-emoji]').textContent = a.emoji;
+  $('[data-pub-title]').textContent = title;
+  $('[data-pub-when]').textContent = whenShort;
+  $('[data-pub-where]').textContent = whereShort;
 }
 
 function setPressed(groupEl, values) {
@@ -475,7 +573,7 @@ function setPressed(groupEl, values) {
 
 function showScreen(name) {
   if (name === 'describe') $('[data-suggestion]').textContent = suggestion();
-  if (['preview', 'list', 'mine'].includes(name)) renderPreview();
+  if (['preview', 'published', 'list', 'mine'].includes(name)) renderPreview();
   document.querySelectorAll('[data-screen]').forEach((s) => { s.hidden = s.dataset.screen !== name; });
   const active = document.querySelector(`[data-screen="${name}"]`);
   active.scrollTop = 0;
@@ -496,6 +594,9 @@ function restart() {
   $('[data-quartier]').value = 'Bobigny centre';
   $('[data-desc]').value = '';
   $('[data-assist]').hidden = false;
+  $('[data-thread]').innerHTML = '';
+  $('[data-msg]').value = '';
+  $('[data-chat-empty]').hidden = false;
   showScreen('start');
 }
 
@@ -525,6 +626,9 @@ document.addEventListener('click', (event) => {
     return;
   }
 
+  const starter = event.target.closest('[data-starter]');
+  if (starter) { $('[data-msg]').value = starter.dataset.starter; $('[data-msg]').focus(); return; }
+
   const target = event.target.closest('[data-go], [data-action]');
   if (!target || target.disabled) return;
   const action = target.dataset.action;
@@ -533,6 +637,17 @@ document.addEventListener('click', (event) => {
   if (action === 'own') { $('[data-desc]').focus({ preventScroll: true }); return; }
   if (action === 'share') { target.setAttribute('aria-checked', String(target.getAttribute('aria-checked') !== 'true')); return; }
   if (action === 'restart') { restart(); return; }
+  if (action === 'send') {
+    const text = $('[data-msg]').value.trim();
+    if (!text) return;
+    const bubble = document.createElement('p');
+    bubble.className = 'bubble';
+    bubble.textContent = text; // textContent : le texte saisi n'est jamais interprété comme du HTML
+    $('[data-thread]').append(bubble);
+    $('[data-msg]').value = '';
+    $('[data-chat-empty]').hidden = true;
+    return;
+  }
   showScreen(target.dataset.go);
 });
 

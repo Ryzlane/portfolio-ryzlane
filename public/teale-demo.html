@@ -77,21 +77,21 @@ h3:focus { outline: none; }
 .label { font-weight: 700; font-size: 14px; margin: 0 0 8px; display: block; }
 
 .actions { display: flex; gap: 10px; margin-top: 22px; }
-.btn { border: 0; border-radius: 12px; padding: 14px 18px; font-weight: 700; font-size: 16px; cursor: pointer; background: #000; color: #fff; flex: 1; }
+.btn { border: 0; border-radius: 2px; padding: 14px 18px; font-weight: 700; font-size: 16px; cursor: pointer; background: #000; color: #fff; flex: 1; }
 .btn.terra { background: var(--terra); }
 .btn.ghost { background: #fff; color: var(--ink); border: 2px solid var(--line); flex: 0 0 auto; }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
 .error { color: #a1301b; font-size: 14px; margin: 10px 0 0; }
 
 /* Restitution */
-.result { border-radius: 16px; padding: 16px; margin-bottom: 12px; background: var(--pink-soft); }
+.result { border-radius: 14px; padding: 16px; margin-bottom: 12px; background: #fff; border: 1.5px solid #b9cfcb; }
 .result h4 { margin: 0 0 4px; font-size: 16px; }
-.result .name { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--terra-dark); }
+.result .name { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--green); }
 .result p { margin: 6px 0 0; font-size: 14px; }
 .result ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; }
 .expert { display: flex; gap: 12px; align-items: center; background: var(--field); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
 .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font-size: 20px; flex: none; }
-.nohr { border: 2px dashed var(--terra); border-radius: 14px; padding: 12px 14px; font-size: 14px; margin-bottom: 12px; }
+.nohr { border: 1.5px dashed #b9cfcb; border-radius: 14px; padding: 12px 14px; font-size: 14px; margin-bottom: 12px; }
 .fields { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; margin-top: 6px; }
 .fields label { font-size: 13px; font-weight: 500; display: grid; gap: 4px; }
 .fields input { border: 0; background: var(--field); border-radius: 6px; padding: 11px; font: inherit; }
@@ -187,7 +187,7 @@ h3:focus { outline: none; }
         <label>E-mail<input type="email" autocomplete="email"></label>
         <label>Téléphone<input type="tel" autocomplete="tel"></label>
       </div>
-      <div class="actions"><button class="btn ghost" type="button" data-prev="2">Retour</button><button class="btn terra" type="button" data-send>Demander ma démo</button></div>
+      <div class="actions"><button class="btn ghost" type="button" data-prev="2">Retour</button><button class="btn" type="button" data-send>Demander ma démo</button></div>
     </div>
 
     <div data-step="4" hidden>

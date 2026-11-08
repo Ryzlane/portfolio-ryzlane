@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Proposer un temps de partage, prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&display=swap">
+<style>
+/* Prototype non officiel, calqué sur le parcours « Proposer un coup de main » de l'app Entourage
+   (couleurs relevées sur des captures de l'app iOS, novembre 2026).
+   Navigation : un écran visible à la fois, géré par showScreen().
+   Les réponses (activité, créneaux, lieu, distance) sont gardées dans l'objet `state`
+   et servent à pré-remplir le titre, la description et l'aperçu. */
+:root {
+  --orange: #ff9739;
+  --orange-head: #f19d4e;
+  --orange-deep: #e36938;
+  --orange-track: #ffcdae;
+  --peach: #feeae3;
+  --peach-2: #fcf0e8;
+  --cream: #ffeadc;
+  --bg: #fefcfa;
+  --green: #3f9a66;
+  --green-bg: #e4f3ea;
+  --ink: #1f1f1f;
+  --muted: #7d7d7d;
+  --line: #e3e3e3;
+  --title: "Quicksand", "Nunito Sans", Arial, sans-serif;
+  --body: "Nunito Sans", Arial, Helvetica, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #f3ebe4; color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.45; }
+[hidden] { display: none !important; }
+button, input, textarea { font: inherit; color: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--orange-deep); outline-offset: 2px; }
+
+.page { max-width: 980px; margin: 0 auto; padding: 20px 16px 32px; display: grid; gap: 16px; justify-items: center; }
+.tag { background: var(--ink); color: #ffd2a9; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; text-align: center; }
+
+/* Cadre de téléphone : pleine largeur sur mobile, cadre visible au-delà */
+.phone { width: 100%; max-width: 390px; height: 800px; max-height: calc(100vh - 80px); min-height: 640px;
+  background: var(--bg); border-radius: 36px; border: 10px solid #1a1a1a; overflow: hidden; position: relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,.18); }
+@media (max-width: 440px) {
+  .page { padding: 12px 0 24px; }
+  .phone { border: 0; border-radius: 0; box-shadow: none; max-height: none; height: calc(100vh - 70px); }
+}
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 22px 20px 18px; overflow-y: auto; background: #fff; }
+.screen > * { flex-shrink: 0; }
+h1, h2, .title-font { font-family: var(--title); font-weight: 700; }
+h1 { font-size: 27px; line-height: 1.2; margin: 0 0 18px; }
+h1:focus, h2:focus { outline: none; }
+
+/* En-tête d'étape, comme dans l'app : retour rond, barre de progression, « Étape x sur 4 » */
+.back { width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid #d9d9d9; background: #fff; display: grid; place-items: center; cursor: pointer; }
+.progress { height: 5px; border-radius: 99px; background: var(--orange-track); margin: 18px 4px 22px; overflow: hidden; }
+.progress span { display: block; height: 100%; background: var(--orange); border-radius: 99px; }
+.step-label { color: var(--muted); font-size: 15px; margin: 0 0 8px; }
+.hint { color: var(--muted); font-size: 14px; margin: -8px 0 16px; }
+.field-label { font-family: var(--title); font-weight: 700; font-size: 17px; margin: 0 0 4px; }
+.field-label small { font-family: var(--body); font-weight: 400; color: var(--muted); font-size: 14px; margin-left: 6px; }
+.field-help { color: #5c5c5c; font-size: 14px; margin: 0 0 10px; }
+
+/* Cartes d'options (radio / cases), style « Quelle est la catégorie de votre contribution ? » */
+.options { display: grid; gap: 10px; margin-bottom: 18px; }
+.option { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: #fff; border: 1.5px solid var(--line);
+  border-radius: 18px; padding: 12px 14px; cursor: pointer; }
+.option .ico { width: 48px; height: 48px; border-radius: 12px; background: var(--peach); display: grid; place-items: center; font-size: 24px; flex: none; }
+.option b { font-family: var(--title); font-size: 17px; display: block; }
+.option span.sub { color: var(--muted); font-size: 14px; }
+.option .radio { margin-left: auto; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #d4d4d4; flex: none; }
+.option[aria-pressed="true"] { border-color: var(--orange); background: #fffaf6; }
+.option[aria-pressed="true"] .radio { border: 8px solid var(--orange); }
+
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip { border: 1.5px solid #d9d9d9; background: #fff; border-radius: 999px; padding: 9px 15px; font-weight: 600; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--peach); border-color: var(--orange); color: var(--orange-deep); }
+
+.input { width: 100%; border: 1.5px solid #d9d9d9; border-radius: 16px; padding: 14px 16px; font-size: 16px; background: #fff; margin-bottom: 18px; }
+textarea.input { min-height: 150px; resize: vertical; line-height: 1.45; }
+
+.reassure { display: flex; gap: 10px; background: var(--green-bg); color: #24613f; border-radius: 16px; padding: 12px 14px; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+
+/* Boutons : pilules orange, comme « Continuer » / « Retour » */
+.actions { display: flex; gap: 12px; margin-top: auto; padding: 12px 0 18px; position: sticky; bottom: -18px; background: #fff; }
+.btn { flex: 1; border-radius: 999px; padding: 15px 18px; font-family: var(--title); font-weight: 700; font-size: 18px; cursor: pointer; border: 0; background: var(--orange); color: #fff; }
+.btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--orange); }
+.btn[disabled] { background: #ffd8b5; cursor: not-allowed; }
+.link { background: none; border: 0; color: var(--orange-deep); font-weight: 700; text-decoration: underline; cursor: pointer; padding: 8px; }
+
+/* Écran d'entrée : style « C'est parti ! » */
+.intro { text-align: left; }
+.confetti { font-size: 56px; text-align: center; margin: 40px 0 26px; }
+.intro p { color: #3d3d3d; font-size: 16px; margin: 0 0 16px; }
+.from-you { background: var(--peach-2); border-radius: 16px; padding: 12px 14px; font-size: 14px; color: #5a4535; margin-bottom: 8px; }
+.from-you b { color: var(--orange-deep); }
+
+/* Aide à la rédaction */
+.assist { border: 1.5px dashed var(--orange); background: #fffaf6; border-radius: 18px; padding: 14px; margin-bottom: 16px; }
+.assist .label { font-family: var(--title); font-weight: 700; color: var(--orange-deep); font-size: 14px; margin-bottom: 6px; display: block; }
+.assist p { margin: 0 0 12px; font-size: 15px; }
+.assist .row { display: flex; gap: 8px; flex-wrap: wrap; }
+.mini { border-radius: 999px; padding: 7px 12px; font-size: 14px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--orange); background: var(--orange); color: #fff; }
+.mini.ghost { background: #fff; color: var(--orange-deep); }
+.checklist { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 6px; font-size: 14px; }
+.checklist li::before { content: "○"; display: inline-block; width: 22px; color: #b9b9b9; font-weight: 700; }
+.checklist li.ok::before { content: "✓"; color: var(--green); }
+.counter { text-align: right; color: var(--muted); font-size: 13px; margin: -12px 0 12px; }
+
+/* Aperçu de l'annonce */
+.preview { border: 1.5px solid var(--line); border-radius: 20px; padding: 16px; margin-bottom: 14px; }
+.preview h2 { font-size: 22px; margin: 0 0 10px; }
+.pill { display: inline-block; background: var(--peach); color: var(--orange); font-family: var(--title); font-weight: 700; padding: 6px 14px; border-radius: 999px; font-size: 15px; margin-bottom: 12px; }
+.facts { display: grid; gap: 8px; margin: 0 0 12px; }
+.fact { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; }
+.fact .i { width: 22px; text-align: center; }
+.preview .desc { margin: 0 0 14px; color: #333; }
+.author { display: flex; gap: 12px; align-items: center; border-top: 1px solid var(--line); padding-top: 12px; }
+.avatar { width: 46px; height: 46px; border-radius: 50%; background: var(--peach); display: grid; place-items: center; font-size: 22px; flex: none; }
+.author small { color: var(--muted); display: block; }
+.badge-charte { display: inline-block; background: var(--green-bg); color: #24613f; font-size: 12px; font-weight: 700; border-radius: 99px; padding: 2px 8px; margin-top: 4px; }
+.share { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--peach-2); border-radius: 16px; padding: 12px 14px; margin-bottom: 8px; font-size: 14px; }
+.switch-btn { width: 50px; height: 30px; border-radius: 99px; border: 0; background: #d4d4d4; position: relative; cursor: pointer; flex: none; }
+.switch-btn::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: left .15s; }
+.switch-btn[aria-checked="true"] { background: var(--orange); }
+.switch-btn[aria-checked="true"]::after { left: 23px; }
+
+/* Liste « Entraide » (reproduit l'écran existant) */
+.list-head { background: var(--orange-head); margin: -22px -20px 0; padding: 34px 20px 54px; color: #fff; border-bottom-right-radius: 140px 60px; }
+.list-head h1 { color: #fff; margin: 0; font-size: 32px; }
+.sheet { background: var(--bg); margin: -28px -20px 0; border-radius: 28px 28px 0 0; padding: 14px 20px 0; flex: 1; }
+.tabs { display: flex; border-bottom: 1.5px solid #d9d9d9; margin-bottom: 6px; }
+.tabs span { flex: 1; text-align: center; padding: 10px 0; color: #b5b5b5; font-weight: 600; font-family: var(--title); }
+.tabs span.on { color: var(--orange); border-bottom: 3px solid var(--orange); margin-bottom: -1.5px; }
+.done-banner { background: var(--green-bg); color: #24613f; border-radius: 14px; padding: 10px 12px; font-size: 14px; font-weight: 700; margin: 10px 0 6px; }
+.item { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f0e6df; }
+.thumb { width: 92px; height: 92px; border-radius: 18px; background: var(--peach-2); display: grid; place-items: center; font-size: 38px; flex: none; }
+.item b { font-family: var(--title); font-size: 18px; display: block; margin-bottom: 4px; }
+.item .l { color: #555; font-size: 14px; display: block; }
+.item.new { background: #fffaf6; border: 1.5px solid var(--orange); border-radius: 18px; padding: 12px; margin: 6px 0; }
+.item.new .l { color: #3a3a3a; }
+
+/* Note de lecture, hors maquette */
+.notes { width: 100%; max-width: 390px; background: #fff; border: 2px solid var(--orange); border-radius: 16px; padding: 16px 18px; font-size: 14px; }
+.notes .nbadge { display: inline-block; background: var(--orange); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; }
+.notes h3 { margin: 0 0 6px; font-family: var(--title); font-size: 17px; color: var(--orange-deep); }
+.notes ol { margin: 6px 0 0; padding-left: 18px; }
+.notes li { margin-bottom: 8px; }
+.notes li::marker { color: var(--orange); font-weight: 700; }
+.notes .step { font-weight: 700; }
+@media (min-width: 900px) {
+  .page { grid-template-columns: 390px 330px; justify-content: center; align-items: start; }
+  .tag { grid-column: 1 / -1; }
+  .notes { position: sticky; top: 20px; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <span class="tag">Prototype non officiel · proposition de Ryzlane Arsac-Gothière pour Entourage</span>
+
+  <div class="phone" aria-live="polite">
+
+    <!-- ===== Écran d'entrée : le premier geste suit le choix fait à l'inscription ===== -->
+    <section class="screen intro" data-screen="start">
+      <div class="confetti" aria-hidden="true">🎉</div>
+      <h1>C'est parti&nbsp;! Proposez un temps de partage</h1>
+      <p>Vous nous avez dit vouloir partager des moments avec vos voisins. Commençons par là&nbsp;: un café, une balade ou une discussion, près de chez vous.</p>
+      <div class="from-you">D'après vos réponses à l'inscription&nbsp;: <b>Temps de partage</b> · <b>Mer. soir</b> · <b>Sam. après-midi</b></div>
+      <div class="actions">
+        <button class="btn" type="button" data-go="what">Proposer un temps de partage</button>
+      </div>
+    </section>
+
+    <!-- ===== Étape 1 : quoi ===== -->
+    <section class="screen" data-screen="what" hidden>
+      <button class="back" type="button" data-go="start" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="progress"><span style="width:25%"></span></div>
+      <p class="step-label">Étape 1 sur 4</p>
+      <h1>Que proposez-vous&nbsp;?</h1>
+      <div class="options" data-group="activity">
+        <button class="option" type="button" data-value="cafe" aria-pressed="false"><span class="ico" aria-hidden="true">☕</span><span><b>Un café</b><span class="sub">Discuter autour d'une boisson</span></span><span class="radio"></span></button>
+        <button class="option" type="button" data-value="balade" aria-pressed="false"><span class="ico" aria-hidden="true">🚶</span><span><b>Une balade</b><span class="sub">Marcher et discuter dans le quartier</span></span><span class="radio"></span></button>
+        <button class="option" type="button" data-value="jeux" aria-pressed="false"><span class="ico" aria-hidden="true">🎲</span><span><b>Un jeu de société</b><span class="sub">Cartes, dames, jeux simples</span></span><span class="radio"></span></button>
+        <button class="option" type="button" data-value="langue" aria-pressed="false"><span class="ico" aria-hidden="true">🗣️</span><span><b>Pratiquer une langue</b><span class="sub">Français, anglais, arabe…</span></span><span class="radio"></span></button>
+      </div>
+      <div data-title-block hidden>
+        <p class="field-label">Titre <small>modifiable</small></p>
+        <input class="input" type="text" data-title maxlength="60" aria-label="Titre de votre proposition">
+      </div>
+      <div class="actions">
+        <button class="btn ghost" type="button" data-go="start">Retour</button>
+        <button class="btn" type="button" data-go="when" data-need="activity" disabled>Continuer</button>
+      </div>
+    </section>
+
+    <!-- ===== Étape 2 : quand ===== -->
+    <section class="screen" data-screen="when" hidden>
+      <button class="back" type="button" data-go="what" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="progress"><span style="width:50%"></span></div>
+      <p class="step-label">Étape 2 sur 4</p>
+      <h1>Quand êtes-vous disponible&nbsp;?</h1>
+      <p class="hint">Pré-rempli avec les disponibilités de votre profil.</p>
+      <div class="chips" data-group="slots">
+        <button class="chip" type="button" data-value="lun-soir" aria-pressed="false">Lun. soir</button>
+        <button class="chip" type="button" data-value="mer-soir" aria-pressed="true">Mer. soir</button>
+        <button class="chip" type="button" data-value="jeu-aprem" aria-pressed="false">Jeu. après-midi</button>
+        <button class="chip" type="button" data-value="sam-matin" aria-pressed="false">Sam. matin</button>
+        <button class="chip" type="button" data-value="sam-aprem" aria-pressed="true">Sam. après-midi</button>
+        <button class="chip" type="button" data-value="dim-aprem" aria-pressed="false">Dim. après-midi</button>
+      </div>
+      <div class="reassure"><span aria-hidden="true">💡</span><span>Un créneau précis aide un voisin à se projeter&nbsp;: il sait tout de suite s'il peut venir.</span></div>
+      <div class="actions">
+        <button class="btn ghost" type="button" data-go="what">Retour</button>
+        <button class="btn" type="button" data-go="where" data-need="slots">Continuer</button>
+      </div>
+    </section>
+
+    <!-- ===== Étape 3 : où, et à quelle distance ===== -->
+    <section class="screen" data-screen="where" hidden>
+      <button class="back" type="button" data-go="when" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="progress"><span style="width:75%"></span></div>
+      <p class="step-label">Étape 3 sur 4</p>
+      <h1>Où vous retrouver&nbsp;?</h1>
+      <p class="field-label">Votre quartier</p>
+      <input class="input" type="text" data-quartier value="Bobigny centre" aria-label="Votre quartier">
+      <p class="field-label">Dans un lieu public</p>
+      <div class="chips" data-group="place">
+        <button class="chip" type="button" data-value="cafe" aria-pressed="false">☕ Un café</button>
+        <button class="chip" type="button" data-value="parc" aria-pressed="false">🌳 Un parc</button>
+        <button class="chip" type="button" data-value="mediatheque" aria-pressed="false">📚 La médiathèque</button>
+        <button class="chip" type="button" data-value="marche" aria-pressed="false">🧺 Le marché</button>
+      </div>
+      <p class="field-label">Jusqu'où êtes-vous prêt·e à aller&nbsp;?</p>
+      <div class="chips" data-group="distance">
+        <button class="chip" type="button" data-value="pied" aria-pressed="true">À pied · 2 km</button>
+        <button class="chip" type="button" data-value="transports" aria-pressed="false">En transports · 10 km</button>
+        <button class="chip" type="button" data-value="loin" aria-pressed="false">Plus loin · 40 km</button>
+      </div>
+      <div class="reassure"><span aria-hidden="true">🔒</span><span>Votre adresse n'est jamais partagée. On se retrouve toujours dans un lieu public.</span></div>
+      <div class="actions">
+        <button class="btn ghost" type="button" data-go="when">Retour</button>
+        <button class="btn" type="button" data-go="describe" data-need="place">Continuer</button>
+      </div>
+    </section>
+
+    <!-- ===== Étape 4 : description, avec une aide à la rédaction ===== -->
+    <section class="screen" data-screen="describe" hidden>
+      <button class="back" type="button" data-go="where" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="progress"><span style="width:100%"></span></div>
+      <p class="step-label">Étape 4 sur 4</p>
+      <h1>Présentez votre proposition</h1>
+      <div class="assist" data-assist>
+        <span class="label">✨ Suggestion à partir de vos réponses</span>
+        <p data-suggestion></p>
+        <div class="row">
+          <button class="mini" type="button" data-action="use">Utiliser ce texte</button>
+          <button class="mini ghost" type="button" data-action="own">Écrire moi-même</button>
+        </div>
+      </div>
+      <p class="field-label">Description</p>
+      <textarea class="input" data-desc maxlength="900" placeholder="Exemple : Je propose une balade dans le parc ce week-end pour discuter et se détendre." aria-label="Description"></textarea>
+      <p class="counter"><span data-count>0</span> / 900</p>
+      <p class="field-label">Votre annonce dit…</p>
+      <ul class="checklist">
+        <li class="ok">ce que vous proposez</li>
+        <li class="ok">quand</li>
+        <li class="ok">où, dans un lieu public</li>
+        <li data-check-me>un mot sur vous</li>
+      </ul>
+      <div class="actions">
+        <button class="btn ghost" type="button" data-go="where">Retour</button>
+        <button class="btn" type="button" data-go="preview" data-need="desc" disabled>Continuer</button>
+      </div>
+    </section>
+
+    <!-- ===== Aperçu ===== -->
+    <section class="screen" data-screen="preview" hidden>
+      <button class="back" type="button" data-go="describe" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="progress"><span style="width:100%"></span></div>
+      <p class="step-label">Dernière étape</p>
+      <h1>Aperçu de votre proposition</h1>
+      <article class="preview">
+        <h2 data-p-title></h2>
+        <span class="pill">Temps de partage</span>
+        <div class="facts">
+          <div class="fact"><span class="i" aria-hidden="true">🗓️</span><span data-p-when></span></div>
+          <div class="fact"><span class="i" aria-hidden="true">📍</span><span data-p-where></span></div>
+          <div class="fact"><span class="i" aria-hidden="true">🚶</span><span data-p-distance></span></div>
+        </div>
+        <p class="desc" data-p-desc></p>
+        <div class="author">
+          <span class="avatar" aria-hidden="true">🙂</span>
+          <span><b>Ryzlane A.</b><small>Membre depuis 11/2026</small><span class="badge-charte">✓ A lu la charte éthique</span></span>
+        </div>
+      </article>
+      <div class="share">
+        <span>Partager aussi dans le groupe <b>Voisins de Bobigny</b></span>
+        <button class="switch-btn" type="button" role="switch" aria-checked="true" aria-label="Partager dans le groupe Voisins de Bobigny" data-action="share"></button>
+      </div>
+      <div class="actions">
+        <button class="btn ghost" type="button" data-go="describe">Retour</button>
+        <button class="btn" type="button" data-go="list">Publier</button>
+      </div>
+    </section>
+
+    <!-- ===== Liste Entraide : la nouvelle annonce à côté des annonces actuelles ===== -->
+    <section class="screen" data-screen="list" hidden>
+      <div class="list-head"><h1>Entraide</h1></div>
+      <div class="sheet">
+        <div class="tabs" aria-hidden="true"><span class="on">Contributions</span><span>Demandes</span><span>Mes annonces</span></div>
+        <div class="done-banner">✓ Votre proposition est en ligne. Vous serez prévenu·e dès qu'un voisin vous écrit.</div>
+        <div class="item new">
+          <span class="thumb" data-l-emoji aria-hidden="true">☕</span>
+          <span><b data-l-title></b><span class="l" data-l-when></span><span class="l" data-l-where></span><span class="l">Aujourd'hui</span></span>
+        </div>
+        <div class="item">
+          <span class="thumb" aria-hidden="true">🎁</span>
+          <span><b>Partage</b><span class="l">À 9 km de moi</span><span class="l">La Courneuve (93120)</span><span class="l">Aujourd'hui</span></span>
+        </div>
+        <div class="item">
+          <span class="thumb" aria-hidden="true">🎁</span>
+          <span><b>Café et discussions</b><span class="l">À 40 km de moi</span><span class="l">Boissise-la-Bertrand (77350)</span><span class="l">Hier</span></span>
+        </div>
+        <div style="text-align:center; padding:16px 0 8px">
+          <button class="btn" type="button" data-action="restart" style="flex:none; padding:12px 26px; font-size:16px">Recommencer</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <aside class="notes">
+    <span class="nbadge">Note de lecture · hors maquette</span>
+    <h3>Ce que le prototype change</h3>
+    <ol>
+      <li><span class="step">Le premier geste</span> suit le choix fait à l'inscription&nbsp;: ici, un temps de partage plutôt qu'un objet à donner.</li>
+      <li><span class="step">Étapes 1 à 3</span>&nbsp;: l'annonce se construit avec des choix (quoi, quand, où) au lieu d'une case vide. Les créneaux viennent des disponibilités du profil, et la distance part de «&nbsp;à pied&nbsp;».</li>
+      <li><span class="step">Étape 4</span>&nbsp;: une description est proposée à partir des réponses, modifiable. Une petite liste montre ce que l'annonce dit déjà.</li>
+      <li><span class="step">À la fin</span>&nbsp;: l'annonce publiée, à côté de deux annonces telles qu'elles apparaissent aujourd'hui dans l'app.</li>
+    </ol>
+  </aside>
+</main>
+
+<script>
+// ---------- Données du prototype ----------
+const ACTIVITIES = {
+  cafe:   { emoji: '☕', title: 'Un café pour discuter', phrase: 'de partager un moment autour d\'une boisson', place: 'cafe' },
+  balade: { emoji: '🚶', title: 'Une balade dans le quartier', phrase: 'une balade pour discuter', place: 'parc' },
+  jeux:   { emoji: '🎲', title: 'Une partie de jeux de société', phrase: 'une partie de jeux de société', place: 'mediatheque' },
+  langue: { emoji: '🗣️', title: 'Pratiquer une langue en discutant', phrase: 'un moment pour pratiquer une langue', place: 'cafe' },
+};
+const SLOTS = {
+  'lun-soir':  { short: 'Lun. soir', long: 'le lundi soir' },
+  'mer-soir':  { short: 'Mer. soir', long: 'le mercredi soir' },
+  'jeu-aprem': { short: 'Jeu. après-midi', long: 'le jeudi après-midi' },
+  'sam-matin': { short: 'Sam. matin', long: 'le samedi matin' },
+  'sam-aprem': { short: 'Sam. après-midi', long: 'le samedi après-midi' },
+  'dim-aprem': { short: 'Dim. après-midi', long: "le dimanche après-midi" },
+};
+const PLACES = {
+  cafe:        { short: 'Un café', phrase: 'dans un café du coin' },
+  parc:        { short: 'Un parc', phrase: 'dans un parc' },
+  mediatheque: { short: 'La médiathèque', phrase: 'à la médiathèque' },
+  marche:      { short: 'Le marché', phrase: 'au marché' },
+};
+const DISTANCES = {
+  pied:       'À pied, moins de 2 km',
+  transports: 'En transports, moins de 10 km',
+  loin:       "Jusqu'à 40 km",
+};
+
+// ---------- État ----------
+const initialState = () => ({ activity: null, slots: ['mer-soir', 'sam-aprem'], place: null, distance: 'pied' });
+let state = initialState();
+const $ = (sel) => document.querySelector(sel);
+
+// Joint une liste en français : « a », « a ou b », « a, b ou c ».
+function joinOr(items) {
+  if (items.length <= 1) return items.join('');
+  return `${items.slice(0, -1).join(', ')} ou ${items[items.length - 1]}`;
+}
+function quartier() { return ($('[data-quartier]').value || '').trim() || 'mon quartier'; }
+
+// Description suggérée, construite uniquement à partir des réponses.
+function suggestion() {
+  const a = ACTIVITIES[state.activity];
+  const when = joinOr(state.slots.map((s) => SLOTS[s].long));
+  const where = PLACES[state.place]?.phrase || 'dans un lieu public';
+  return `Je vous propose ${a.phrase} ${when}, ${where}, côté ${quartier()}. `
+    + "L'idée : faire connaissance entre voisins, sans prise de tête. "
+    + "Je m'appelle Ryzlane, je viens d'arriver sur Entourage. Écrivez-moi pour qu'on fixe le jour !";
+}
+
+// ---------- Rendu ----------
+function refreshButtons() {
+  const desc = $('[data-desc]').value.trim();
+  const ready = {
+    activity: !!state.activity && $('[data-title]').value.trim().length > 0,
+    slots: state.slots.length > 0,
+    place: !!state.place,
+    desc: desc.length >= 20,
+  };
+  document.querySelectorAll('[data-need]').forEach((b) => { b.disabled = !ready[b.dataset.need]; });
+  $('[data-count]').textContent = String($('[data-desc]').value.length);
+  // « Un mot sur vous » : coché si la description parle à la première personne.
+  $('[data-check-me]').classList.toggle('ok', /\b(je|j'|j’|moi|m'appelle)\b/i.test(desc));
+}
+
+function renderPreview() {
+  const a = ACTIVITIES[state.activity];
+  const title = $('[data-title]').value.trim();
+  const whenShort = state.slots.map((s) => SLOTS[s].short).join(' · ');
+  const whereShort = `${PLACES[state.place].short} · ${quartier()}`;
+  $('[data-p-title]').textContent = title;
+  $('[data-p-when]').textContent = whenShort;
+  $('[data-p-where]').textContent = whereShort;
+  $('[data-p-distance]').textContent = DISTANCES[state.distance];
+  $('[data-p-desc]').textContent = $('[data-desc]').value.trim();
+  $('[data-l-emoji]').textContent = a.emoji;
+  $('[data-l-title]').textContent = title;
+  $('[data-l-when]').textContent = whenShort;
+  $('[data-l-where]').textContent = `${PLACES[state.place].short} · ${quartier()} · à pied`;
+}
+
+function setPressed(groupEl, values) {
+  groupEl.querySelectorAll('[data-value]').forEach((b) => b.setAttribute('aria-pressed', String(values.includes(b.dataset.value))));
+}
+
+function showScreen(name) {
+  if (name === 'describe') $('[data-suggestion]').textContent = suggestion();
+  if (name === 'preview' || name === 'list') renderPreview();
+  document.querySelectorAll('[data-screen]').forEach((s) => { s.hidden = s.dataset.screen !== name; });
+  const active = document.querySelector(`[data-screen="${name}"]`);
+  active.scrollTop = 0;
+  // Focus sur le titre de l'écran (lecteurs d'écran), sans contour sur un bouton.
+  const h = active.querySelector('h1');
+  if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+  refreshButtons();
+}
+
+function restart() {
+  state = initialState();
+  setPressed($('[data-group="activity"]'), []);
+  setPressed($('[data-group="slots"]'), state.slots);
+  setPressed($('[data-group="place"]'), []);
+  setPressed($('[data-group="distance"]'), [state.distance]);
+  $('[data-title]').value = '';
+  $('[data-title-block]').hidden = true;
+  $('[data-quartier]').value = 'Bobigny centre';
+  $('[data-desc]').value = '';
+  $('[data-assist]').hidden = false;
+  showScreen('start');
+}
+
+// ---------- Interactions ----------
+document.addEventListener('click', (event) => {
+  const option = event.target.closest('[data-group] [data-value]');
+  if (option) {
+    const group = option.closest('[data-group]');
+    const key = group.dataset.group;
+    const value = option.dataset.value;
+    if (key === 'slots') {
+      // Plusieurs créneaux possibles
+      state.slots = state.slots.includes(value) ? state.slots.filter((v) => v !== value) : [...state.slots, value];
+      setPressed(group, state.slots);
+    } else {
+      state[key] = value;
+      setPressed(group, [value]);
+      if (key === 'activity') {
+        // Titre et lieu pré-remplis selon l'activité, toujours modifiables
+        $('[data-title]').value = ACTIVITIES[value].title;
+        $('[data-title-block]').hidden = false;
+        state.place = ACTIVITIES[value].place;
+        setPressed($('[data-group="place"]'), [state.place]);
+      }
+    }
+    refreshButtons();
+    return;
+  }
+
+  const target = event.target.closest('[data-go], [data-action]');
+  if (!target || target.disabled) return;
+  const action = target.dataset.action;
+  if (action === 'use') { $('[data-desc]').value = suggestion(); refreshButtons(); return; }
+  if (action === 'own') { $('[data-assist]').hidden = true; $('[data-desc]').focus(); return; }
+  if (action === 'share') { target.setAttribute('aria-checked', String(target.getAttribute('aria-checked') !== 'true')); return; }
+  if (action === 'restart') { restart(); return; }
+  showScreen(target.dataset.go);
+});
+
+document.addEventListener('input', refreshButtons);
+restart();
+</script>
+</body>
+</html>

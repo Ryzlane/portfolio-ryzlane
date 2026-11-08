@@ -9,11 +9,13 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito+Sans:wght@400;600;700&display=swap">
 <style>
-/* Prototype non officiel, calqué sur le parcours « Proposer un coup de main » de l'app Entourage
-   (couleurs relevées sur des captures de l'app iOS, novembre 2026).
-   Navigation : un écran visible à la fois, géré par showScreen().
-   Les réponses (activité, créneaux, lieu, distance) sont gardées dans l'objet `state`
-   et servent à pré-remplir le titre, la description et l'aperçu. */
+/* Prototype non officiel du parcours « Créer une contribution » de l'app Entourage.
+   Les écrans existants (liste Entraide, menu « + », « Avant de commencer », barre d'onglets,
+   illustrations et icônes) reprennent l'app : les visuels du dossier entourage/ sont découpés
+   dans des captures de l'app iOS (novembre 2026). Seul le formulaire (étapes 1 à 4) et l'écran
+   après publication sont des propositions.
+   Navigation : un écran visible à la fois, géré par showScreen(). Les réponses sont gardées dans
+   `state` et servent à pré-remplir le titre, la description et l'aperçu. */
 :root {
   --orange: #ff9739;
   --orange-head: #f19d4e;
@@ -21,7 +23,6 @@
   --orange-track: #ffcdae;
   --peach: #feeae3;
   --peach-2: #fcf0e8;
-  --cream: #ffeadc;
   --bg: #fefcfa;
   --green: #3f9a66;
   --green-bg: #e4f3ea;
@@ -35,8 +36,10 @@
 * { box-sizing: border-box; }
 body { margin: 0; background: #f3ebe4; color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.45; }
 [hidden] { display: none !important; }
+img { display: block; max-width: 100%; }
 button, input, textarea { font: inherit; color: inherit; }
-button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--orange-deep); outline-offset: 2px; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--orange-deep); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 .page { max-width: 980px; margin: 0 auto; padding: 20px 16px 32px; display: grid; gap: 16px; justify-items: center; }
 .tag { background: var(--ink); color: #ffd2a9; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; text-align: center; }
@@ -51,180 +54,42 @@ button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visib
 }
 .screen { position: absolute; inset: 0; display: flex; flex-direction: column; padding: 22px 20px 18px; overflow-y: auto; background: #fff; }
 .screen > * { flex-shrink: 0; }
-h1, h2, .title-font { font-family: var(--title); font-weight: 700; }
+h1, h2 { font-family: var(--title); font-weight: 700; }
 h1 { font-size: 27px; line-height: 1.2; margin: 0 0 18px; }
 h1:focus, h2:focus { outline: none; }
 
-/* En-tête d'étape, comme dans l'app : retour rond, barre de progression, « Étape x sur 4 » */
-.back { width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid #d9d9d9; background: #fff; display: grid; place-items: center; cursor: pointer; }
-.progress { height: 5px; border-radius: 99px; background: var(--orange-track); margin: 18px 4px 22px; overflow: hidden; }
-.progress span { display: block; height: 100%; background: var(--orange); border-radius: 99px; }
-.step-label { color: var(--muted); font-size: 15px; margin: 0 0 8px; }
-.hint { color: var(--muted); font-size: 14px; margin: -8px 0 16px; }
-.field-label { font-family: var(--title); font-weight: 700; font-size: 17px; margin: 0 0 4px; }
-.field-label small { font-family: var(--body); font-weight: 400; color: var(--muted); font-size: 14px; margin-left: 6px; }
-.field-help { color: #5c5c5c; font-size: 14px; margin: 0 0 10px; }
-
-/* Cartes d'options (radio / cases), style « Quelle est la catégorie de votre contribution ? » */
-.options { display: grid; gap: 10px; margin-bottom: 18px; }
-.option { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: #fff; border: 1.5px solid var(--line);
-  border-radius: 18px; padding: 12px 14px; cursor: pointer; }
-.option .ico { width: 48px; height: 48px; border-radius: 12px; background: var(--peach); display: grid; place-items: center; font-size: 24px; flex: none; }
-.option b { font-family: var(--title); font-size: 17px; display: block; }
-.option span.sub { color: var(--muted); font-size: 14px; }
-.option .radio { margin-left: auto; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #d4d4d4; flex: none; }
-.option[aria-pressed="true"] { border-color: var(--orange); background: #fffaf6; }
-.option[aria-pressed="true"] .radio { border: 8px solid var(--orange); }
-
-.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-.chip { border: 1.5px solid #d9d9d9; background: #fff; border-radius: 999px; padding: 9px 15px; font-weight: 600; cursor: pointer; }
-.chip[aria-pressed="true"] { background: var(--peach); border-color: var(--orange); color: var(--orange-deep); }
-
-.input { width: 100%; border: 1.5px solid #d9d9d9; border-radius: 16px; padding: 14px 16px; font-size: 16px; background: #fff; margin-bottom: 18px; }
-textarea.input { min-height: 150px; resize: vertical; line-height: 1.45; }
-
-.reassure { display: flex; gap: 10px; background: var(--green-bg); color: #24613f; border-radius: 16px; padding: 12px 14px; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
-
-/* Boutons : pilules orange, comme « Continuer » / « Retour » */
-.actions { display: flex; gap: 12px; margin-top: auto; padding: 12px 0 18px; position: sticky; bottom: -18px; background: #fff; }
-.btn { flex: 1; border-radius: 999px; padding: 15px 18px; font-family: var(--title); font-weight: 700; font-size: 18px; cursor: pointer; border: 0; background: var(--orange); color: #fff; }
-.btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--orange); }
-.btn[disabled] { background: #ffd8b5; cursor: not-allowed; }
-.link { background: none; border: 0; color: var(--orange-deep); font-weight: 700; text-decoration: underline; cursor: pointer; padding: 8px; }
-
-/* Écran d'entrée : style « C'est parti ! » */
-.intro { text-align: left; }
-.confetti { font-size: 56px; text-align: center; margin: 40px 0 26px; }
-.intro p { color: #3d3d3d; font-size: 16px; margin: 0 0 16px; }
-.from-you { background: var(--peach-2); border-radius: 16px; padding: 12px 14px; font-size: 14px; color: #5a4535; margin-bottom: 8px; }
-.from-you b { color: var(--orange-deep); }
-
-/* Aide à la rédaction */
-.assist { border: 1.5px dashed var(--orange); background: #fffaf6; border-radius: 18px; padding: 14px; margin-bottom: 16px; }
-.assist .label { font-family: var(--title); font-weight: 700; color: var(--orange-deep); font-size: 14px; margin-bottom: 6px; display: block; }
-.assist p { margin: 0 0 12px; font-size: 15px; }
-.assist .row { display: flex; gap: 8px; flex-wrap: wrap; }
-.mini { border-radius: 999px; padding: 7px 12px; font-size: 14px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--orange); background: var(--orange); color: #fff; }
-.mini.ghost { background: #fff; color: var(--orange-deep); }
-.checklist { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 6px; font-size: 14px; }
-.checklist li::before { content: "○"; display: inline-block; width: 22px; color: #b9b9b9; font-weight: 700; }
-.checklist li.ok::before { content: "✓"; color: var(--green); }
-.counter { text-align: right; color: var(--muted); font-size: 13px; margin: -12px 0 12px; }
-
-/* Aperçu de l'annonce */
-.preview { border: 1.5px solid var(--line); border-radius: 20px; padding: 16px; margin-bottom: 14px; }
-.preview h2 { font-size: 22px; margin: 0 0 10px; }
-.pill { display: inline-block; background: var(--peach); color: var(--orange); font-family: var(--title); font-weight: 700; padding: 6px 14px; border-radius: 999px; font-size: 15px; margin-bottom: 12px; }
-.facts { display: grid; gap: 8px; margin: 0 0 12px; }
-.fact { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; }
-.fact .i { width: 22px; text-align: center; }
-.preview .desc { margin: 0 0 14px; color: #333; }
-.author { display: flex; gap: 12px; align-items: center; border-top: 1px solid var(--line); padding-top: 12px; }
-.avatar { width: 46px; height: 46px; border-radius: 50%; background: var(--peach); display: grid; place-items: center; font-size: 22px; flex: none; }
-.author small { color: var(--muted); display: block; }
-.badge-charte { display: inline-block; background: var(--green-bg); color: #24613f; font-size: 12px; font-weight: 700; border-radius: 99px; padding: 2px 8px; margin-top: 4px; }
-.share { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--peach-2); border-radius: 16px; padding: 12px 14px; margin-bottom: 8px; font-size: 14px; }
-.switch-btn { width: 50px; height: 30px; border-radius: 99px; border: 0; background: #d4d4d4; position: relative; cursor: pointer; flex: none; }
-.switch-btn::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: left .15s; }
-.switch-btn[aria-checked="true"] { background: var(--orange); }
-.switch-btn[aria-checked="true"]::after { left: 23px; }
-
-/* Liste « Entraide » (reproduit l'écran existant) */
-.list-head { background: var(--orange-head); margin: -22px -20px 0; padding: 34px 20px 54px; color: #fff; border-bottom-right-radius: 140px 60px; }
-.list-head h1 { color: #fff; margin: 0; font-size: 32px; }
-.sheet { background: var(--bg); margin: -28px -20px 0; border-radius: 28px 28px 0 0; padding: 14px 20px 0; flex: 1; }
-.tabs { display: flex; border-bottom: 1.5px solid #d9d9d9; margin-bottom: 6px; }
-.tabs span { flex: 1; text-align: center; padding: 10px 0; color: #b5b5b5; font-weight: 600; font-family: var(--title); }
-.tabs span.on { color: var(--orange); border-bottom: 3px solid var(--orange); margin-bottom: -1.5px; }
-.done-banner { background: var(--green-bg); color: #24613f; border-radius: 14px; padding: 10px 12px; font-size: 14px; font-weight: 700; margin: 10px 0 6px; }
-.item { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f0e6df; }
-.thumb { width: 92px; height: 92px; border-radius: 18px; background: var(--peach-2); display: grid; place-items: center; font-size: 38px; flex: none; }
-.item b { font-family: var(--title); font-size: 18px; display: block; margin-bottom: 4px; }
-.item .l { color: #555; font-size: 14px; display: block; }
-.item.new { background: #fffaf6; border: 1.5px solid var(--orange); border-radius: 18px; padding: 12px; margin: 6px 0; }
-.item.new .l { color: #3a3a3a; }
-button.item { width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; align-items: center; }
+/* ---------- Liste Entraide (reprise de l'app) ---------- */
+.list { background: var(--bg); padding: 0 0 12px; }
+.list-header { width: 100%; }
+.list-body { padding: 0 20px; flex: 1; }
+.tabs { display: flex; border-bottom: 1.5px solid #d9d9d9; margin: 0 0 4px; }
+.tabs span { flex: 1; text-align: center; padding: 8px 0 10px; color: #b5b5b5; font-weight: 600; font-family: var(--title); font-size: 15px; }
+.tabs span.on { color: var(--orange-head); border-bottom: 3px solid var(--orange-head); margin-bottom: -1.5px; }
+.item { display: flex; gap: 16px; padding: 14px 0; border-bottom: 1px solid #f3e9e1; align-items: center; }
+.item .thumb { width: 92px; height: 92px; border-radius: 18px; flex: none; object-fit: cover; }
+.item b { font-family: var(--title); font-size: 18px; line-height: 1.25; display: block; margin-bottom: 4px; }
+.meta { display: flex; align-items: center; gap: 8px; color: #555; font-size: 14px; }
+.meta img { width: 16px; height: 17px; flex: none; }
+.item.new { background: #fffaf6; border: 1.5px solid var(--orange); border-radius: 18px; padding: 12px; margin: 10px 0 4px; width: 100%; text-align: left; cursor: pointer; }
 .item .chev { margin-left: auto; font-size: 30px; color: var(--orange); line-height: 1; }
-.dtop { display: flex; align-items: center; gap: 14px; border-bottom: 1.5px solid var(--orange); padding: 6px 0 14px; margin-bottom: 18px; }
-.dtop h1 { font-size: 22px; margin: 0; }
-.icon-back { background: none; border: 0; padding: 4px; cursor: pointer; display: grid; place-items: center; }
-.dname { font-size: 22px; margin: 0 0 12px; }
-.dhero { position: relative; height: 170px; border-radius: 20px; background: var(--peach-2); display: grid; place-items: center; font-size: 76px; margin-bottom: 16px; }
-.dhero .pill { position: absolute; top: 12px; right: 12px; background: #fff; margin: 0; }
-.desc { margin: 0 0 16px; color: #333; }
-.sec { font-family: var(--title); font-weight: 700; font-size: 18px; margin: 18px 0 8px; }
-.near { display: flex; align-items: center; gap: 12px; border: 1.5px solid var(--line); border-radius: 18px; padding: 10px 12px; }
-.near .thumb.sm, .thumb.sm { width: 60px; height: 60px; border-radius: 14px; font-size: 28px; }
-.near-txt { flex: 1; min-width: 0; }
-.near .mini { flex: none; }
-.near-txt b { font-family: var(--title); font-size: 16px; display: block; }
-.near-txt .l { color: #555; font-size: 13px; display: block; }
-.or { text-align: center; color: var(--muted); font-size: 14px; margin: 0; }
-ol.next { margin: 0 0 14px; padding-left: 20px; font-size: 15px; }
-ol.next li { margin-bottom: 6px; }
-ol.next li::marker { color: var(--orange); font-weight: 700; }
-.chat-empty { text-align: center; display: grid; gap: 6px; justify-items: center; margin: 40px 0 0; color: var(--muted); }
-.chat-empty b { color: var(--ink); font-family: var(--title); font-size: 19px; }
-.bubble-ico { width: 84px; height: 84px; border-radius: 50%; background: var(--peach); display: grid; place-items: center; font-size: 34px; margin-bottom: 8px; }
-.starters { display: grid; gap: 8px; justify-items: center; margin-top: 10px; }
-.thread { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-.bubble { background: var(--orange); color: #fff; border-radius: 18px 18px 4px 18px; padding: 10px 14px; margin: 0; max-width: 85%; }
-.composer { display: flex; gap: 10px; margin-top: auto; padding: 12px 0 18px; position: sticky; bottom: -18px; background: #fff; }
-.composer input { flex: 1; border: 1.5px solid #d4d4d4; border-radius: 999px; padding: 13px 18px; font-size: 16px; }
-.send { width: 52px; height: 52px; border-radius: 50%; border: 0; background: var(--orange); display: grid; place-items: center; cursor: pointer; flex: none; }
-.home { padding-bottom: 0; }
-.home-head { background: var(--orange-head); margin: -22px -20px 0; padding: 22px 20px 56px; color: #fff; display: grid; grid-template-columns: 52px 1fr 52px; align-items: center; text-align: center; border-bottom-right-radius: 160px 70px; }
-.hh-avatar { width: 48px; height: 48px; border-radius: 50%; background: #fbe3d3; position: relative; overflow: hidden; }
-.hh-avatar::before { content: ""; position: absolute; left: 15px; top: 9px; width: 18px; height: 18px; border-radius: 50%; background: #e8773a; }
-.hh-avatar::after { content: ""; position: absolute; left: 7px; top: 30px; width: 34px; height: 30px; border-radius: 50%; background: #e8773a; }
-.hh-logo { font-family: var(--title); font-weight: 600; font-size: 32px; letter-spacing: .02em; }
-.hh-bell { width: 48px; height: 48px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-size: 20px; }
-.hh-tag { grid-column: 1 / -1; font-family: var(--title); font-weight: 600; font-size: 15px; margin-top: 4px; }
-.home-sheet { background: var(--bg); margin: -30px -20px 0; border-radius: 30px 30px 0 0; padding: 22px 20px 10px; }
-.wtitle { display: flex; justify-content: space-between; align-items: center; }
-.wtitle h1 { font-size: 23px; margin: 0; }
-.wbars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 16px 0 10px; }
-.wbars span { height: 7px; border-radius: 99px; background: #fbe3d3; }
-.wsub { color: var(--muted); margin: 0 0 12px; font-size: 14px; }
-.wcard { border: 2px solid #f6a65a; border-radius: 22px; padding: 14px 14px 10px; margin-bottom: 12px; background: #fff; }
-.wrow { display: grid; grid-template-columns: 48px 1fr auto; gap: 10px; align-items: start; }
-.wico { width: 48px; height: 48px; border-radius: 50%; background: var(--peach); display: grid; place-items: center; font-size: 20px; }
-.wrow b { font-family: var(--title); font-size: 16px; line-height: 1.3; }
-.todo { background: var(--peach); color: var(--orange); font-family: var(--title); font-weight: 700; font-size: 13px; border-radius: 99px; padding: 4px 10px; white-space: nowrap; }
-.wcard p { color: var(--muted); font-size: 14px; margin: 6px 0 12px 58px; }
-.wbtn { display: block; width: 100%; text-align: center; border: 2px solid #f6a65a; color: var(--orange); background: #fff; border-radius: 999px; padding: 11px; font-family: var(--title); font-weight: 700; font-size: 16px; }
-button.wbtn { cursor: pointer; }
-.wbtn.full { background: var(--orange-head); border-color: var(--orange-head); color: #fff; }
-.wskip { display: block; text-align: center; color: var(--muted); text-decoration: underline; font-size: 14px; margin-top: 8px; }
-.hsec { font-size: 20px; margin: 22px 0 10px; }
-.hcard { border: 1.5px solid #f3e4d8; border-radius: 20px; padding: 14px; background: #fff; display: grid; gap: 4px; }
-.hc-who { display: flex; gap: 10px; align-items: center; margin-bottom: 4px; }
-.hc-who b { display: block; font-family: var(--title); }
-.pill.sm { font-size: 12px; padding: 3px 10px; margin: 2px 0 0; justify-self: start; }
-.hc-title { font-family: var(--title); font-size: 17px; }
-.hcard p { margin: 0; color: #555; font-size: 14px; }
-.hcard .l { color: #555; font-size: 14px; }
-.hc-foot { display: flex; justify-content: space-between; align-items: center; color: var(--orange); font-size: 14px; margin-top: 6px; }
-.ev-img { height: 110px; border-radius: 14px; background: var(--peach-2); display: grid; place-items: center; font-size: 46px; margin-bottom: 6px; }
-.propose { display: grid; gap: 8px; margin: 22px 0 10px; }
-.tabbar { position: sticky; bottom: 8px; margin: 0 0 8px; display: flex; justify-content: space-around; background: rgba(255,255,255,.96); border: 1px solid #ececec; border-radius: 40px; padding: 8px 6px; box-shadow: 0 4px 16px rgba(0,0,0,.08); font-size: 18px; }
-.tabbar span { display: grid; justify-items: center; gap: 2px; padding: 4px 6px; border-radius: 20px; }
-.tabbar small { font-size: 11px; color: #333; }
-.tabbar .on { background: #f1f1f1; }
-.tabbar .on small { color: var(--orange); }
-.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-.tabbar button { background: none; border: 0; font: inherit; cursor: pointer; display: grid; justify-items: center; gap: 2px; padding: 4px 6px; border-radius: 20px; }
-.tabbar button.on { background: #f1f1f1; }
-.tabbar button.on small { color: var(--orange); }
-.fab { position: sticky; bottom: 92px; margin: -60px 0 0 auto; width: 62px; height: 62px; border-radius: 50%; border: 0; background: var(--orange-head); color: #fff; font-size: 34px; box-shadow: 0 6px 16px rgba(0,0,0,.2); cursor: pointer; display: grid; place-items: center; z-index: 2; }
-.fabmenu { background: linear-gradient(180deg, #f6c88c 0%, #fbf3ec 30%, #f7f3f0 100%); justify-content: flex-end; }
-.fab-items { display: grid; gap: 16px; justify-items: end; margin-bottom: 30px; }
-.fab-items > button, .fab-static { display: flex; align-items: center; gap: 16px; background: none; border: 0; font-family: var(--title); font-weight: 700; font-size: 18px; cursor: pointer; color: var(--ink); }
-.fab-static { cursor: default; }
-.fab-items i { font-style: normal; width: 60px; height: 60px; border-radius: 50%; background: #ef9f6c; display: grid; place-items: center; font-size: 24px; box-shadow: 0 4px 12px rgba(0,0,0,.15); }
-.fab-close { width: 66px; height: 66px; border-radius: 50%; background: var(--orange-head) !important; color: #fff !important; font-size: 26px !important; justify-content: center; box-shadow: 0 6px 16px rgba(0,0,0,.2); }
+.restart { background: none; border: 0; color: var(--orange-deep); font-weight: 700; text-decoration: underline; cursor: pointer; padding: 18px 0 8px; display: block; margin: 0 auto; }
+.fab { position: sticky; bottom: 92px; align-self: flex-end; margin: -64px 18px 0 0; width: 64px; height: 64px; border-radius: 50%; border: 0;
+  background: #ef9f50; color: #fff; font-size: 40px; font-weight: 300; line-height: 1; box-shadow: 0 6px 14px rgba(0,0,0,.22); cursor: pointer; z-index: 2; }
+.tabbar { position: sticky; bottom: 0; width: 100%; margin-top: 14px; background: var(--bg); padding: 0 10px; }
+.tabbar img { width: 100%; height: auto; }
+
+/* ---------- Menu du bouton « + » (reprise de l'app) ---------- */
+.fabmenu { background: linear-gradient(180deg, #f6c88c 0%, #fbf3ec 32%, #f7f3f0 100%); justify-content: flex-end; padding-bottom: 96px; }
+.fab-items { display: grid; gap: 14px; justify-items: end; }
+.fab-items .row { display: flex; align-items: center; gap: 14px; background: none; border: 0; font-family: var(--title); font-weight: 700; font-size: 18px; color: var(--ink); padding: 0; }
+button.row { cursor: pointer; }
+.fab-items .row img { width: 64px; height: 64px; }
+.fab-close { width: 68px; height: 68px; border-radius: 50%; border: 0; background: #ef9f50; color: #fff; font-size: 30px; cursor: pointer; box-shadow: 0 6px 14px rgba(0,0,0,.22); margin-right: -2px; }
+
+/* ---------- « Avant de commencer » (reprise de l'app) ---------- */
 .btop { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
 .btop h1 { margin: 0; font-size: 25px; }
+.back { width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid #d9d9d9; background: #fff; display: grid; place-items: center; cursor: pointer; flex: none; }
 .offer { display: flex; gap: 14px; background: linear-gradient(135deg, #fbe5d6, #f8d2b6); border-radius: 22px; padding: 16px; margin-bottom: 16px; }
 .offer-ico { width: 52px; height: 52px; border-radius: 50%; background: var(--orange-head); display: grid; place-items: center; font-size: 24px; flex: none; }
 .offer small { color: var(--orange-deep); font-weight: 700; letter-spacing: .03em; }
@@ -238,9 +103,82 @@ button.wbtn { cursor: pointer; }
 .blist li { display: flex; gap: 12px; padding: 9px 0; border-bottom: 1px solid #eee; font-size: 14px; }
 .bno { background: var(--peach-2); border: 1px solid #f3c7a8; border-radius: 18px; padding: 10px 14px; margin-bottom: 14px; }
 .bno p { margin: 4px 0; font-size: 14px; color: #555; }
+.bno p::before { content: "✕"; color: var(--orange-deep); margin-right: 8px; }
 .bno small { display: block; border-top: 1px solid var(--orange); margin-top: 8px; padding-top: 8px; color: var(--muted); font-size: 13px; }
 .bgreen { background: var(--green-bg); color: #3f9a66; font-weight: 700; border-radius: 18px; padding: 12px 14px; font-size: 14px; }
 .charte-link { text-align: center; color: var(--orange-deep); text-decoration: underline; font-weight: 700; font-size: 14px; padding: 4px; }
+
+/* ---------- Formulaire guidé (proposition) ---------- */
+.progress { height: 5px; border-radius: 99px; background: var(--orange-track); margin: 18px 4px 22px; overflow: hidden; }
+.progress span { display: block; height: 100%; background: var(--orange); border-radius: 99px; }
+.step-label { color: var(--muted); font-size: 15px; margin: 0 0 8px; }
+.hint { color: var(--muted); font-size: 14px; margin: -8px 0 16px; }
+.field-label { font-family: var(--title); font-weight: 700; font-size: 17px; margin: 0 0 6px; }
+.field-label small { font-family: var(--body); font-weight: 400; color: var(--muted); font-size: 14px; margin-left: 6px; }
+.options { display: grid; gap: 10px; margin-bottom: 16px; }
+.option { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: #fff; border: 1.5px solid var(--line); border-radius: 18px; padding: 12px 14px; cursor: pointer; }
+.option img { width: 50px; height: 50px; flex: none; }
+.option b { font-family: var(--title); font-size: 17px; display: block; }
+.option span.sub { color: var(--muted); font-size: 14px; }
+.option .radio { margin-left: auto; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #d4d4d4; flex: none; }
+.option[aria-pressed="true"] { border-color: var(--orange); background: #fffaf6; }
+.option[aria-pressed="true"] .radio { border: 8px solid var(--orange); }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.chip { border: 1.5px solid #d9d9d9; background: #fff; border-radius: 999px; padding: 9px 15px; font-weight: 600; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--peach); border-color: var(--orange); color: var(--orange-deep); }
+.input { width: 100%; border: 1.5px solid #d9d9d9; border-radius: 16px; padding: 14px 16px; font-size: 16px; background: #fff; margin-bottom: 18px; }
+textarea.input { min-height: 150px; resize: vertical; line-height: 1.45; }
+.counter { text-align: right; color: var(--muted); font-size: 13px; margin: -12px 0 12px; }
+.reassure { background: var(--green-bg); color: #24613f; border-radius: 16px; padding: 12px 14px; font-size: 14px; font-weight: 600; margin-bottom: 14px; }
+.assist { border: 1.5px dashed var(--orange); background: #fffaf6; border-radius: 18px; padding: 14px; margin-bottom: 16px; }
+.assist .label { font-family: var(--title); font-weight: 700; color: var(--orange-deep); font-size: 14px; margin-bottom: 6px; display: block; }
+.assist p { margin: 0 0 12px; font-size: 15px; }
+.assist .row { display: flex; gap: 8px; flex-wrap: wrap; }
+.mini { border-radius: 999px; padding: 7px 12px; font-size: 14px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--orange); background: var(--orange); color: #fff; }
+.mini.ghost { background: #fff; color: var(--orange-deep); }
+.checklist { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 6px; font-size: 14px; }
+.checklist li::before { content: "○"; display: inline-block; width: 22px; color: #b9b9b9; font-weight: 700; }
+.checklist li.ok::before { content: "✓"; color: var(--green); }
+.actions { display: flex; gap: 12px; margin-top: auto; padding: 12px 0 18px; position: sticky; bottom: -18px; background: #fff; }
+.btn { flex: 1; border-radius: 999px; padding: 15px 18px; font-family: var(--title); font-weight: 700; font-size: 18px; cursor: pointer; border: 0; background: var(--orange); color: #fff; }
+.btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--orange); }
+.btn[disabled] { background: #ffd8b5; cursor: not-allowed; }
+
+/* Aperçu, détail et confirmation */
+.preview { border: 1.5px solid var(--line); border-radius: 20px; padding: 16px; margin-bottom: 14px; }
+.preview h2 { font-size: 22px; margin: 0 0 10px; }
+.pill { display: inline-block; background: var(--peach); color: var(--orange); font-family: var(--title); font-weight: 700; padding: 6px 14px; border-radius: 999px; font-size: 15px; margin-bottom: 12px; }
+.facts { display: grid; gap: 8px; margin: 0 0 12px; }
+.facts .meta { color: var(--ink); font-size: 15px; }
+.desc { margin: 0 0 14px; color: #333; }
+.author { display: flex; gap: 12px; align-items: center; border-top: 1px solid var(--line); padding-top: 12px; }
+.author small { color: var(--muted); display: block; }
+/* Avatar par défaut de l'app : silhouette orange sur fond pêche */
+.avatar { width: 48px; height: 48px; border-radius: 50%; background: #fbe3d3; position: relative; overflow: hidden; flex: none; }
+.avatar::before { content: ""; position: absolute; left: 15px; top: 9px; width: 18px; height: 18px; border-radius: 50%; background: #f47b3a; }
+.avatar::after { content: ""; position: absolute; left: 7px; top: 30px; width: 34px; height: 30px; border-radius: 50%; background: #f47b3a; }
+.badge-charte { display: inline-block; background: var(--green-bg); color: #24613f; font-size: 12px; font-weight: 700; border-radius: 99px; padding: 2px 8px; margin-top: 4px; }
+.share { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--peach-2); border-radius: 16px; padding: 12px 14px; margin-bottom: 8px; font-size: 14px; }
+.switch-btn { width: 50px; height: 30px; border-radius: 99px; border: 0; background: #d4d4d4; position: relative; cursor: pointer; flex: none; }
+.switch-btn::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: left .15s; }
+.switch-btn[aria-checked="true"] { background: var(--orange); }
+.switch-btn[aria-checked="true"]::after { left: 23px; }
+.confetti { width: 110px; margin: 10px auto 12px; }
+.summary { display: flex; align-items: center; gap: 12px; border: 1.5px solid var(--line); border-radius: 18px; padding: 10px 12px; margin-bottom: 18px; }
+.summary img { width: 60px; height: 60px; border-radius: 14px; }
+.summary b { font-family: var(--title); font-size: 16px; display: block; }
+.summary .l { color: #555; font-size: 13px; display: block; }
+ol.next { margin: 0 0 14px; padding-left: 20px; font-size: 15px; }
+ol.next li { margin-bottom: 6px; }
+ol.next li::marker { color: var(--orange); font-weight: 700; }
+.relance { background: var(--peach-2); border-radius: 16px; padding: 12px 14px; font-size: 14px; color: #5a4535; }
+.dtop { display: flex; align-items: center; gap: 14px; border-bottom: 1.5px solid var(--orange); padding: 6px 0 14px; margin-bottom: 18px; }
+.dtop h1 { font-size: 22px; margin: 0; }
+.icon-back { background: none; border: 0; padding: 4px; cursor: pointer; display: grid; place-items: center; }
+.dname { font-size: 22px; margin: 0 0 12px; }
+.dhero { position: relative; height: 180px; border-radius: 20px; background: #fbe8dc; display: grid; place-items: center; margin-bottom: 16px; overflow: hidden; }
+.dhero img { width: 150px; border-radius: 30px; }  /* masque les coins clairs de l'illustration découpée */
+.dhero .pill { position: absolute; top: 12px; right: 12px; background: #fff; margin: 0; }
 .mine-msg { background: var(--peach-2); border-radius: 14px; padding: 10px 12px; font-size: 14px; color: #5a4535; margin: 14px 0 0; }
 
 /* Note de lecture, hors maquette */
@@ -264,113 +202,52 @@ button.wbtn { cursor: pointer; }
 
   <div class="phone" aria-live="polite">
 
-    <!-- ===== Fin de l'inscription : plus de contribution imposée, on arrive sur l'accueil existant ===== -->
-    <section class="screen home" data-screen="start">
-      <div class="home-head">
-        <span class="hh-avatar" aria-hidden="true"></span>
-        <span class="hh-logo">entourage</span>
-        <span class="hh-bell" aria-hidden="true">🔔</span>
-        <span class="hh-tag">L'app qui recrée du lien entre voisins</span>
+    <!-- ===== Liste Entraide (écran actuel de l'app) ===== -->
+    <section class="screen list" data-screen="list">
+      <h1 class="sr-only">Entraide</h1>
+      <img class="list-header" src="entourage/header-entraide.png" alt="">
+      <div class="list-body">
+        <div class="tabs" aria-hidden="true"><span class="on">Contributions</span><span>Demandes</span><span>Mes annonces</span></div>
+
+        <button class="item new" type="button" data-go="mine" data-mine-item hidden aria-label="Voir mon annonce">
+          <img class="thumb" src="entourage/illu-contribution.png" alt="">
+          <span>
+            <b data-l-title></b>
+            <span class="meta"><img src="entourage/ico-calendar.png" alt=""><span data-l-when></span></span>
+            <span class="meta"><img src="entourage/ico-pin.png" alt=""><span data-l-where></span></span>
+            <span class="meta"><img src="entourage/ico-person.png" alt=""><span data-l-distance></span></span>
+          </span>
+          <span class="chev" aria-hidden="true">›</span>
+        </button>
+
+        <div class="item"><img class="thumb" src="entourage/illu-contribution.png" alt=""><span><b>Partage</b>
+          <span class="meta"><img src="entourage/ico-person.png" alt="">À 9 km de moi</span><span class="meta"><img src="entourage/ico-pin.png" alt="">La Courneuve (93120)</span><span class="meta"><img src="entourage/ico-calendar.png" alt="">Aujourd'hui</span></span></div>
+        <div class="item"><img class="thumb" src="entourage/illu-echange.png" alt=""><span><b>Échange Humain</b>
+          <span class="meta"><img src="entourage/ico-person.png" alt="">À 16 km de moi</span><span class="meta"><img src="entourage/ico-pin.png" alt="">Massy (91300)</span><span class="meta"><img src="entourage/ico-calendar.png" alt="">Aujourd'hui</span></span></div>
+        <div class="item"><img class="thumb" src="entourage/illu-contribution.png" alt=""><span><b>Café et discussions</b>
+          <span class="meta"><img src="entourage/ico-person.png" alt="">À 40 km de moi</span><span class="meta"><img src="entourage/ico-pin.png" alt="">Boissise-la-Bertrand (77350)</span><span class="meta"><img src="entourage/ico-calendar.png" alt="">Hier</span></span></div>
+        <div class="item"><img class="thumb" src="entourage/illu-contribution.png" alt=""><span><b>Boisson et échange</b>
+          <span class="meta"><img src="entourage/ico-person.png" alt="">À 33 km de moi</span><span class="meta"><img src="entourage/ico-pin.png" alt="">Magny-le-Hongre (77700)</span><span class="meta"><img src="entourage/ico-calendar.png" alt="">Hier</span></span></div>
+        <div class="item"><img class="thumb" src="entourage/illu-contribution.png" alt=""><span><b>Génère CV ultra modern gratuit et lettre de motivation gratuit avec…</b>
+          <span class="meta"><img src="entourage/ico-person.png" alt="">À 11 km de moi</span><span class="meta"><img src="entourage/ico-pin.png" alt="">Le Perreux-sur-Marne (94170)</span><span class="meta"><img src="entourage/ico-calendar.png" alt="">Hier</span></span></div>
+
+        <button class="restart" type="button" data-action="restart">Recommencer la démo</button>
       </div>
-      <div class="home-sheet">
-        <div class="wtitle"><h1>Votre parcours de bienvenue</h1><span aria-hidden="true">•••</span></div>
-        <div class="wbars" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
-        <p class="wsub">À votre rythme, dans l'ordre que vous voulez.</p>
-
-        <article class="wcard">
-          <div class="wrow"><span class="wico" aria-hidden="true">🎥</span><b>1 min pour tout comprendre</b><span class="todo">À faire</span></div>
-          <p>Qui sommes-nous, comment ça marche, et comment vous pouvez agir en 1 minute</p>
-          <span class="wbtn full">Regarder la vidéo</span>
-          <span class="wskip">Passer cette étape</span>
-        </article>
-        <article class="wcard">
-          <div class="wrow"><span class="wico" aria-hidden="true">👥</span><b>Rejoignez un groupe qui vous ressemble</b><span class="todo">À faire</span></div>
-          <p>Des membres partout en France partagent vos centres d'intérêt. Rejoignez-les.</p>
-          <span class="wbtn">Découvrir les groupes</span>
-          <span class="wskip">Passer cette étape</span>
-        </article>
-        <article class="wcard">
-          <div class="wrow"><span class="wico" aria-hidden="true">🧑‍🤝‍🧑</span><b>Rencontrez l'équipe en visio</b><span class="todo">À faire</span></div>
-          <p>Une session d'accueil en petit groupe pour poser vos questions à l'équipe avec plusieurs créneaux disponibles.</p>
-          <span class="wbtn">Voir les prochaines dates</span>
-          <span class="wskip">Passer cette étape</span>
-        </article>
-        <article class="wcard">
-          <div class="wrow"><span class="wico" aria-hidden="true">💬</span><b>Participez à un premier événement</b><span class="todo">À faire</span></div>
-          <p>Un café, une balade, un atelier ou un papotage en visio&nbsp;: choisissez ce qui vous fait envie.</p>
-          <button class="wbtn" type="button" data-action="to-events">Voir les événements</button>
-          <span class="wskip">Passer cette étape</span>
-        </article>
-
-        <h2 class="hsec">Donner un coup de pouce</h2>
-        <article class="hcard">
-          <div class="hc-who"><span class="avatar" aria-hidden="true">🙂</span><span><b>Nadia M.</b><span class="pill sm">Temps de partage</span></span></div>
-          <b class="hc-title">Un café pour papoter</b>
-          <p>Mercredi soir, dans un café de Pantin. Pour discuter de tout et de rien&nbsp;!</p>
-          <div class="hc-foot"><span>📍 À 3 km de moi</span><button class="mini" type="button" data-go="chat">Écrire</button></div>
-        </article>
-
-        <h2 class="hsec" data-events>Participer à un événement solidaire</h2>
-        <article class="hcard ev">
-          <div class="ev-img" aria-hidden="true">🎲</div>
-          <span class="pill sm">Jeux</span>
-          <b class="hc-title">Goûter et jeux de société</b>
-          <span class="l">Sam. 14 nov., 15:00</span>
-          <span class="l">93200 Saint-Denis · 10 participants</span>
-          <div class="hc-foot"><span></span><button class="mini" type="button" data-go="joined">Participer</button></div>
-        </article>
-
-      </div>
-      <nav class="tabbar" aria-label="Navigation de l'app">
-        <button type="button" data-go="start" class="on">🏠<small>Accueil</small></button><button type="button" data-go="list" class="">🧡<small>Entraide</small></button><span aria-hidden="true">💬<small>Discussions</small></span><span aria-hidden="true">👥<small>Groupes</small></span><span aria-hidden="true">📅<small>Événements</small></span>
-      </nav>
+      <button class="fab" type="button" data-go="create" aria-label="Créer une contribution ou une demande">+</button>
+      <div class="tabbar"><img src="entourage/tabbar-entraide.png" alt="Barre d'onglets : Accueil, Entraide (actif), Discussions, Groupes, Événements"></div>
     </section>
 
-    <!-- ===== Participer à un événement ===== -->
-    <section class="screen intro" data-screen="joined" hidden>
-      <div class="confetti" aria-hidden="true">🎉</div>
-      <h1>Vous participez&nbsp;!</h1>
-      <p>Rendez-vous samedi 14 novembre à 15&nbsp;h, à Saint-Denis, pour un goûter et des jeux de société.</p>
-      <p>La discussion de l'événement est ouverte&nbsp;: vous pouvez dire bonjour aux autres participants avant d'y aller.</p>
-      <div class="reassure"><span aria-hidden="true">🙂</span><span>Vous pouvez venir seul·e&nbsp;: c'est tout le principe.</span></div>
-      <div class="actions">
-        <button class="btn" type="button" data-go="start">Retour à l'accueil</button>
-      </div>
-    </section>
-
-    <!-- ===== Écrire à un voisin (reprend la nouvelle messagerie de l'app) ===== -->
-    <section class="screen" data-screen="chat" hidden>
-      <div class="dtop" style="border-bottom-color:#e3e3e3">
-        <button class="icon-back" type="button" data-go="start" aria-label="Retour"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff9739" stroke-width="2" stroke-linecap="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg></button>
-        <h1>Nadia M.</h1>
-      </div>
-      <div class="chat-empty" data-chat-empty>
-        <span class="bubble-ico" aria-hidden="true">💬</span>
-        <b>C'est le début de votre échange</b>
-        <span>Pas sûr de quoi dire&nbsp;? Choisissez un sujet pour démarrer.</span>
-        <div class="starters">
-          <button class="chip" type="button" data-starter="Bonjour Nadia ! Votre café de mercredi soir me tente, vous êtes toujours partante ?">Dire bonjour 👋</button>
-          <button class="chip" type="button" data-starter="Bonjour Nadia, je peux venir mercredi soir. Où est-ce qu'on se retrouve ?">Poser une question 💬</button>
-        </div>
-      </div>
-      <div class="thread" data-thread></div>
-      <div class="composer">
-        <input type="text" data-msg placeholder="Écrire un message…" aria-label="Votre message">
-        <button class="send" type="button" data-action="send" aria-label="Envoyer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
-      </div>
-    </section>
-
-    <!-- ===== Menu du bouton « + » (repris de l'app) ===== -->
+    <!-- ===== Menu du bouton « + » (écran actuel de l'app) ===== -->
     <section class="screen fabmenu" data-screen="create" hidden>
       <h1 class="sr-only">Créer</h1>
       <div class="fab-items">
-        <button type="button" data-go="before"><span>Créer une contribution</span><i aria-hidden="true">🤲</i></button>
-        <span class="fab-static"><span>Créer une demande</span><i aria-hidden="true">🙋</i></span>
-        <button type="button" class="fab-close" data-go="list" aria-label="Fermer">✕</button>
+        <button class="row" type="button" data-go="before"><span>Créer une contribution</span><img src="entourage/fab-contribution.png" alt=""></button>
+        <span class="row"><span>Créer une demande</span><img src="entourage/fab-demande.png" alt=""></span>
+        <button class="fab-close" type="button" data-go="list" aria-label="Fermer">✕</button>
       </div>
     </section>
 
-    <!-- ===== « Avant de commencer » (repris de l'app, inchangé) ===== -->
+    <!-- ===== « Avant de commencer » (écran actuel de l'app) ===== -->
     <section class="screen" data-screen="before" hidden>
       <div class="btop">
         <button class="back" type="button" data-go="list" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
@@ -389,10 +266,10 @@ button.wbtn { cursor: pointer; }
       </ul>
       <p class="bhead"><span class="no-dot" aria-hidden="true">!</span>Ce qui ne passe pas par ici&nbsp;:</p>
       <div class="bno">
-        <p>✕ La distribution régulière de nourriture</p>
-        <p>✕ L'accompagnement social ou administratif</p>
-        <p>✕ Les services à distance (livraison, drive, bon cadeau, cagnotte…)</p>
-        <p>✕ Se donner rendez-vous chez l'un ou chez l'autre&nbsp;: on se retrouve dans un lieu public</p>
+        <p>La distribution régulière de nourriture</p>
+        <p>L'accompagnement social ou administratif</p>
+        <p>Les services à distance (livraison, drive, bon cadeau, cagnotte…)</p>
+        <p>Se donner rendez-vous chez l'un ou chez l'autre&nbsp;: on se retrouve dans un lieu public</p>
         <small>Pas d'inquiétude&nbsp;: si une proposition sort du cadre, notre équipe vous recontacte pour vous aider à la reformuler ou vous orienter.</small>
       </div>
       <div class="bgreen">✨ Chez Entourage, la solidarité naît du lien, du sourire et de l'échange. C'est la rencontre qui compte avant tout.</div>
@@ -402,19 +279,27 @@ button.wbtn { cursor: pointer; }
       </div>
     </section>
 
-    <!-- ===== Étape 1 : quoi ===== -->
+    <!-- ===== Étape 1 : catégorie (celles de l'app), puis l'activité pour un temps de partage ===== -->
     <section class="screen" data-screen="what" hidden>
       <button class="back" type="button" data-go="before" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
       <div class="progress"><span style="width:25%"></span></div>
       <p class="step-label">Étape 1 sur 4</p>
       <h1>Que proposez-vous&nbsp;?</h1>
-      <p class="hint">Vos choix d'inscription sont en premier, mais vous pouvez proposer autre chose.</p>
-      <div class="options" data-group="activity">
-        <button class="option" type="button" data-value="cafe" aria-pressed="false"><span class="ico" aria-hidden="true">☕</span><span><b>Un café</b><span class="sub">Discuter autour d'une boisson</span></span><span class="radio"></span></button>
-        <button class="option" type="button" data-value="balade" aria-pressed="false"><span class="ico" aria-hidden="true">🚶</span><span><b>Une balade</b><span class="sub">Marcher et discuter dans le quartier</span></span><span class="radio"></span></button>
-        <button class="option" type="button" data-value="jeux" aria-pressed="false"><span class="ico" aria-hidden="true">🎲</span><span><b>Un jeu de société</b><span class="sub">Cartes, dames, jeux simples</span></span><span class="radio"></span></button>
-        <button class="option" type="button" data-value="langue" aria-pressed="false"><span class="ico" aria-hidden="true">🗣️</span><span><b>Pratiquer une langue</b><span class="sub">Français, anglais, arabe…</span></span><span class="radio"></span></button>
-        <button class="option" type="button" data-value="service" aria-pressed="false"><span class="ico" aria-hidden="true">🤝</span><span><b>Un service ou un objet</b><span class="sub">Lessive, impression, vêtements…</span></span><span class="radio"></span></button>
+      <div class="options" data-group="category">
+        <button class="option" type="button" data-value="partage" aria-pressed="false"><img src="entourage/cat-partage.png" alt=""><span><b>Temps de partage</b><span class="sub">Café, activité…</span></span><span class="radio"></span></button>
+        <button class="option" type="button" data-value="service" aria-pressed="false"><img src="entourage/cat-service.png" alt=""><span><b>Service</b><span class="sub">Lessive, impression de documents…</span></span><span class="radio"></span></button>
+        <button class="option" type="button" data-value="vetements" aria-pressed="false"><img src="entourage/cat-vetements.png" alt=""><span><b>Vêtements</b><span class="sub">Chaussures, manteau…</span></span><span class="radio"></span></button>
+        <button class="option" type="button" data-value="equipement" aria-pressed="false"><img src="entourage/cat-equipement.png" alt=""><span><b>Équipement</b><span class="sub">Téléphone, sac de couchage…</span></span><span class="radio"></span></button>
+        <button class="option" type="button" data-value="hygiene" aria-pressed="false"><img src="entourage/cat-hygiene.png" alt=""><span><b>Produit d'hygiène</b><span class="sub">Savon, protection sanitaire…</span></span><span class="radio"></span></button>
+      </div>
+      <div data-activity-block hidden>
+        <p class="field-label">Quel moment&nbsp;?</p>
+        <div class="chips" data-group="activity">
+          <button class="chip" type="button" data-value="cafe" aria-pressed="false">Un café</button>
+          <button class="chip" type="button" data-value="balade" aria-pressed="false">Une balade</button>
+          <button class="chip" type="button" data-value="jeux" aria-pressed="false">Un jeu de société</button>
+          <button class="chip" type="button" data-value="langue" aria-pressed="false">Pratiquer une langue</button>
+        </div>
       </div>
       <div data-title-block hidden>
         <p class="field-label">Titre <small>modifiable</small></p>
@@ -422,7 +307,7 @@ button.wbtn { cursor: pointer; }
       </div>
       <div class="actions">
         <button class="btn ghost" type="button" data-go="before">Retour</button>
-        <button class="btn" type="button" data-go="when" data-need="activity" disabled>Continuer</button>
+        <button class="btn" type="button" data-go="when" data-need="what" disabled>Continuer</button>
       </div>
     </section>
 
@@ -441,7 +326,7 @@ button.wbtn { cursor: pointer; }
         <button class="chip" type="button" data-value="sam-aprem" aria-pressed="true">Sam. après-midi</button>
         <button class="chip" type="button" data-value="dim-aprem" aria-pressed="false">Dim. après-midi</button>
       </div>
-      <div class="reassure"><span aria-hidden="true">💡</span><span>Un créneau précis aide un voisin à se projeter&nbsp;: il sait tout de suite s'il peut venir.</span></div>
+      <div class="reassure">Un créneau précis aide un voisin à se projeter&nbsp;: il sait tout de suite s'il peut venir.</div>
       <div class="actions">
         <button class="btn ghost" type="button" data-go="what">Retour</button>
         <button class="btn" type="button" data-go="where" data-need="slots">Continuer</button>
@@ -458,10 +343,10 @@ button.wbtn { cursor: pointer; }
       <input class="input" type="text" data-quartier value="Bobigny centre" aria-label="Votre quartier">
       <p class="field-label">Dans un lieu public</p>
       <div class="chips" data-group="place">
-        <button class="chip" type="button" data-value="cafe" aria-pressed="false">☕ Un café</button>
-        <button class="chip" type="button" data-value="parc" aria-pressed="false">🌳 Un parc</button>
-        <button class="chip" type="button" data-value="mediatheque" aria-pressed="false">📚 La médiathèque</button>
-        <button class="chip" type="button" data-value="marche" aria-pressed="false">🧺 Le marché</button>
+        <button class="chip" type="button" data-value="cafe" aria-pressed="false">Un café</button>
+        <button class="chip" type="button" data-value="parc" aria-pressed="false">Un parc</button>
+        <button class="chip" type="button" data-value="mediatheque" aria-pressed="false">La médiathèque</button>
+        <button class="chip" type="button" data-value="marche" aria-pressed="false">Le marché</button>
       </div>
       <p class="field-label">Jusqu'où êtes-vous prêt·e à aller&nbsp;?</p>
       <div class="chips" data-group="distance">
@@ -469,20 +354,20 @@ button.wbtn { cursor: pointer; }
         <button class="chip" type="button" data-value="transports" aria-pressed="false">En transports · 10 km</button>
         <button class="chip" type="button" data-value="loin" aria-pressed="false">Plus loin · 40 km</button>
       </div>
-      <div class="reassure"><span aria-hidden="true">🔒</span><span>Votre adresse n'est jamais partagée. On se retrouve toujours dans un lieu public.</span></div>
+      <div class="reassure">Votre adresse n'est jamais partagée. On se retrouve toujours dans un lieu public.</div>
       <div class="actions">
         <button class="btn ghost" type="button" data-go="when">Retour</button>
         <button class="btn" type="button" data-go="describe" data-need="place">Continuer</button>
       </div>
     </section>
 
-    <!-- ===== Étape 4 : description, avec une aide à la rédaction ===== -->
+    <!-- ===== Étape 4 : description, avec une suggestion ===== -->
     <section class="screen" data-screen="describe" hidden>
       <button class="back" type="button" data-go="where" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
       <div class="progress"><span style="width:100%"></span></div>
       <p class="step-label">Étape 4 sur 4</p>
       <h1>Présentez votre proposition</h1>
-      <div class="assist" data-assist>
+      <div class="assist">
         <span class="label">✨ Suggestion à partir de vos réponses</span>
         <p data-suggestion></p>
         <div class="row">
@@ -514,15 +399,15 @@ button.wbtn { cursor: pointer; }
       <h1>Aperçu de votre proposition</h1>
       <article class="preview">
         <h2 data-p-title></h2>
-        <span class="pill" data-p-cat>Temps de partage</span>
+        <span class="pill" data-p-cat></span>
         <div class="facts">
-          <div class="fact"><span class="i" aria-hidden="true">🗓️</span><span data-p-when></span></div>
-          <div class="fact"><span class="i" aria-hidden="true">📍</span><span data-p-where></span></div>
-          <div class="fact"><span class="i" aria-hidden="true">🚶</span><span data-p-distance></span></div>
+          <span class="meta"><img src="entourage/ico-calendar.png" alt=""><span data-p-when></span></span>
+          <span class="meta"><img src="entourage/ico-pin.png" alt=""><span data-p-where></span></span>
+          <span class="meta"><img src="entourage/ico-person.png" alt=""><span data-p-distance></span></span>
         </div>
         <p class="desc" data-p-desc></p>
         <div class="author">
-          <span class="avatar" aria-hidden="true">🙂</span>
+          <span class="avatar" aria-hidden="true"></span>
           <span><b>Ryzlane A.</b><small>Membre depuis 11/2026</small><span class="badge-charte">✓ A lu la charte éthique</span></span>
         </div>
       </article>
@@ -537,71 +422,43 @@ button.wbtn { cursor: pointer; }
     </section>
 
     <!-- ===== Après publication : ce qui va se passer ===== -->
-    <section class="screen intro" data-screen="published" hidden>
-      <div class="confetti" style="margin:26px 0 16px" aria-hidden="true">🎉</div>
+    <section class="screen" data-screen="published" hidden>
+      <img class="confetti" src="entourage/confetti.png" alt="">
       <h1>C'est en ligne&nbsp;!</h1>
-      <article class="near" style="margin-bottom:18px">
-        <span class="thumb sm" data-pub-emoji aria-hidden="true">☕</span>
-        <span class="near-txt"><b data-pub-title></b><span class="l" data-pub-when></span><span class="l" data-pub-where></span></span>
-      </article>
+      <div class="summary">
+        <img src="entourage/illu-contribution.png" alt="">
+        <span><b data-pub-title></b><span class="l" data-pub-when></span><span class="l" data-pub-where></span></span>
+      </div>
       <p class="field-label">Et maintenant&nbsp;?</p>
       <ol class="next">
         <li>Un voisin vous écrit&nbsp;: vous recevez une notification.</li>
         <li>Vous fixez le jour ensemble dans la messagerie.</li>
         <li>Vous vous retrouvez dans le lieu public choisi.</li>
       </ol>
-      <div class="from-you">Pas de message au bout de 7 jours&nbsp;? On vous proposera de préciser votre annonce ou de rejoindre un événement près de chez vous.</div>
+      <div class="relance">Pas de message au bout de 7 jours&nbsp;? On vous proposera de préciser votre annonce ou de rejoindre un événement près de chez vous.</div>
       <div class="actions">
         <button class="btn ghost" type="button" data-go="list">Voir la liste</button>
         <button class="btn" type="button" data-go="mine">Mon annonce</button>
       </div>
     </section>
 
-    <!-- ===== Liste Entraide : la nouvelle annonce à côté des annonces actuelles ===== -->
-    <section class="screen" data-screen="list" hidden>
-      <div class="list-head"><h1>Entraide</h1></div>
-      <div class="sheet">
-        <div class="tabs" aria-hidden="true"><span class="on">Contributions</span><span>Demandes</span><span>Mes annonces</span></div>
-        <button class="item new" type="button" data-go="mine" data-mine-item hidden aria-label="Voir mon annonce">
-          <span class="thumb" data-l-emoji aria-hidden="true">☕</span>
-          <span><b data-l-title></b><span class="l" data-l-when></span><span class="l" data-l-where></span><span class="l">Aujourd'hui</span></span>
-          <span class="chev" aria-hidden="true">›</span>
-        </button>
-        <div class="item">
-          <span class="thumb" aria-hidden="true">🎁</span>
-          <span><b>Partage</b><span class="l">À 9 km de moi</span><span class="l">La Courneuve (93120)</span><span class="l">Aujourd'hui</span></span>
-        </div>
-        <div class="item">
-          <span class="thumb" aria-hidden="true">🎁</span>
-          <span><b>Café et discussions</b><span class="l">À 40 km de moi</span><span class="l">Boissise-la-Bertrand (77350)</span><span class="l">Hier</span></span>
-        </div>
-        <div style="text-align:center; padding:16px 0 8px">
-          <button class="link" type="button" data-action="restart">Recommencer la démo</button>
-        </div>
-      </div>
-      <button class="fab" type="button" data-go="create" aria-label="Créer une contribution ou une demande">+</button>
-      <nav class="tabbar" aria-label="Navigation de l'app">
-        <button type="button" data-go="start" class="">🏠<small>Accueil</small></button><button type="button" data-go="list" class="on">🧡<small>Entraide</small></button><span aria-hidden="true">💬<small>Discussions</small></span><span aria-hidden="true">👥<small>Groupes</small></span><span aria-hidden="true">📅<small>Événements</small></span>
-      </nav>
-    </section>
-
-    <!-- ===== Détail de mon annonce (reprend l'écran « Contribution » de l'app) ===== -->
+    <!-- ===== Détail de mon annonce (sur le modèle de l'écran « Contribution ») ===== -->
     <section class="screen" data-screen="mine" hidden>
       <div class="dtop">
         <button class="icon-back" type="button" data-go="list" aria-label="Retour"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff9739" stroke-width="2" stroke-linecap="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg></button>
         <h1>Contribution</h1>
       </div>
       <h2 class="dname" data-m-title></h2>
-      <div class="dhero" aria-hidden="true"><span data-m-emoji>☕</span><span class="pill" data-m-cat>Temps de partage</span></div>
+      <div class="dhero"><img src="entourage/illu-contribution.png" alt=""><span class="pill" data-m-cat></span></div>
       <div class="facts">
-        <div class="fact"><span class="i" aria-hidden="true">🗓️</span><span data-m-when></span></div>
-        <div class="fact"><span class="i" aria-hidden="true">📍</span><span data-m-where></span></div>
-        <div class="fact"><span class="i" aria-hidden="true">🚶</span><span data-m-distance></span></div>
+        <span class="meta"><img src="entourage/ico-calendar.png" alt=""><span data-m-when></span></span>
+        <span class="meta"><img src="entourage/ico-pin.png" alt=""><span data-m-where></span></span>
+        <span class="meta"><img src="entourage/ico-person.png" alt=""><span data-m-distance></span></span>
       </div>
       <p class="desc" data-m-desc></p>
       <p class="field-label">Créée aujourd'hui par</p>
       <div class="author" style="border:0; padding-top:4px">
-        <span class="avatar" aria-hidden="true">🙂</span>
+        <span class="avatar" aria-hidden="true"></span>
         <span><b>Ryzlane A.</b><small>Membre depuis 11/2026</small><span class="badge-charte">✓ A lu la charte éthique</span></span>
       </div>
       <p class="mine-msg">0 message pour l'instant. Vous serez prévenu·e dès qu'un voisin vous écrit.</p>
@@ -616,22 +473,28 @@ button.wbtn { cursor: pointer; }
     <span class="nbadge">Note de lecture · hors maquette</span>
     <h3>Ce que le prototype change</h3>
     <ol>
-      <li><span class="step">Après l'inscription</span>, plus de contribution imposée&nbsp;: on arrive sur l'accueil actuel et son parcours de bienvenue, qui propose déjà de participer à un premier événement. Publier reste possible, en bas de l'accueil.</li>
-      <li><span class="step">Pour proposer soi-même</span>, quand on le souhaite&nbsp;: onglet Entraide, puis le bouton «&nbsp;+&nbsp;», comme aujourd'hui. Seul le formulaire change&nbsp;: des choix (quoi, quand, où) au lieu d'une case vide, et une distance qui part de «&nbsp;à pied&nbsp;».</li>
+      <li><span class="step">Le point de départ</span> est l'onglet Entraide tel qu'il est aujourd'hui. Touchez le bouton «&nbsp;+&nbsp;», puis «&nbsp;Créer une contribution&nbsp;». Ces écrans reprennent l'app à l'identique.</li>
+      <li><span class="step">Étapes 1 à 3</span>&nbsp;: les catégories de l'app, puis des choix (quoi, quand, où) au lieu d'une case vide. Les créneaux viennent des disponibilités du profil, et la distance part de «&nbsp;à pied&nbsp;».</li>
       <li><span class="step">Étape 4</span>&nbsp;: une description est proposée à partir des réponses, modifiable.</li>
-      <li><span class="step">Après la publication</span>, un écran explique la suite, y compris ce qui se passe si personne n'écrit au bout de 7 jours.</li>
+      <li><span class="step">Après la publication</span>, un écran explique la suite, y compris ce qui se passe si personne n'écrit au bout de 7 jours. Votre annonce apparaît ensuite dans la liste&nbsp;: touchez-la pour la revoir.</li>
     </ol>
   </aside>
 </main>
 
 <script>
 // ---------- Données du prototype ----------
+const CATEGORIES = {
+  partage:    { label: 'Temps de partage' },
+  service:    { label: 'Service', title: 'Un coup de main', phrase: 'un coup de main (lessive, impression de documents…)', place: 'mediatheque' },
+  vetements:  { label: 'Vêtements', title: 'Vêtements à donner', phrase: 'des vêtements en bon état', place: 'marche' },
+  equipement: { label: 'Équipement', title: 'Équipement à donner', phrase: 'un équipement (téléphone, sac de couchage…)', place: 'marche' },
+  hygiene:    { label: "Produit d'hygiène", title: "Produits d'hygiène à donner", phrase: "des produits d'hygiène neufs", place: 'marche' },
+};
 const ACTIVITIES = {
-  cafe:   { emoji: '☕', title: 'Un café pour discuter', phrase: 'de partager un moment autour d\'une boisson', place: 'cafe' },
-  balade: { emoji: '🚶', title: 'Une balade dans le quartier', phrase: 'une balade pour discuter', place: 'parc' },
-  jeux:   { emoji: '🎲', title: 'Une partie de jeux de société', phrase: 'une partie de jeux de société', place: 'mediatheque' },
-  langue: { emoji: '🗣️', title: 'Pratiquer une langue en discutant', phrase: 'un moment pour pratiquer une langue', place: 'cafe' },
-  service: { emoji: '🤝', title: 'Un coup de main', phrase: 'un coup de main (un service ou un objet)', place: 'mediatheque', cat: 'Service ou objet' },
+  cafe:   { title: 'Un café pour discuter', phrase: "de partager un moment autour d'une boisson", place: 'cafe' },
+  balade: { title: 'Une balade dans le quartier', phrase: 'une balade pour discuter', place: 'parc' },
+  jeux:   { title: 'Une partie de jeux de société', phrase: 'une partie de jeux de société', place: 'mediatheque' },
+  langue: { title: 'Pratiquer une langue en discutant', phrase: 'un moment pour pratiquer une langue', place: 'cafe' },
 };
 const SLOTS = {
   'lun-soir':  { short: 'Lun. soir', long: 'le lundi soir' },
@@ -639,7 +502,7 @@ const SLOTS = {
   'jeu-aprem': { short: 'Jeu. après-midi', long: 'le jeudi après-midi' },
   'sam-matin': { short: 'Sam. matin', long: 'le samedi matin' },
   'sam-aprem': { short: 'Sam. après-midi', long: 'le samedi après-midi' },
-  'dim-aprem': { short: 'Dim. après-midi', long: "le dimanche après-midi" },
+  'dim-aprem': { short: 'Dim. après-midi', long: 'le dimanche après-midi' },
 };
 const PLACES = {
   cafe:        { short: 'Un café', phrase: 'dans un café du coin' },
@@ -654,7 +517,7 @@ const DISTANCES = {
 };
 
 // ---------- État ----------
-const initialState = () => ({ activity: null, slots: ['mer-soir', 'sam-aprem'], place: null, distance: 'pied', published: false });
+const initialState = () => ({ category: null, activity: null, slots: ['mer-soir', 'sam-aprem'], place: null, distance: 'pied', published: false });
 let state = initialState();
 const $ = (sel) => document.querySelector(sel);
 
@@ -664,13 +527,14 @@ function joinOr(items) {
   return `${items.slice(0, -1).join(', ')} ou ${items[items.length - 1]}`;
 }
 function quartier() { return ($('[data-quartier]').value || '').trim() || 'mon quartier'; }
+// Ce qui est proposé : l'activité pour un temps de partage, sinon la catégorie.
+function offer() { return state.category === 'partage' ? ACTIVITIES[state.activity] : CATEGORIES[state.category]; }
 
 // Description suggérée, construite uniquement à partir des réponses.
 function suggestion() {
-  const a = ACTIVITIES[state.activity];
   const when = joinOr(state.slots.map((s) => SLOTS[s].long));
   const where = PLACES[state.place]?.phrase || 'dans un lieu public';
-  return `Je vous propose ${a.phrase} ${when}, ${where}, côté ${quartier()}. `
+  return `Je vous propose ${offer().phrase} ${when}, ${where}, côté ${quartier()}. `
     + "L'idée : faire connaissance entre voisins, sans prise de tête. "
     + "Je m'appelle Ryzlane, je viens d'arriver sur Entourage. Écrivez-moi pour qu'on fixe le jour !";
 }
@@ -678,8 +542,9 @@ function suggestion() {
 // ---------- Rendu ----------
 function refreshButtons() {
   const desc = $('[data-desc]').value.trim();
+  const whatChosen = !!state.category && (state.category !== 'partage' || !!state.activity);
   const ready = {
-    activity: !!state.activity && $('[data-title]').value.trim().length > 0,
+    what: whatChosen && $('[data-title]').value.trim().length > 0,
     slots: state.slots.length > 0,
     place: !!state.place,
     desc: desc.length >= 20,
@@ -690,33 +555,18 @@ function refreshButtons() {
   $('[data-check-me]').classList.toggle('ok', /\b(je|j'|j’|moi|m'appelle)\b/i.test(desc));
 }
 
-function renderPreview() {
-  const a = ACTIVITIES[state.activity];
+function setText(sel, text) { document.querySelectorAll(sel).forEach((el) => { el.textContent = text; }); }
+
+function renderAnnonce() {
   const title = $('[data-title]').value.trim();
-  const whenShort = state.slots.map((s) => SLOTS[s].short).join(' · ');
-  const whereShort = `${PLACES[state.place].short} · ${quartier()}`;
-  $('[data-p-title]').textContent = title;
-  $('[data-p-when]').textContent = whenShort;
-  $('[data-p-where]').textContent = whereShort;
-  $('[data-p-distance]').textContent = DISTANCES[state.distance];
-  $('[data-p-desc]').textContent = $('[data-desc]').value.trim();
-  $('[data-l-emoji]').textContent = a.emoji;
-  $('[data-l-title]').textContent = title;
-  $('[data-l-when]').textContent = whenShort;
-  $('[data-l-where]').textContent = `${PLACES[state.place].short} · ${quartier()} · à pied`;
-  $('[data-m-emoji]').textContent = a.emoji;
-  $('[data-m-title]').textContent = title;
-  $('[data-m-when]').textContent = whenShort;
-  $('[data-m-where]').textContent = whereShort;
-  $('[data-m-distance]').textContent = DISTANCES[state.distance];
-  $('[data-m-desc]').textContent = $('[data-desc]').value.trim();
-  const cat = a.cat || 'Temps de partage';
-  $('[data-p-cat]').textContent = cat;
-  $('[data-m-cat]').textContent = cat;
-  $('[data-pub-emoji]').textContent = a.emoji;
-  $('[data-pub-title]').textContent = title;
-  $('[data-pub-when]').textContent = whenShort;
-  $('[data-pub-where]').textContent = whereShort;
+  const when = state.slots.map((s) => SLOTS[s].short).join(' · ');
+  const where = `${PLACES[state.place].short} · ${quartier()}`;
+  setText('[data-p-title], [data-l-title], [data-m-title], [data-pub-title]', title);
+  setText('[data-p-when], [data-l-when], [data-m-when], [data-pub-when]', when);
+  setText('[data-p-where], [data-l-where], [data-m-where], [data-pub-where]', where);
+  setText('[data-p-distance], [data-l-distance], [data-m-distance]', DISTANCES[state.distance]);
+  setText('[data-p-desc], [data-m-desc]', $('[data-desc]').value.trim());
+  setText('[data-p-cat], [data-m-cat]', CATEGORIES[state.category].label);
 }
 
 function setPressed(groupEl, values) {
@@ -726,8 +576,7 @@ function setPressed(groupEl, values) {
 function showScreen(name) {
   if (name === 'describe') $('[data-suggestion]').textContent = suggestion();
   if (name === 'published') state.published = true;
-  // L'aperçu n'a de sens qu'une fois l'activité et le lieu choisis
-  if (state.activity && state.place && ['preview', 'published', 'list', 'mine'].includes(name)) renderPreview();
+  if (state.category && state.place && ['preview', 'published', 'list', 'mine'].includes(name)) renderAnnonce();
   $('[data-mine-item]').hidden = !state.published;
   document.querySelectorAll('[data-screen]').forEach((s) => { s.hidden = s.dataset.screen !== name; });
   const active = document.querySelector(`[data-screen="${name}"]`);
@@ -738,21 +587,27 @@ function showScreen(name) {
   refreshButtons();
 }
 
+// Choix du titre et du lieu par défaut quand la catégorie ou l'activité change.
+function applyDefaults() {
+  const o = state.category && (state.category !== 'partage' || state.activity) ? offer() : null;
+  $('[data-activity-block]').hidden = state.category !== 'partage';
+  $('[data-title-block]').hidden = !o;
+  if (!o) return;
+  $('[data-title]').value = o.title;
+  state.place = o.place;
+  setPressed($('[data-group="place"]'), [state.place]);
+}
+
 function restart() {
   state = initialState();
-  setPressed($('[data-group="activity"]'), []);
+  ['category', 'activity', 'place'].forEach((g) => setPressed($(`[data-group="${g}"]`), []));
   setPressed($('[data-group="slots"]'), state.slots);
-  setPressed($('[data-group="place"]'), []);
   setPressed($('[data-group="distance"]'), [state.distance]);
   $('[data-title]').value = '';
-  $('[data-title-block]').hidden = true;
   $('[data-quartier]').value = 'Bobigny centre';
   $('[data-desc]').value = '';
-  $('[data-assist]').hidden = false;
-  $('[data-thread]').innerHTML = '';
-  $('[data-msg]').value = '';
-  $('[data-chat-empty]').hidden = false;
-  showScreen('start');
+  applyDefaults();
+  showScreen('list');
 }
 
 // ---------- Interactions ----------
@@ -769,20 +624,12 @@ document.addEventListener('click', (event) => {
     } else {
       state[key] = value;
       setPressed(group, [value]);
-      if (key === 'activity') {
-        // Titre et lieu pré-remplis selon l'activité, toujours modifiables
-        $('[data-title]').value = ACTIVITIES[value].title;
-        $('[data-title-block]').hidden = false;
-        state.place = ACTIVITIES[value].place;
-        setPressed($('[data-group="place"]'), [state.place]);
-      }
+      if (key === 'category') { state.activity = null; setPressed($('[data-group="activity"]'), []); }
+      if (key === 'category' || key === 'activity') applyDefaults();
     }
     refreshButtons();
     return;
   }
-
-  const starter = event.target.closest('[data-starter]');
-  if (starter) { $('[data-msg]').value = starter.dataset.starter; $('[data-msg]').focus(); return; }
 
   const target = event.target.closest('[data-go], [data-action]');
   if (!target || target.disabled) return;
@@ -792,18 +639,6 @@ document.addEventListener('click', (event) => {
   if (action === 'own') { $('[data-desc]').focus({ preventScroll: true }); return; }
   if (action === 'share') { target.setAttribute('aria-checked', String(target.getAttribute('aria-checked') !== 'true')); return; }
   if (action === 'restart') { restart(); return; }
-  if (action === 'to-events') { $('[data-events]').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
-  if (action === 'send') {
-    const text = $('[data-msg]').value.trim();
-    if (!text) return;
-    const bubble = document.createElement('p');
-    bubble.className = 'bubble';
-    bubble.textContent = text; // textContent : le texte saisi n'est jamais interprété comme du HTML
-    $('[data-thread]').append(bubble);
-    $('[data-msg]').value = '';
-    $('[data-chat-empty]').hidden = true;
-    return;
-  }
   showScreen(target.dataset.go);
 });
 

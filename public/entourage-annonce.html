@@ -143,6 +143,16 @@ textarea.input { min-height: 150px; resize: vertical; line-height: 1.45; }
 .item .l { color: #555; font-size: 14px; display: block; }
 .item.new { background: #fffaf6; border: 1.5px solid var(--orange); border-radius: 18px; padding: 12px; margin: 6px 0; }
 .item.new .l { color: #3a3a3a; }
+button.item { width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; align-items: center; }
+.item .chev { margin-left: auto; font-size: 30px; color: var(--orange); line-height: 1; }
+.dtop { display: flex; align-items: center; gap: 14px; border-bottom: 1.5px solid var(--orange); padding: 6px 0 14px; margin-bottom: 18px; }
+.dtop h1 { font-size: 22px; margin: 0; }
+.icon-back { background: none; border: 0; padding: 4px; cursor: pointer; display: grid; place-items: center; }
+.dname { font-size: 22px; margin: 0 0 12px; }
+.dhero { position: relative; height: 170px; border-radius: 20px; background: var(--peach-2); display: grid; place-items: center; font-size: 76px; margin-bottom: 16px; }
+.dhero .pill { position: absolute; top: 12px; right: 12px; background: #fff; margin: 0; }
+.desc { margin: 0 0 16px; color: #333; }
+.mine-msg { background: var(--peach-2); border-radius: 14px; padding: 10px 12px; font-size: 14px; color: #5a4535; margin: 14px 0 0; }
 
 /* Note de lecture, hors maquette */
 .notes { width: 100%; max-width: 390px; background: #fff; border: 2px solid var(--orange); border-radius: 16px; padding: 16px 18px; font-size: 14px; }
@@ -314,10 +324,11 @@ textarea.input { min-height: 150px; resize: vertical; line-height: 1.45; }
       <div class="sheet">
         <div class="tabs" aria-hidden="true"><span class="on">Contributions</span><span>Demandes</span><span>Mes annonces</span></div>
         <div class="done-banner">✓ Votre proposition est en ligne. Vous serez prévenu·e dès qu'un voisin vous écrit.</div>
-        <div class="item new">
+        <button class="item new" type="button" data-go="mine" aria-label="Voir mon annonce">
           <span class="thumb" data-l-emoji aria-hidden="true">☕</span>
           <span><b data-l-title></b><span class="l" data-l-when></span><span class="l" data-l-where></span><span class="l">Aujourd'hui</span></span>
-        </div>
+          <span class="chev" aria-hidden="true">›</span>
+        </button>
         <div class="item">
           <span class="thumb" aria-hidden="true">🎁</span>
           <span><b>Partage</b><span class="l">À 9 km de moi</span><span class="l">La Courneuve (93120)</span><span class="l">Aujourd'hui</span></span>
@@ -331,6 +342,32 @@ textarea.input { min-height: 150px; resize: vertical; line-height: 1.45; }
         </div>
       </div>
     </section>
+
+    <!-- ===== Détail de mon annonce (reprend l'écran « Contribution » de l'app) ===== -->
+    <section class="screen" data-screen="mine" hidden>
+      <div class="dtop">
+        <button class="icon-back" type="button" data-go="list" aria-label="Retour"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ff9739" stroke-width="2" stroke-linecap="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg></button>
+        <h1>Contribution</h1>
+      </div>
+      <h2 class="dname" data-m-title></h2>
+      <div class="dhero" aria-hidden="true"><span data-m-emoji>☕</span><span class="pill">Temps de partage</span></div>
+      <div class="facts">
+        <div class="fact"><span class="i" aria-hidden="true">🗓️</span><span data-m-when></span></div>
+        <div class="fact"><span class="i" aria-hidden="true">📍</span><span data-m-where></span></div>
+        <div class="fact"><span class="i" aria-hidden="true">🚶</span><span data-m-distance></span></div>
+      </div>
+      <p class="desc" data-m-desc></p>
+      <p class="field-label">Créée aujourd'hui par</p>
+      <div class="author" style="border:0; padding-top:4px">
+        <span class="avatar" aria-hidden="true">🙂</span>
+        <span><b>Ryzlane A.</b><small>Membre depuis 11/2026</small><span class="badge-charte">✓ A lu la charte éthique</span></span>
+      </div>
+      <p class="mine-msg">0 message pour l'instant. Vous serez prévenu·e dès qu'un voisin vous écrit.</p>
+      <div class="actions">
+        <button class="btn ghost" type="button" data-go="list">Retour</button>
+        <button class="btn" type="button" data-go="preview">Modifier</button>
+      </div>
+    </section>
   </div>
 
   <aside class="notes">
@@ -340,7 +377,7 @@ textarea.input { min-height: 150px; resize: vertical; line-height: 1.45; }
       <li><span class="step">Le premier geste</span> suit le choix fait à l'inscription&nbsp;: ici, un temps de partage plutôt qu'un objet à donner.</li>
       <li><span class="step">Étapes 1 à 3</span>&nbsp;: l'annonce se construit avec des choix (quoi, quand, où) au lieu d'une case vide. Les créneaux viennent des disponibilités du profil, et la distance part de «&nbsp;à pied&nbsp;».</li>
       <li><span class="step">Étape 4</span>&nbsp;: une description est proposée à partir des réponses, modifiable. Une petite liste montre ce que l'annonce dit déjà.</li>
-      <li><span class="step">À la fin</span>&nbsp;: l'annonce publiée, à côté de deux annonces telles qu'elles apparaissent aujourd'hui dans l'app.</li>
+      <li><span class="step">À la fin</span>&nbsp;: l'annonce publiée, à côté de deux annonces telles qu'elles apparaissent aujourd'hui dans l'app. Touchez la vôtre pour la revoir en détail.</li>
     </ol>
   </aside>
 </main>
@@ -424,6 +461,12 @@ function renderPreview() {
   $('[data-l-title]').textContent = title;
   $('[data-l-when]').textContent = whenShort;
   $('[data-l-where]').textContent = `${PLACES[state.place].short} · ${quartier()} · à pied`;
+  $('[data-m-emoji]').textContent = a.emoji;
+  $('[data-m-title]').textContent = title;
+  $('[data-m-when]').textContent = whenShort;
+  $('[data-m-where]').textContent = whereShort;
+  $('[data-m-distance]').textContent = DISTANCES[state.distance];
+  $('[data-m-desc]').textContent = $('[data-desc]').value.trim();
 }
 
 function setPressed(groupEl, values) {
@@ -432,7 +475,7 @@ function setPressed(groupEl, values) {
 
 function showScreen(name) {
   if (name === 'describe') $('[data-suggestion]').textContent = suggestion();
-  if (name === 'preview' || name === 'list') renderPreview();
+  if (['preview', 'list', 'mine'].includes(name)) renderPreview();
   document.querySelectorAll('[data-screen]').forEach((s) => { s.hidden = s.dataset.screen !== name; });
   const active = document.querySelector(`[data-screen="${name}"]`);
   active.scrollTop = 0;
@@ -486,7 +529,8 @@ document.addEventListener('click', (event) => {
   if (!target || target.disabled) return;
   const action = target.dataset.action;
   if (action === 'use') { $('[data-desc]').value = suggestion(); refreshButtons(); return; }
-  if (action === 'own') { $('[data-assist]').hidden = true; $('[data-desc]').focus(); return; }
+  // La suggestion reste affichée : on peut s'en inspirer ou l'utiliser plus tard.
+  if (action === 'own') { $('[data-desc]').focus({ preventScroll: true }); return; }
   if (action === 'share') { target.setAttribute('aria-checked', String(target.getAttribute('aria-checked') !== 'true')); return; }
   if (action === 'restart') { restart(); return; }
   showScreen(target.dataset.go);

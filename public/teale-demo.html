@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Demande de démo guidée, prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caprasimo&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+/* Prototype non officiel, inspiré de la page « Demander une démo » de teale
+   (vert #16393b, terracotta #af664c, rose poudré #f0dcd5, Caprasimo + DM Sans).
+   Formulaire en 3 étapes ; aucune donnée n'est envoyée. */
+:root {
+  --green: #16393b;
+  --green-soft: #24504f;
+  --terra: #af664c;
+  --terra-dark: #8f4f39;
+  --pink: #f0dcd5;
+  --pink-soft: #f8ece7;
+  --field: #f7f8fa;
+  --ink: #171617;
+  --muted: #5f6368;
+  --line: #d9dcdf;
+  --display: "Caprasimo", Georgia, serif;
+  --font: "DM Sans", Arial, Helvetica, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--green); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.5; }
+[hidden] { display: none !important; }
+button { font: inherit; color: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--terra); outline-offset: 2px; }
+
+.tag { display: block; text-align: center; background: #000; color: var(--pink); font-size: 12px; font-weight: 700; padding: 6px 12px; }
+.nav { display: flex; align-items: center; justify-content: space-between; padding: 16px max(16px, 4vw); color: #fff; }
+.logo { font-family: var(--display); font-size: 30px; letter-spacing: -.5px; }
+.nav .demo { background: var(--terra); color: #fff; font-weight: 700; font-size: 14px; padding: 10px 16px; border-radius: 12px; }
+
+.hero { display: grid; gap: 32px; padding: 20px max(16px, 4vw) 56px; max-width: 1240px; margin: 0 auto; align-items: start; }
+@media (min-width: 960px) { .hero { grid-template-columns: 1fr 560px; } .pitch { position: sticky; top: 24px; } }
+.pitch { color: #fff; }
+.pitch h1 { font-family: var(--display); font-weight: 400; font-size: clamp(38px, 5vw, 58px); line-height: 1.08; margin: 10px 0 18px; }
+.pitch .lead { font-size: 19px; font-weight: 700; margin: 0 0 22px; }
+.pitch ul { padding-left: 20px; margin: 0 0 26px; }
+.pitch li { margin-bottom: 8px; }
+.pitch li::marker { color: var(--terra); }
+.notes { background: var(--green-soft); border-radius: 16px; padding: 16px 18px; font-size: 14px; }
+.notes b { color: var(--pink); }
+.notes ol { margin: 6px 0 0; padding-left: 18px; }
+
+/* Carte du formulaire */
+.card { background: #fff; border: 2px solid #000; border-radius: 22px; padding: 26px clamp(16px, 4vw, 30px) 28px; }
+.card h2 { font-family: var(--display); font-weight: 400; font-size: clamp(28px, 4vw, 40px); line-height: 1.1; margin: 0 0 6px; text-align: center; }
+.intro { text-align: center; color: var(--muted); margin: 0 0 18px; }
+.steps { display: flex; gap: 6px; margin-bottom: 20px; }
+.steps span { flex: 1; height: 6px; border-radius: 6px; background: var(--line); }
+.steps span.on { background: var(--terra); }
+h3 { font-size: 18px; margin: 0 0 4px; }
+h3:focus { outline: none; }
+.hint { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+
+.options { display: grid; gap: 10px; }
+.opt { width: 100%; text-align: left; background: var(--field); border: 2px solid transparent; border-radius: 14px; padding: 12px 14px; cursor: pointer;
+  display: grid; grid-template-columns: 26px 1fr; gap: 10px; align-items: start; }
+.opt .box { width: 22px; height: 22px; border-radius: 6px; border: 2px solid #9aa0a6; margin-top: 1px; display: grid; place-items: center; background: #fff; }
+.opt[aria-pressed="true"] { border-color: var(--terra); background: var(--pink-soft); }
+.opt[aria-pressed="true"] .box { background: var(--terra); border-color: var(--terra); }
+.opt[aria-pressed="true"] .box::after { content: "✓"; color: #fff; font-size: 14px; font-weight: 700; }
+.opt strong { display: block; font-size: 15px; }
+.opt small { color: var(--muted); font-size: 13px; }
+
+.row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+.pill { border: 2px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 14px; cursor: pointer; font-weight: 500; }
+.pill[aria-pressed="true"] { border-color: var(--terra); background: var(--pink-soft); font-weight: 700; }
+.label { font-weight: 700; font-size: 14px; margin: 0 0 8px; display: block; }
+
+.actions { display: flex; gap: 10px; margin-top: 22px; }
+.btn { border: 0; border-radius: 12px; padding: 14px 18px; font-weight: 700; font-size: 16px; cursor: pointer; background: #000; color: #fff; flex: 1; }
+.btn.terra { background: var(--terra); }
+.btn.ghost { background: #fff; color: var(--ink); border: 2px solid var(--line); flex: 0 0 auto; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.error { color: #a1301b; font-size: 14px; margin: 10px 0 0; }
+
+/* Restitution */
+.result { border-radius: 16px; padding: 16px; margin-bottom: 12px; background: var(--pink-soft); }
+.result h4 { margin: 0 0 4px; font-size: 16px; }
+.result .name { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--terra-dark); }
+.result p { margin: 6px 0 0; font-size: 14px; }
+.result ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px; }
+.expert { display: flex; gap: 12px; align-items: center; background: var(--field); border-radius: 14px; padding: 12px 14px; margin-bottom: 12px; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font-size: 20px; flex: none; }
+.nohr { border: 2px dashed var(--terra); border-radius: 14px; padding: 12px 14px; font-size: 14px; margin-bottom: 12px; }
+.fields { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; margin-top: 6px; }
+.fields label { font-size: 13px; font-weight: 500; display: grid; gap: 4px; }
+.fields input { border: 0; background: var(--field); border-radius: 6px; padding: 11px; font: inherit; }
+@media (max-width: 520px) { .fields { grid-template-columns: 1fr; } }
+.done { text-align: center; padding: 20px 0 6px; }
+.done .big { font-family: var(--display); font-size: 30px; margin: 6px 0; }
+</style>
+</head>
+<body>
+<span class="tag">Prototype non officiel · proposition de Ryzlane Arsac-Gothière pour teale</span>
+<header class="nav"><span class="logo">teale.</span><span class="demo">Demander une démo</span></header>
+
+<main class="hero">
+  <section class="pitch">
+    <h1>Passez à l'action avec teale</h1>
+    <p class="lead">Dites-nous ce que vous observez dans vos équipes, on vous présente l'expert qu'il vous faut.</p>
+    <ul>
+      <li>Pas besoin de connaître les termes RPS ou QVCT : décrivez simplement la situation.</li>
+      <li>Un interlocuteur choisi selon votre problématique dès le premier appel.</li>
+      <li>Une démo centrée sur votre cas, pas sur toute la plateforme.</li>
+    </ul>
+    <div class="notes">
+      <b>Ce que le prototype change</b>
+      <ol>
+        <li>Aujourd'hui, le besoin tient dans une seule case de texte libre.</li>
+        <li>Ici, on coche des situations concrètes, sans jargon.</li>
+        <li>Chaque situation mène au bon cas d'usage, au bon expert, et à ce que la démo montrera.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="card" aria-live="polite">
+    <h2>Demandez une démo</h2>
+    <p class="intro">3 étapes, 1 minute.</p>
+    <div class="steps" aria-hidden="true"><span data-bar="1" class="on"></span><span data-bar="2"></span><span data-bar="3"></span></div>
+
+    <!-- Étape 1 : la situation, en mots de tous les jours -->
+    <div data-step="1">
+      <h3 tabindex="-1">Qu'est-ce qui se passe dans vos équipes&nbsp;?</h3>
+      <p class="hint">Cochez tout ce qui ressemble à votre situation.</p>
+      <div class="options" data-group="situations">
+        <button class="opt" type="button" data-sit="burnout" aria-pressed="false"><span class="box"></span><span><strong>Une personne de l'équipe est en burn-out ou en arrêt depuis longtemps</strong><small>ou j'ai peur que ça arrive</small></span></button>
+        <button class="opt" type="button" data-sit="surcharge" aria-pressed="false"><span class="box"></span><span><strong>La charge de travail déborde</strong><small>les équipes enchaînent les soirées, les priorités changent sans cesse</small></span></button>
+        <button class="opt" type="button" data-sit="communication" aria-pressed="false"><span class="box"></span><span><strong>L'information circule mal, les tensions montent</strong><small>malentendus, réunions qui dérapent, équipes qui ne se parlent plus</small></span></button>
+        <button class="opt" type="button" data-sit="conflit" aria-pressed="false"><span class="box"></span><span><strong>On m'a signalé un conflit ou un comportement inacceptable</strong><small>harcèlement, propos déplacés, manager en difficulté</small></span></button>
+        <button class="opt" type="button" data-sit="absences" aria-pressed="false"><span class="box"></span><span><strong>Les absences et les départs se multiplient</strong><small>arrêts courts répétés, démissions</small></span></button>
+        <button class="opt" type="button" data-sit="reorg" aria-pressed="false"><span class="box"></span><span><strong>On réorganise ou on se sépare de collaborateurs</strong><small>fusion, déménagement, plan de départs</small></span></button>
+        <button class="opt" type="button" data-sit="anticiper" aria-pressed="false"><span class="box"></span><span><strong>Tout va plutôt bien, je veux anticiper</strong><small>prendre soin des équipes avant que ça coince</small></span></button>
+      </div>
+      <p class="error" data-error="1" hidden>Cochez au moins une situation.</p>
+      <div class="actions"><button class="btn" type="button" data-next="2">Continuer</button></div>
+    </div>
+
+    <!-- Étape 2 : l'entreprise -->
+    <div data-step="2" hidden>
+      <h3 tabindex="-1">Votre entreprise</h3>
+      <p class="hint">Pour vous proposer un accompagnement à votre taille.</p>
+      <span class="label">Combien de salariés&nbsp;?</span>
+      <div class="row" data-group="taille">
+        <button class="pill" type="button" data-val="moins de 20" aria-pressed="false">Moins de 20</button>
+        <button class="pill" type="button" data-val="20 à 49" aria-pressed="false">20 à 49</button>
+        <button class="pill" type="button" data-val="50 à 249" aria-pressed="false">50 à 249</button>
+        <button class="pill" type="button" data-val="250 et plus" aria-pressed="false">250 et plus</button>
+      </div>
+      <span class="label">Quelqu'un s'occupe-t-il des RH&nbsp;?</span>
+      <div class="row" data-group="rh">
+        <button class="pill" type="button" data-val="oui" aria-pressed="false">Oui, une équipe RH</button>
+        <button class="pill" type="button" data-val="partiel" aria-pressed="false">Une personne, en plus d'autre chose</button>
+        <button class="pill" type="button" data-val="non" aria-pressed="false">Non, c'est moi</button>
+      </div>
+      <p class="error" data-error="2" hidden>Répondez aux deux questions.</p>
+      <div class="actions"><button class="btn ghost" type="button" data-prev="1">Retour</button><button class="btn" type="button" data-next="3">Voir ce qu'on vous propose</button></div>
+    </div>
+
+    <!-- Étape 3 : la restitution, puis les coordonnées -->
+    <div data-step="3" hidden>
+      <h3 tabindex="-1">Ce que nous vous proposons</h3>
+      <p class="hint">À partir de ce que vous avez coché.</p>
+      <div data-results></div>
+      <div class="expert"><span class="avatar" aria-hidden="true">👤</span><span data-expert></span></div>
+      <div class="nohr" data-nohr hidden></div>
+      <span class="label">Où vous recontacter</span>
+      <div class="fields">
+        <label>Prénom<input type="text" autocomplete="given-name"></label>
+        <label>Entreprise<input type="text" autocomplete="organization"></label>
+        <label>E-mail<input type="email" autocomplete="email"></label>
+        <label>Téléphone<input type="tel" autocomplete="tel"></label>
+      </div>
+      <div class="actions"><button class="btn ghost" type="button" data-prev="2">Retour</button><button class="btn terra" type="button" data-send>Demander ma démo</button></div>
+    </div>
+
+    <div data-step="4" hidden>
+      <div class="done">
+        <div style="font-size:40px" aria-hidden="true">🌿</div>
+        <h3 class="big" tabindex="-1">Merci&nbsp;!</h3>
+        <p data-done-text></p>
+        <p class="hint">Prototype : aucune donnée n'a été envoyée.</p>
+      </div>
+      <div class="actions"><button class="btn ghost" type="button" data-restart style="flex:1">Recommencer</button></div>
+    </div>
+  </section>
+</main>
+
+<script>
+// Chaque situation cochée est traduite en cas d'usage teale, avec ce que la démo montrera.
+// Les cas d'usage et les leviers reprennent ceux présentés sur teale.io.
+const SITUATIONS = {
+  burnout: { usecase: 'Burn-out et épuisement professionnel', plain: 'Repérer les signes d\'épuisement avant l\'arrêt, et accompagner le retour de la personne absente.', demo: ['l\'évaluation de la santé mentale dans l\'application', 'l\'accès gratuit à des psychologues pour vos salariés'], expert: 'un psychologue du travail' },
+  surcharge: { usecase: 'Risques psychosociaux : le stress au travail', plain: 'Ce que vous décrivez fait partie des « risques psychosociaux » : la surcharge et le manque de moyens en font partie.', demo: ['le suivi par équipe des points d\'attention', 'les formations pour aider les managers à prioriser'], expert: 'un psychologue du travail' },
+  communication: { usecase: 'Risques psychosociaux : relations et communication', plain: 'Les tensions et le manque de communication sont un facteur de risque reconnu. Ils se travaillent collectivement.', demo: ['les ateliers d\'équipe', 'le plan de communication pour trouver les bons mots'], expert: 'un coach spécialisé en dynamique d\'équipe' },
+  conflit: { usecase: 'Risques psychosociaux : violences internes', plain: 'Un conflit ou un harcèlement signalé demande une réponse rapide et encadrée, pour la personne concernée comme pour l\'équipe.', demo: ['le soutien individuel par un psychologue', 'la formation des managers à ces situations'], expert: 'un psychologue spécialisé dans les conflits au travail' },
+  absences: { usecase: 'Absentéisme', plain: 'Des absences répétées sont souvent le signe visible d\'un mal-être qu\'on ne voit pas encore.', demo: ['les données d\'engagement et de santé mentale par équipe', 'le plan d\'action recommandé par votre binôme psychologue et chargé de compte'], expert: 'un chargé de compte et un psychologue' },
+  reorg: { usecase: 'PSE et gestion de crise', plain: 'Une réorganisation fragilise même les équipes qui allaient bien : mieux vaut accompagner avant, pendant et après.', demo: ['l\'accompagnement de crise', 'la communication aux équipes'], expert: 'un expert de la gestion de crise' },
+  anticiper: { usecase: 'Démarche QVCT (qualité de vie et des conditions de travail)', plain: 'Agir avant que ça coince, c\'est exactement ce qu\'on appelle une démarche QVCT : prendre soin des conditions de travail au quotidien.', demo: ['les conférences mensuelles et les contenus', 'l\'outil d\'évaluation de la santé mentale'], expert: 'un chargé de compte QVCT' }
+};
+
+const state = { sits: new Set(), taille: null, rh: null };
+
+function goTo(step) {
+  document.querySelectorAll('[data-step]').forEach((el) => { el.hidden = el.dataset.step !== String(step); });
+  document.querySelectorAll('[data-bar]').forEach((bar) => { bar.classList.toggle('on', Number(bar.dataset.bar) <= Math.min(step, 3)); });
+  document.querySelectorAll('[data-error]').forEach((e) => { e.hidden = true; });
+  const title = document.querySelector(`[data-step="${step}"] h3`);
+  if (title) title.focus({ preventScroll: true });
+  document.querySelector('.card').scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+
+// Construit la restitution de l'étape 3 à partir des réponses.
+function renderResults() {
+  const box = document.querySelector('[data-results]');
+  box.innerHTML = '';
+  const experts = [];
+  state.sits.forEach((key) => {
+    const s = SITUATIONS[key];
+    experts.push(s.expert);
+    const card = document.createElement('div');
+    card.className = 'result';
+    const name = document.createElement('div'); name.className = 'name'; name.textContent = s.usecase;
+    const plain = document.createElement('p'); plain.textContent = s.plain;
+    const h = document.createElement('h4'); h.textContent = 'Pendant la démo, nous vous montrerons :';
+    h.style.marginTop = '8px';
+    const ul = document.createElement('ul');
+    s.demo.forEach((d) => { const li = document.createElement('li'); li.textContent = d; ul.appendChild(li); });
+    card.append(name, plain, h, ul);
+    box.appendChild(card);
+  });
+  const unique = [...new Set(experts)];
+  document.querySelector('[data-expert]').textContent = `Votre interlocuteur : ${unique.join(', puis ')}, en plus de votre chargé de compte.`;
+
+  const nohr = document.querySelector('[data-nohr]');
+  if (state.rh === 'non' || state.rh === 'partiel') {
+    nohr.hidden = false;
+    nohr.textContent = 'Pas d\'équipe RH ? Nous vous aidons aussi à annoncer la démarche à vos équipes et à intégrer l\'évaluation des risques psychosociaux à votre document unique (DUERP), obligatoire dès le premier salarié.';
+  } else {
+    nohr.hidden = true;
+  }
+}
+
+document.addEventListener('click', (event) => {
+  const t = event.target.closest('button');
+  if (!t) return;
+
+  if (t.dataset.sit) {
+    const on = t.getAttribute('aria-pressed') !== 'true';
+    t.setAttribute('aria-pressed', String(on));
+    if (on) state.sits.add(t.dataset.sit); else state.sits.delete(t.dataset.sit);
+    return;
+  }
+  if (t.dataset.val) {
+    const group = t.closest('[data-group]');
+    group.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === t)));
+    state[group.dataset.group] = t.dataset.val;
+    return;
+  }
+  if (t.dataset.next === '2') {
+    if (!state.sits.size) { document.querySelector('[data-error="1"]').hidden = false; return; }
+    goTo(2); return;
+  }
+  if (t.dataset.next === '3') {
+    if (!state.taille || !state.rh) { document.querySelector('[data-error="2"]').hidden = false; return; }
+    renderResults(); goTo(3); return;
+  }
+  if (t.dataset.prev) { goTo(Number(t.dataset.prev)); return; }
+  if (t.hasAttribute('data-send')) {
+    const n = state.sits.size;
+    document.querySelector('[data-done-text]').textContent = `Votre interlocuteur vous recontacte avec une démo centrée sur ${n > 1 ? 'vos ' + n + ' situations' : 'votre situation'}.`;
+    goTo(4); return;
+  }
+  if (t.hasAttribute('data-restart')) {
+    state.sits.clear(); state.taille = null; state.rh = null;
+    document.querySelectorAll('[aria-pressed]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
+    document.querySelectorAll('.fields input').forEach((i) => { i.value = ''; });
+    goTo(1);
+  }
+});
+</script>
+</body>
+</html>

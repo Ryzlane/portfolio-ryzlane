@@ -46,8 +46,11 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 .pitch ul { padding-left: 20px; margin: 0 0 26px; }
 .pitch li { margin-bottom: 8px; }
 .pitch li::marker { color: var(--terra); }
-.notes { background: var(--green-soft); border-radius: 16px; padding: 16px 18px; font-size: 14px; }
-.notes b { color: var(--pink); }
+/* Note de lecture du prototype : distincte de la page teale reproduite */
+.notes { background: #fff; color: var(--ink); border: 2px solid var(--terra); border-radius: 16px; padding: 16px 18px; font-size: 14px; position: relative; }
+.notes .badge { display: inline-block; background: var(--terra); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; }
+.notes b { color: var(--terra-dark); display: block; font-size: 15px; }
+.notes li::marker { color: var(--terra); }
 .notes ol { margin: 6px 0 0; padding-left: 18px; }
 
 /* Carte du formulaire */
@@ -117,6 +120,7 @@ h3:focus { outline: none; }
       <li>Une démo centrée sur votre cas, pas sur toute la plateforme.</li>
     </ul>
     <div class="notes">
+      <span class="badge">Note de lecture · hors maquette</span>
       <b>Ce que le prototype change</b>
       <ol>
         <li>Aujourd'hui, le besoin tient dans une seule case de texte libre.</li>

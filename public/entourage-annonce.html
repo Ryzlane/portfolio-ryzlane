@@ -136,6 +136,13 @@ textarea.input { min-height: 150px; resize: vertical; line-height: 1.45; }
 .assist .row { display: flex; gap: 8px; flex-wrap: wrap; }
 .mini { border-radius: 999px; padding: 7px 12px; font-size: 14px; font-weight: 700; cursor: pointer; border: 1.5px solid var(--orange); background: var(--orange); color: #fff; }
 .mini.ghost { background: #fff; color: var(--orange-deep); }
+.subs { margin: -4px 0 4px; padding: 4px 4px 2px; }
+.subs .chips { margin-bottom: 10px; }
+.sub-q { font-family: var(--title); font-weight: 700; font-size: 15px; margin: 0 0 8px; }
+.field-help { color: #5c5c5c; font-size: 14px; margin: -2px 0 10px; }
+.upload { border: 1.5px dashed #cfcfcf; border-radius: 18px; padding: 18px; display: grid; justify-items: center; gap: 8px; margin-bottom: 20px; }
+.upload img { width: 56px; height: 56px; }
+.upload span { text-decoration: underline; font-weight: 600; }
 .checklist { list-style: none; padding: 0; margin: 0 0 8px; display: grid; gap: 6px; font-size: 14px; }
 .checklist li::before { content: "○"; display: inline-block; width: 22px; color: #b9b9b9; font-weight: 700; }
 .checklist li.ok::before { content: "✓"; color: var(--green); }
@@ -279,34 +286,71 @@ ol.next li::marker { color: var(--orange); font-weight: 700; }
       </div>
     </section>
 
-    <!-- ===== Étape 1 : catégorie (celles de l'app), puis l'activité pour un temps de partage ===== -->
+    <!-- ===== Étape 1 : catégorie (celles de l'app), avec ses précisions juste en dessous ===== -->
     <section class="screen" data-screen="what" hidden>
-      <button class="back" type="button" data-go="before" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <button class="back" type="button" data-go="before" data-back-what aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
       <div class="progress"><span style="width:25%"></span></div>
       <p class="step-label">Étape 1 sur 4</p>
       <h1>Que proposez-vous&nbsp;?</h1>
       <div class="options" data-group="category">
         <button class="option" type="button" data-value="partage" aria-pressed="false"><img src="entourage/cat-partage.png" alt=""><span><b>Temps de partage</b><span class="sub">Café, activité…</span></span><span class="radio"></span></button>
+        <div class="subs" data-subs-for="partage" hidden>
+          <p class="sub-q">Quel moment&nbsp;?</p>
+          <div class="chips" data-group="sub">
+            <button class="chip" type="button" data-value="cafe" aria-pressed="false">Un café</button>
+            <button class="chip" type="button" data-value="balade" aria-pressed="false">Une balade</button>
+            <button class="chip" type="button" data-value="jeux" aria-pressed="false">Un jeu de société</button>
+            <button class="chip" type="button" data-value="langue" aria-pressed="false">Pratiquer une langue</button>
+            <button class="chip" type="button" data-value="autre" aria-pressed="false">Autre</button>
+          </div>
+        </div>
         <button class="option" type="button" data-value="service" aria-pressed="false"><img src="entourage/cat-service.png" alt=""><span><b>Service</b><span class="sub">Lessive, impression de documents…</span></span><span class="radio"></span></button>
+        <div class="subs" data-subs-for="service" hidden>
+          <p class="sub-q">Quel service&nbsp;?</p>
+          <div class="chips" data-group="sub">
+            <button class="chip" type="button" data-value="lessive" aria-pressed="false">Lessive</button>
+            <button class="chip" type="button" data-value="impression" aria-pressed="false">Impression de documents</button>
+            <button class="chip" type="button" data-value="reparation" aria-pressed="false">Petite réparation</button>
+            <button class="chip" type="button" data-value="autre" aria-pressed="false">Autre</button>
+          </div>
+        </div>
         <button class="option" type="button" data-value="vetements" aria-pressed="false"><img src="entourage/cat-vetements.png" alt=""><span><b>Vêtements</b><span class="sub">Chaussures, manteau…</span></span><span class="radio"></span></button>
+        <div class="subs" data-subs-for="vetements" hidden>
+          <p class="sub-q">Pour qui&nbsp;?</p>
+          <div class="chips" data-group="who">
+            <button class="chip" type="button" data-value="femme" aria-pressed="false">Femme</button>
+            <button class="chip" type="button" data-value="homme" aria-pressed="false">Homme</button>
+            <button class="chip" type="button" data-value="enfant" aria-pressed="false">Enfant</button>
+          </div>
+          <p class="sub-q">Quoi&nbsp;?</p>
+          <div class="chips" data-group="sub">
+            <button class="chip" type="button" data-value="manteau" aria-pressed="false">Manteau</button>
+            <button class="chip" type="button" data-value="chaussures" aria-pressed="false">Chaussures</button>
+            <button class="chip" type="button" data-value="autre" aria-pressed="false">Autre</button>
+          </div>
+        </div>
         <button class="option" type="button" data-value="equipement" aria-pressed="false"><img src="entourage/cat-equipement.png" alt=""><span><b>Équipement</b><span class="sub">Téléphone, sac de couchage…</span></span><span class="radio"></span></button>
+        <div class="subs" data-subs-for="equipement" hidden>
+          <p class="sub-q">Quoi exactement&nbsp;?</p>
+          <div class="chips" data-group="sub">
+            <button class="chip" type="button" data-value="telephone" aria-pressed="false">Téléphone</button>
+            <button class="chip" type="button" data-value="couchage" aria-pressed="false">Sac de couchage</button>
+            <button class="chip" type="button" data-value="electromenager" aria-pressed="false">Petit électroménager</button>
+            <button class="chip" type="button" data-value="autre" aria-pressed="false">Autre</button>
+          </div>
+        </div>
         <button class="option" type="button" data-value="hygiene" aria-pressed="false"><img src="entourage/cat-hygiene.png" alt=""><span><b>Produit d'hygiène</b><span class="sub">Savon, protection sanitaire…</span></span><span class="radio"></span></button>
-      </div>
-      <div data-activity-block hidden>
-        <p class="field-label">Quel moment&nbsp;?</p>
-        <div class="chips" data-group="activity">
-          <button class="chip" type="button" data-value="cafe" aria-pressed="false">Un café</button>
-          <button class="chip" type="button" data-value="balade" aria-pressed="false">Une balade</button>
-          <button class="chip" type="button" data-value="jeux" aria-pressed="false">Un jeu de société</button>
-          <button class="chip" type="button" data-value="langue" aria-pressed="false">Pratiquer une langue</button>
+        <div class="subs" data-subs-for="hygiene" hidden>
+          <p class="sub-q">Quoi exactement&nbsp;?</p>
+          <div class="chips" data-group="sub">
+            <button class="chip" type="button" data-value="soins" aria-pressed="false">Savon et soins</button>
+            <button class="chip" type="button" data-value="protections" aria-pressed="false">Protections périodiques</button>
+            <button class="chip" type="button" data-value="autre" aria-pressed="false">Autre</button>
+          </div>
         </div>
       </div>
-      <div data-title-block hidden>
-        <p class="field-label">Titre <small>modifiable</small></p>
-        <input class="input" type="text" data-title maxlength="60" aria-label="Titre de votre proposition">
-      </div>
       <div class="actions">
-        <button class="btn ghost" type="button" data-go="before">Retour</button>
+        <button class="btn ghost" type="button" data-go="before" data-back-what>Retour</button>
         <button class="btn" type="button" data-go="when" data-need="what" disabled>Continuer</button>
       </div>
     </section>
@@ -361,12 +405,19 @@ ol.next li::marker { color: var(--orange); font-weight: 700; }
       </div>
     </section>
 
-    <!-- ===== Étape 4 : description, avec une suggestion ===== -->
+    <!-- ===== Étape 4 : titre, description et image (mise en forme de l'app), avec une suggestion ===== -->
     <section class="screen" data-screen="describe" hidden>
       <button class="back" type="button" data-go="where" aria-label="Retour"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg></button>
       <div class="progress"><span style="width:100%"></span></div>
       <p class="step-label">Étape 4 sur 4</p>
-      <h1>Présentez votre proposition</h1>
+      <h1>Décrivez votre contribution</h1>
+
+      <p class="field-label">Titre <small>obligatoire</small></p>
+      <p class="field-help">Donnez un nom court et explicite à votre contribution&nbsp;: c'est ce que les voisins liront en premier.</p>
+      <input class="input" type="text" data-title maxlength="70" aria-label="Titre de votre contribution">
+
+      <p class="field-label">Description <small>obligatoire</small></p>
+      <p class="field-help">Décrivez en détail la contribution que vous proposez.</p>
       <div class="assist">
         <span class="label">✨ Suggestion à partir de vos réponses</span>
         <p data-suggestion></p>
@@ -375,11 +426,15 @@ ol.next li::marker { color: var(--orange); font-weight: 700; }
           <button class="mini ghost" type="button" data-action="own">Écrire moi-même</button>
         </div>
       </div>
-      <p class="field-label">Description</p>
-      <textarea class="input" data-desc maxlength="900" placeholder="Exemple : Je propose une balade dans le parc ce week-end pour discuter et se détendre." aria-label="Description"></textarea>
+      <textarea class="input" data-desc maxlength="900" aria-label="Description"></textarea>
       <p class="counter"><span data-count>0</span> / 900</p>
+
+      <p class="field-label">Image (facultatif)</p>
+      <div class="upload" aria-hidden="true"><img src="entourage/ico-image.png" alt=""><span>Ajouter une image</span></div>
+
       <p class="field-label">Votre annonce dit…</p>
       <ul class="checklist">
+        <li data-check-title>un titre précis</li>
         <li class="ok">ce que vous proposez</li>
         <li class="ok">quand</li>
         <li class="ok">où, dans un lieu public</li>
@@ -417,7 +472,7 @@ ol.next li::marker { color: var(--orange); font-weight: 700; }
       </div>
       <div class="actions">
         <button class="btn ghost" type="button" data-go="describe">Retour</button>
-        <button class="btn" type="button" data-go="published">Publier</button>
+        <button class="btn" type="button" data-action="publish">Publier</button>
       </div>
     </section>
 
@@ -464,7 +519,7 @@ ol.next li::marker { color: var(--orange); font-weight: 700; }
       <p class="mine-msg">0 message pour l'instant. Vous serez prévenu·e dès qu'un voisin vous écrit.</p>
       <div class="actions">
         <button class="btn ghost" type="button" data-go="list">Retour</button>
-        <button class="btn" type="button" data-go="preview">Modifier</button>
+        <button class="btn" type="button" data-action="edit">Modifier</button>
       </div>
     </section>
   </div>
@@ -474,8 +529,9 @@ ol.next li::marker { color: var(--orange); font-weight: 700; }
     <h3>Ce que le prototype change</h3>
     <ol>
       <li><span class="step">Le point de départ</span> est l'onglet Entraide tel qu'il est aujourd'hui. Touchez le bouton «&nbsp;+&nbsp;», puis «&nbsp;Créer une contribution&nbsp;». Ces écrans reprennent l'app à l'identique.</li>
-      <li><span class="step">Étapes 1 à 3</span>&nbsp;: les catégories de l'app, puis des choix (quoi, quand, où) au lieu d'une case vide. Les créneaux viennent des disponibilités du profil, et la distance part de «&nbsp;à pied&nbsp;».</li>
-      <li><span class="step">Étape 4</span>&nbsp;: une description est proposée à partir des réponses, modifiable.</li>
+      <li><span class="step">Étape 1</span>&nbsp;: les catégories de l'app, chacune avec ses précisions juste en dessous (quel moment, quel service, quel objet).</li>
+      <li><span class="step">Étapes 2 et 3</span>&nbsp;: quand et où, au lieu d'une case vide. Les créneaux viennent des disponibilités du profil, et la distance part de «&nbsp;à pied&nbsp;».</li>
+      <li><span class="step">Étape 4</span>&nbsp;: l'écran de l'app (titre, description, image), avec un titre écrit par la personne et une description proposée à partir des réponses.</li>
       <li><span class="step">Après la publication</span>, un écran explique la suite, y compris ce qui se passe si personne n'écrit au bout de 7 jours. Votre annonce apparaît ensuite dans la liste&nbsp;: touchez-la pour la revoir.</li>
     </ol>
   </aside>
@@ -483,19 +539,47 @@ ol.next li::marker { color: var(--orange); font-weight: 700; }
 
 <script>
 // ---------- Données du prototype ----------
+// Catégories de l'app. `kind` distingue ce qu'on partage (moment, service) de ce qu'on donne (objet).
 const CATEGORIES = {
-  partage:    { label: 'Temps de partage' },
-  service:    { label: 'Service', title: 'Un coup de main', phrase: 'un coup de main (lessive, impression de documents…)', place: 'mediatheque' },
-  vetements:  { label: 'Vêtements', title: 'Vêtements à donner', phrase: 'des vêtements en bon état', place: 'marche' },
-  equipement: { label: 'Équipement', title: 'Équipement à donner', phrase: 'un équipement (téléphone, sac de couchage…)', place: 'marche' },
-  hygiene:    { label: "Produit d'hygiène", title: "Produits d'hygiène à donner", phrase: "des produits d'hygiène neufs", place: 'marche' },
+  partage:    { label: 'Temps de partage', kind: 'moment' },
+  service:    { label: 'Service', kind: 'moment' },
+  vetements:  { label: 'Vêtements', kind: 'objet' },
+  equipement: { label: 'Équipement', kind: 'objet' },
+  hygiene:    { label: "Produit d'hygiène", kind: 'objet' },
 };
-const ACTIVITIES = {
-  cafe:   { title: 'Un café pour discuter', phrase: "de partager un moment autour d'une boisson", place: 'cafe' },
-  balade: { title: 'Une balade dans le quartier', phrase: 'une balade pour discuter', place: 'parc' },
-  jeux:   { title: 'Une partie de jeux de société', phrase: 'une partie de jeux de société', place: 'mediatheque' },
-  langue: { title: 'Pratiquer une langue en discutant', phrase: 'un moment pour pratiquer une langue', place: 'cafe' },
+// Précisions par catégorie : exemple de titre (placeholder), formulation pour la suggestion, lieu par défaut.
+const SUBS = {
+  partage: {
+    cafe:   { example: 'Un café pour papoter samedi', phrase: "de partager un moment autour d'une boisson", place: 'cafe' },
+    balade: { example: 'Balade au parc de la Bergère', phrase: 'une balade pour discuter', place: 'parc' },
+    jeux:   { example: 'Partie de cartes à la médiathèque', phrase: 'une partie de jeux de société', place: 'mediatheque' },
+    langue: { example: "Pratiquer l'anglais autour d'un café", phrase: 'un moment pour pratiquer une langue', place: 'cafe' },
+    autre:  { example: 'Atelier dessin au parc', phrase: 'un moment de partage', place: 'parc' },
+  },
+  service: {
+    lessive:    { example: 'Aide pour une lessive à la laverie', phrase: 'un coup de main pour une lessive', place: 'cafe' },
+    impression: { example: 'Impression de CV ou de documents', phrase: 'un coup de main pour imprimer des documents', place: 'mediatheque' },
+    reparation: { example: 'Recoudre un vêtement ou réparer un sac', phrase: 'un coup de main pour une petite réparation', place: 'cafe' },
+    autre:      { example: 'Recharger un téléphone', phrase: 'un coup de main', place: 'cafe' },
+  },
+  vetements: {
+    manteau:    { example: "Manteau d'hiver {who}, taille M", phrase: 'un manteau', place: 'marche' },
+    chaussures: { example: 'Baskets {who}, pointure 42', phrase: 'des chaussures', place: 'marche' },
+    autre:      { example: 'Pulls {who}, taille L', phrase: 'des vêtements', place: 'marche' },
+  },
+  equipement: {
+    telephone:      { example: 'Téléphone Android avec chargeur', phrase: 'un téléphone en bon état', place: 'marche' },
+    couchage:       { example: 'Sac de couchage grand froid', phrase: 'un sac de couchage', place: 'marche' },
+    electromenager: { example: 'Bouilloire électrique qui fonctionne', phrase: 'un petit appareil électroménager qui fonctionne', place: 'marche' },
+    autre:          { example: 'Sac à dos 30 litres', phrase: 'un équipement en bon état', place: 'marche' },
+  },
+  hygiene: {
+    soins:       { example: 'Lot de savons et gels douche neufs', phrase: 'des produits de soin neufs (savon, gel douche…)', place: 'marche' },
+    protections: { example: 'Paquets de serviettes hygiéniques neufs', phrase: 'des protections périodiques neuves', place: 'marche' },
+    autre:       { example: 'Brosses à dents et dentifrices neufs', phrase: "des produits d'hygiène neufs", place: 'marche' },
+  },
 };
+const WHO = { femme: 'femme', homme: 'homme', enfant: 'enfant' };
 const SLOTS = {
   'lun-soir':  { short: 'Lun. soir', long: 'le lundi soir' },
   'mer-soir':  { short: 'Mer. soir', long: 'le mercredi soir' },
@@ -517,9 +601,11 @@ const DISTANCES = {
 };
 
 // ---------- État ----------
-const initialState = () => ({ category: null, activity: null, slots: ['mer-soir', 'sam-aprem'], place: null, distance: 'pied', published: false });
+const initialState = () => ({ category: null, sub: null, who: null, slots: ['mer-soir', 'sam-aprem'], place: null,
+  distance: 'pied', published: false, editing: false });
 let state = initialState();
 const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
 
 // Joint une liste en français : « a », « a ou b », « a, b ou c ».
 function joinOr(items) {
@@ -527,35 +613,49 @@ function joinOr(items) {
   return `${items.slice(0, -1).join(', ')} ou ${items[items.length - 1]}`;
 }
 function quartier() { return ($('[data-quartier]').value || '').trim() || 'mon quartier'; }
-// Ce qui est proposé : l'activité pour un temps de partage, sinon la catégorie.
-function offer() { return state.category === 'partage' ? ACTIVITIES[state.activity] : CATEGORIES[state.category]; }
+function subInfo() { return state.category && state.sub ? SUBS[state.category][state.sub] : null; }
+function whoLabel() { return state.who ? WHO[state.who] : ''; }
+// L'étape 1 est complète quand la précision est choisie (et « pour qui » pour les vêtements).
+function whatChosen() { return !!subInfo() && (state.category !== 'vetements' || !!state.who); }
 
 // Description suggérée, construite uniquement à partir des réponses.
 function suggestion() {
+  const info = subInfo();
   const when = joinOr(state.slots.map((s) => SLOTS[s].long));
   const where = PLACES[state.place]?.phrase || 'dans un lieu public';
-  return `Je vous propose ${offer().phrase} ${when}, ${where}, côté ${quartier()}. `
-    + "L'idée : faire connaissance entre voisins, sans prise de tête. "
-    + "Je m'appelle Ryzlane, je viens d'arriver sur Entourage. Écrivez-moi pour qu'on fixe le jour !";
+  const me = "Je m'appelle Ryzlane, je viens d'arriver sur Entourage. Écrivez-moi pour qu'on fixe le jour !";
+  if (CATEGORIES[state.category].kind === 'objet') {
+    const what = state.category === 'vetements' ? `${info.phrase} pour ${whoLabel()}, en bon état` : info.phrase;
+    return `Je donne ${what}. Remise en main propre ${where}, côté ${quartier()}, ${when}. ${me}`;
+  }
+  return `Je vous propose ${info.phrase} ${when}, ${where}, côté ${quartier()}. `
+    + `L'idée : faire connaissance entre voisins, sans prise de tête. ${me}`;
 }
 
 // ---------- Rendu ----------
+function titleIsPrecise(title) {
+  const words = title.split(/\s+/).filter(Boolean);
+  const generic = Object.values(CATEGORIES).some((c) => c.label.toLowerCase() === title.toLowerCase());
+  return words.length >= 3 && !generic;
+}
+
 function refreshButtons() {
+  const title = $('[data-title]').value.trim();
   const desc = $('[data-desc]').value.trim();
-  const whatChosen = !!state.category && (state.category !== 'partage' || !!state.activity);
   const ready = {
-    what: whatChosen && $('[data-title]').value.trim().length > 0,
+    what: whatChosen(),
     slots: state.slots.length > 0,
     place: !!state.place,
-    desc: desc.length >= 20,
+    desc: title.length > 0 && desc.length >= 20,
   };
-  document.querySelectorAll('[data-need]').forEach((b) => { b.disabled = !ready[b.dataset.need]; });
+  $$('[data-need]').forEach((b) => { b.disabled = !ready[b.dataset.need]; });
   $('[data-count]').textContent = String($('[data-desc]').value.length);
+  $('[data-check-title]').classList.toggle('ok', titleIsPrecise(title));
   // « Un mot sur vous » : coché si la description parle à la première personne.
   $('[data-check-me]').classList.toggle('ok', /\b(je|j'|j’|moi|m'appelle)\b/i.test(desc));
 }
 
-function setText(sel, text) { document.querySelectorAll(sel).forEach((el) => { el.textContent = text; }); }
+function setText(sel, text) { $$(sel).forEach((el) => { el.textContent = text; }); }
 
 function renderAnnonce() {
   const title = $('[data-title]').value.trim();
@@ -570,16 +670,29 @@ function renderAnnonce() {
 }
 
 function setPressed(groupEl, values) {
-  groupEl.querySelectorAll('[data-value]').forEach((b) => b.setAttribute('aria-pressed', String(values.includes(b.dataset.value))));
+  groupEl.querySelectorAll(':scope > [data-value]').forEach((b) => b.setAttribute('aria-pressed', String(values.includes(b.dataset.value))));
+}
+function clearGroup(name) { $$(`[data-group="${name}"]`).forEach((g) => setPressed(g, [])); }
+
+// Exemple de titre adapté aux précisions choisies (le champ reste vide : c'est la personne qui écrit).
+function updateTitleExample() {
+  const info = subInfo();
+  const example = info ? info.example.replace('{who}', whoLabel() || 'homme') : 'Balade dans le parc';
+  $('[data-title]').placeholder = `Exemple : ${example}`;
 }
 
 function showScreen(name) {
-  if (name === 'describe') $('[data-suggestion]').textContent = suggestion();
+  if (name === 'describe') { $('[data-suggestion]').textContent = suggestion(); updateTitleExample(); }
+  if (name === 'what') $$('[data-back-what]').forEach((b) => { b.dataset.go = state.editing ? 'mine' : 'before'; });
+  if (name === 'preview') {
+    const publish = $('[data-action="publish"]');
+    publish.textContent = state.editing ? 'Enregistrer' : 'Publier';
+  }
   if (name === 'published') state.published = true;
   if (state.category && state.place && ['preview', 'published', 'list', 'mine'].includes(name)) renderAnnonce();
   $('[data-mine-item]').hidden = !state.published;
-  document.querySelectorAll('[data-screen]').forEach((s) => { s.hidden = s.dataset.screen !== name; });
-  const active = document.querySelector(`[data-screen="${name}"]`);
+  $$('[data-screen]').forEach((s) => { s.hidden = s.dataset.screen !== name; });
+  const active = $(`[data-screen="${name}"]`);
   active.scrollTop = 0;
   // Focus sur le titre de l'écran (lecteurs d'écran), sans contour sur un bouton.
   const h = active.querySelector('h1');
@@ -587,26 +700,25 @@ function showScreen(name) {
   refreshButtons();
 }
 
-// Choix du titre et du lieu par défaut quand la catégorie ou l'activité change.
-function applyDefaults() {
-  const o = state.category && (state.category !== 'partage' || state.activity) ? offer() : null;
-  $('[data-activity-block]').hidden = state.category !== 'partage';
-  $('[data-title-block]').hidden = !o;
-  if (!o) return;
-  $('[data-title]').value = o.title;
-  state.place = o.place;
-  setPressed($('[data-group="place"]'), [state.place]);
+// Affiche les précisions sous la catégorie choisie, et le lieu par défaut selon la précision.
+function applyCategory() {
+  $$('[data-subs-for]').forEach((el) => { el.hidden = el.dataset.subsFor !== state.category; });
+  const info = subInfo();
+  if (info) {
+    state.place = info.place;
+    setPressed($('[data-group="place"]'), [state.place]);
+  }
 }
 
 function restart() {
   state = initialState();
-  ['category', 'activity', 'place'].forEach((g) => setPressed($(`[data-group="${g}"]`), []));
+  ['category', 'sub', 'who', 'place'].forEach(clearGroup);
   setPressed($('[data-group="slots"]'), state.slots);
   setPressed($('[data-group="distance"]'), [state.distance]);
   $('[data-title]').value = '';
   $('[data-quartier]').value = 'Bobigny centre';
   $('[data-desc]').value = '';
-  applyDefaults();
+  applyCategory();
   showScreen('list');
 }
 
@@ -622,10 +734,10 @@ document.addEventListener('click', (event) => {
       state.slots = state.slots.includes(value) ? state.slots.filter((v) => v !== value) : [...state.slots, value];
       setPressed(group, state.slots);
     } else {
+      if (key === 'category' && value !== state.category) { state.sub = null; state.who = null; clearGroup('sub'); clearGroup('who'); }
       state[key] = value;
       setPressed(group, [value]);
-      if (key === 'category') { state.activity = null; setPressed($('[data-group="activity"]'), []); }
-      if (key === 'category' || key === 'activity') applyDefaults();
+      if (['category', 'sub', 'who'].includes(key)) applyCategory();
     }
     refreshButtons();
     return;
@@ -639,6 +751,12 @@ document.addEventListener('click', (event) => {
   if (action === 'own') { $('[data-desc]').focus({ preventScroll: true }); return; }
   if (action === 'share') { target.setAttribute('aria-checked', String(target.getAttribute('aria-checked') !== 'true')); return; }
   if (action === 'restart') { restart(); return; }
+  // « Modifier » rouvre le formulaire pré-rempli ; le dernier bouton devient « Enregistrer ».
+  if (action === 'edit') { state.editing = true; showScreen('what'); return; }
+  if (action === 'publish') {
+    if (state.editing) { state.editing = false; showScreen('mine'); } else { showScreen('published'); }
+    return;
+  }
   showScreen(target.dataset.go);
 });
 

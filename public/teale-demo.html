@@ -95,6 +95,9 @@ h3:focus { outline: none; }
 .fields { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; margin-top: 6px; }
 .fields label { font-size: 13px; font-weight: 500; display: grid; gap: 4px; }
 .fields input { border: 0; background: var(--field); border-radius: 6px; padding: 11px; font: inherit; }
+.precise { display: grid; gap: 6px; margin-top: 16px; font-weight: 700; font-size: 14px; }
+.precise small { font-weight: 400; color: var(--muted); }
+.precise textarea { border: 0; background: var(--field); border-radius: 6px; padding: 11px; font: inherit; font-weight: 400; min-height: 92px; resize: vertical; }
 @media (max-width: 520px) { .fields { grid-template-columns: 1fr; } }
 .done { text-align: center; padding: 20px 0 6px; }
 .done .big { font-family: var(--display); font-size: 30px; margin: 6px 0; }
@@ -141,6 +144,9 @@ h3:focus { outline: none; }
         <button class="opt" type="button" data-sit="reorg" aria-pressed="false"><span class="box"></span><span><strong>On réorganise ou on se sépare de collaborateurs</strong><small>fusion, déménagement, plan de départs</small></span></button>
         <button class="opt" type="button" data-sit="anticiper" aria-pressed="false"><span class="box"></span><span><strong>Tout va plutôt bien, je veux anticiper</strong><small>prendre soin des équipes avant que ça coince</small></span></button>
       </div>
+      <label class="precise">Vous voulez préciser&nbsp;? <small>Facultatif. Quelques mots suffisent, par exemple : « une équipe de 8 personnes, la tension monte depuis notre levée de fonds ».</small>
+        <textarea data-precision rows="3"></textarea>
+      </label>
       <p class="error" data-error="1" hidden>Cochez au moins une situation.</p>
       <div class="actions"><button class="btn" type="button" data-next="2">Continuer</button></div>
     </div>
@@ -173,6 +179,7 @@ h3:focus { outline: none; }
       <div data-results></div>
       <div class="expert"><span class="avatar" aria-hidden="true">👤</span><span data-expert></span></div>
       <div class="nohr" data-nohr hidden></div>
+      <div class="result" data-precision-recap hidden><div class="name">Votre précision, transmise à votre interlocuteur</div><p data-precision-text></p></div>
       <span class="label">Où vous recontacter</span>
       <div class="fields">
         <label>Prénom<input type="text" autocomplete="given-name"></label>
@@ -241,6 +248,11 @@ function renderResults() {
   const unique = [...new Set(experts)];
   document.querySelector('[data-expert]').textContent = `Votre interlocuteur : ${unique.join(', puis ')}, en plus de votre chargé de compte.`;
 
+  // La précision libre est rappelée telle quelle : c'est ce que lira l'équipe qui traite la demande.
+  const precision = document.querySelector('[data-precision]').value.trim();
+  document.querySelector('[data-precision-recap]').hidden = !precision;
+  document.querySelector('[data-precision-text]').textContent = precision ? `« ${precision} »` : '';
+
   const nohr = document.querySelector('[data-nohr]');
   if (state.rh === 'non' || state.rh === 'partiel') {
     nohr.hidden = false;
@@ -283,7 +295,7 @@ document.addEventListener('click', (event) => {
   if (t.hasAttribute('data-restart')) {
     state.sits.clear(); state.taille = null; state.rh = null;
     document.querySelectorAll('[aria-pressed]').forEach((b) => b.setAttribute('aria-pressed', 'false'));
-    document.querySelectorAll('.fields input').forEach((i) => { i.value = ''; });
+    document.querySelectorAll('.fields input, [data-precision]').forEach((i) => { i.value = ''; });
     goTo(1);
   }
 });

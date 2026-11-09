@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>L'assistant des intervenants, prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Lato:wght@400;700&display=swap">
+<style>
+/* Prototype non officiel : un assistant dans l'app Click&Care pour les intervenants à domicile.
+   Le style reprend les écrans de création de compte de l'app iOS (v5.1.2, novembre 2026) : couleurs relevées sur les captures.
+   L'intérieur de l'app n'a pas pu être vu (création de compte bloquée) : aucun écran existant n'est imité.
+   La première page (data-screen="start") est une mise en situation hors app ; les parcours sont des propositions.
+   Les réponses de l'assistant reprennent les articles du centre d'aide (aide.clickandcare.fr), cités en source.
+   Navigation : un écran visible à la fois, géré par showScreen(). */
+:root {
+  --navy: #04263f;
+  --text: #4f5b64;
+  --bg: #f1f5f8;
+  --card: #fff;
+  --teal: #387f95;
+  --teal-light: #6fc1bf;
+  --teal-deep: #0a8199;
+  --grad: linear-gradient(90deg, var(--teal-light), var(--teal-deep));
+  --salmon: #f1a594;
+  --salmon-bg: #fdeeea;
+  --disabled: #bec5ca;
+  --line: #e2e8ec;
+  --ok: #2f8a5b;
+  --ok-bg: #e5f4ec;
+  --title: "Montserrat", Arial, sans-serif;
+  --body: "Lato", Arial, Helvetica, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #dfe8ed; color: var(--navy); font-family: var(--body); font-size: 15px; line-height: 1.45; }
+[hidden] { display: none !important; }
+img { display: block; max-width: 100%; }
+button, input { font: inherit; color: inherit; }
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 3px solid var(--teal-deep); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+.page { max-width: 980px; margin: 0 auto; padding: 20px 16px 32px; display: grid; gap: 16px; justify-items: center; }
+.tag { background: var(--navy); color: #bfe6e4; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; text-align: center; }
+
+/* Cadre de téléphone : pleine largeur sur mobile, cadre visible au-delà */
+.phone { width: 100%; max-width: 390px; height: 800px; max-height: calc(100vh - 80px); min-height: 640px;
+  background: var(--bg); border-radius: 36px; border: 10px solid #1a1a1a; overflow: hidden; position: relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,.18); }
+@media (max-width: 440px) {
+  .page { padding: 12px 0 24px; }
+  .phone { border: 0; border-radius: 0; box-shadow: none; max-height: none; height: calc(100vh - 70px); }
+}
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg); }
+.screen > * { flex-shrink: 0; }
+.body { padding: 18px 18px 22px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+h1, h2, h3 { font-family: var(--title); font-weight: 700; margin: 0; }
+h1 { font-size: 22px; line-height: 1.25; }
+h2 { font-size: 17px; line-height: 1.3; }
+h1:focus, h2:focus { outline: none; }
+p { margin: 0; color: var(--text); }
+
+/* En-tête des écrans internes, comme « Créer un compte » dans l'app */
+.bar { background: #fff; display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; padding: 14px 8px; position: sticky; top: 0; z-index: 2; }
+.bar h1 { font-size: 18px; text-align: center; }
+.back { width: 44px; height: 44px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.back svg { width: 14px; height: 24px; }
+
+/* Mise en situation : volontairement hors du style de l'app (fond neutre, cartes en pointillés) */
+.start { background: #fafafa; }
+.offapp { align-self: flex-start; background: var(--navy); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 4px 9px; border-radius: 4px; }
+.situation { display: grid; gap: 6px; text-align: left; background: #fff; border: 1.5px dashed #9fb3bf; border-radius: 14px; padding: 14px 16px; cursor: pointer; }
+.situation b { font-size: 16px; line-height: 1.35; color: var(--navy); font-weight: 700; }
+.situation .go { color: var(--teal); font-weight: 700; font-size: 14px; }
+.situation:hover { border-color: var(--teal); }
+.card { background: var(--card); border-radius: 16px; padding: 16px; box-shadow: 0 1px 2px rgba(4,38,63,.05); }
+.kicker { font-family: var(--title); font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--teal); }
+.row { display: flex; gap: 10px; }
+.row > * { flex: 1; }
+
+.btn { border: 0; border-radius: 10px; padding: 14px 12px; font-family: var(--title); font-weight: 600; font-size: 15px; cursor: pointer; text-align: center; text-decoration: none; display: block; }
+.btn.primary { background: var(--grad); color: #fff; }
+.btn.solid { background: var(--teal); color: #fff; }
+.btn.outline { background: #fff; color: var(--teal); border: 1.5px solid var(--teal); }
+.btn:disabled { background: var(--disabled); color: #fff; cursor: not-allowed; }
+
+/* Pastilles de choix */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip { border: 1.5px solid #cfe5e7; background: #f4fafa; color: var(--navy); border-radius: 999px; padding: 8px 12px; font-size: 14px; cursor: pointer; text-align: left; }
+.chip[aria-pressed="true"] { background: var(--teal); border-color: var(--teal); color: #fff; }
+
+/* Badges et encadrés */
+.pill { display: inline-block; font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+.pill.ok { background: var(--ok-bg); color: var(--ok); }
+.pill.todo { background: var(--salmon-bg); color: #b4553f; }
+.box { border-radius: 12px; padding: 12px 14px; font-size: 14px; }
+.box.ok { background: var(--ok-bg); color: #1f5e3e; }
+.box.info { background: #e8f3f6; color: var(--navy); }
+.box b { font-family: var(--title); }
+.steps { margin: 6px 0 0; padding-left: 20px; color: var(--text); }
+.steps li { margin-bottom: 6px; }
+.source { font-size: 12.5px; color: var(--text); }
+.source a { color: var(--teal); }
+
+/* Déclaration des heures */
+.week { display: grid; gap: 2px; }
+.day { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.day:last-child { border-bottom: 0; }
+.day small { display: block; color: var(--text); font-size: 13px; }
+.stepper { display: flex; align-items: center; gap: 10px; }
+.stepper button { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--teal); background: #fff; color: var(--teal); font-size: 20px; line-height: 1; cursor: pointer; }
+.stepper output { min-width: 34px; text-align: center; font-family: var(--title); font-weight: 700; }
+.total { display: flex; justify-content: space-between; font-family: var(--title); font-weight: 700; padding-top: 8px; }
+.check { display: flex; gap: 10px; align-items: center; color: var(--text); font-size: 14px; }
+.check input { width: 22px; height: 22px; accent-color: var(--teal); }
+
+/* Fenêtre du bas, comme le message d'erreur de l'app */
+.sheet-wrap { position: absolute; inset: 0; background: rgba(4,38,63,.35); display: flex; align-items: flex-end; z-index: 5; }
+.sheet { background: #fff; width: 100%; border-radius: 24px 24px 0 0; padding: 22px 18px 24px; display: grid; gap: 12px; max-height: 88%; overflow-y: auto; }
+
+/* Assistant */
+.chat { display: flex; flex-direction: column; gap: 10px; }
+.msg { max-width: 88%; border-radius: 16px; padding: 10px 13px; font-size: 14.5px; }
+.msg.me { align-self: flex-end; background: var(--teal); color: #fff; border-bottom-right-radius: 4px; }
+.msg.bot { align-self: flex-start; background: #fff; color: var(--navy); border-bottom-left-radius: 4px; display: grid; gap: 8px; }
+.msg.bot p { color: var(--navy); }
+.msg.bot ul { margin: 0; padding-left: 18px; }
+.composer { position: sticky; bottom: 0; background: #fff; padding: 10px 12px; display: flex; gap: 8px; border-top: 1px solid var(--line); }
+.composer input { flex: 1; border: 1.5px solid var(--line); border-radius: 999px; padding: 10px 14px; background: var(--bg); }
+.composer button { border: 0; border-radius: 999px; background: var(--teal); color: #fff; padding: 0 16px; font-family: var(--title); font-weight: 600; cursor: pointer; }
+
+/* Note de lecture, hors maquette */
+.notes { width: 100%; max-width: 390px; background: #fff; border: 2px solid var(--teal); border-radius: 16px; padding: 16px 18px; font-size: 14px; }
+.notes .nbadge { display: inline-block; background: var(--teal); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; }
+.notes h3 { margin: 0 0 6px; font-size: 16px; color: var(--teal); }
+.notes ol { margin: 6px 0 0; padding-left: 18px; }
+.notes li { margin-bottom: 8px; }
+.notes li::marker { color: var(--teal); font-weight: 700; }
+.notes .step { font-weight: 700; }
+.notes p { color: var(--navy); margin-top: 8px; }
+@media (min-width: 900px) {
+  .page { grid-template-columns: 390px 330px; justify-content: center; align-items: start; }
+  .tag { grid-column: 1 / -1; }
+  .notes { position: sticky; top: 20px; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <span class="tag">Prototype non officiel · proposition de Ryzlane Arsac-Gothière pour Click&amp;Care</span>
+
+  <div class="phone" aria-live="polite">
+
+    <!-- ===== Mise en situation (hors app) : choix d'un parcours ===== -->
+    <section class="screen start" data-screen="start">
+      <div class="body">
+        <span class="offapp">Mise en situation · hors app</span>
+        <h1 tabindex="-1">Une semaine d'Awa, aide à domicile</h1>
+        <p>Trois moments où l'app pourrait l'aider, au moment où elle en a besoin. Choisissez-en un.</p>
+
+        <button class="situation" type="button" data-action="cancel">
+          <span class="kicker">Lundi matin</span>
+          <b>Awa se réveille malade. Elle a une mission jeudi chez Mme Lefèvre.</b>
+          <span class="go">Parcours «&nbsp;Je ne peux pas venir&nbsp;» ›</span>
+        </button>
+        <button class="situation" type="button" data-go="ask" data-topic="hospital">
+          <span class="kicker">Entre deux missions</span>
+          <b>Mme Lefèvre est hospitalisée. Awa se demande si elle sera payée.</b>
+          <span class="go">Parcours «&nbsp;Une question&nbsp;» ›</span>
+        </button>
+        <button class="situation" type="button" data-go="hours">
+          <span class="kicker">Fin de semaine</span>
+          <b>Awa doit déclarer ses heures de la semaine du 2 novembre.</b>
+          <span class="go">Parcours «&nbsp;Déclarer mes heures&nbsp;» ›</span>
+        </button>
+
+        <p class="source">Awa, Mme Lefèvre, les missions et les dates sont fictives. Les règles citées viennent du centre d'aide Click&amp;Care.</p>
+      </div>
+    </section>
+
+    <!-- ===== Je ne peux pas venir ===== -->
+    <section class="screen" data-screen="cancel" hidden>
+      <header class="bar">
+        <button class="back" type="button" data-go="start" aria-label="Retour"><svg viewBox="0 0 14 24" aria-hidden="true"><path d="M12 2 2 12l10 10" fill="none" stroke="#04263f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h1 tabindex="-1">Je ne peux pas venir</h1>
+        <span></span>
+      </header>
+      <div class="body">
+        <div class="box ok"><b>Vous êtes dans les temps.</b> Votre mission chez Mme Lefèvre est jeudi&nbsp;: prévenir au moins 3&nbsp;jours avant nous laisse le temps de trouver un remplaçant.</div>
+        <div class="card">
+          <h2>Que se passe-t-il&nbsp;?</h2>
+          <div class="chips" role="group" aria-label="Motif">
+            <button class="chip" type="button" data-reason="sick" aria-pressed="false">Je suis malade</button>
+            <button class="chip" type="button" data-reason="family" aria-pressed="false">Imprévu personnel</button>
+            <button class="chip" type="button" data-reason="other" aria-pressed="false">Autre raison</button>
+          </div>
+        </div>
+
+        <div class="card" data-reason-help="sick" hidden>
+          <h2>Votre arrêt maladie, en 2 gestes</h2>
+          <p>Dans les 48&nbsp;heures après l'arrêt prescrit par votre médecin&nbsp;:</p>
+          <ol class="steps">
+            <li>Envoyez les volets 1 et 2 à votre CPAM.</li>
+            <li>Envoyez le volet 3 (ou une copie) à chacun de vos employeurs, dont Mme Lefèvre.</li>
+          </ol>
+          <p class="source">Vous pouvez aussi toucher des indemnités complémentaires de l'Ircem Prévoyance, sous conditions. Source&nbsp;: <a href="https://aide.clickandcare.fr/fr/article/je-suis-malade-que-faire-apres-la-prescription-de-mon-arret-maladie-en-mode-cesu-1s70u8p/" target="_blank" rel="noopener">centre d'aide Click&amp;Care</a></p>
+        </div>
+        <div class="card" data-reason-help="family" hidden>
+          <h2>Un justificatif sera demandé</h2>
+          <p>La famille vous demandera un justificatif de votre absence. Vous pourrez l'ajouter ici dès que vous l'avez, en photo.</p>
+        </div>
+        <div class="card" data-reason-help="other" hidden>
+          <h2>Dites-nous en un mot</h2>
+          <p>L'équipe vous rappelle si elle a besoin de précisions. Un justificatif pourra être demandé par la famille.</p>
+        </div>
+
+        <button class="btn primary" type="button" data-action="notify" disabled>Prévenir Click&amp;Care</button>
+        <p class="source">Ou appelez l'équipe au 09&nbsp;78&nbsp;38&nbsp;38&nbsp;38, de 9&nbsp;h à 19&nbsp;h, 7&nbsp;jours sur 7.</p>
+      </div>
+    </section>
+
+    <!-- ===== Annulation envoyée ===== -->
+    <section class="screen" data-screen="notified" hidden>
+      <div class="body" style="justify-content:center; text-align:center;">
+        <h1 tabindex="-1">C'est noté, merci de nous avoir prévenus</h1>
+        <p>L'équipe cherche un remplaçant pour Mme Lefèvre et prévient la famille. Vous recevrez une confirmation ici.</p>
+        <div class="box info" data-notified-extra hidden style="text-align:left;"><b>À faire d'ici 48&nbsp;h&nbsp;:</b> envoyer les volets de votre arrêt à la CPAM et à vos employeurs. On vous le rappellera demain.</div>
+        <button class="btn solid" type="button" data-go="start">Voir les autres situations</button>
+      </div>
+    </section>
+
+    <!-- ===== Déclarer mes heures ===== -->
+    <section class="screen" data-screen="hours" hidden>
+      <header class="bar">
+        <button class="back" type="button" data-go="start" aria-label="Retour"><svg viewBox="0 0 14 24" aria-hidden="true"><path d="M12 2 2 12l10 10" fill="none" stroke="#04263f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h1 tabindex="-1">Déclarer mes heures</h1>
+        <span></span>
+      </header>
+      <div class="body">
+        <div class="card">
+          <div class="row" style="justify-content:space-between; align-items:center;">
+            <h2>Semaine du 26 octobre</h2><span class="pill ok" style="flex:none">Déclarée</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="row" style="justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <h2>Semaine du 2 novembre</h2><span class="pill todo" style="flex:none" data-week-pill>À déclarer</span>
+          </div>
+          <p style="font-size:14px">Pré-rempli avec vos missions prévues chez Mme Lefèvre. Corrigez si besoin.</p>
+          <div class="week" data-week></div>
+          <div class="total"><span>Total</span><span data-total></span></div>
+        </div>
+        <label class="check"><input type="checkbox" data-nowork> Je n'ai pas travaillé cette semaine</label>
+        <button class="btn primary" type="button" data-action="validate">Je valide les heures</button>
+        <p class="source">Une erreur après coup&nbsp;? Une déclaration déjà payée ne peut plus être corrigée&nbsp;: écrivez à l'équipe avant. Source&nbsp;: <a href="https://aide.clickandcare.fr/fr/article/jai-fait-une-erreur-dans-mon-rapport-horaire-que-faire-rlnc3t/" target="_blank" rel="noopener">centre d'aide Click&amp;Care</a></p>
+      </div>
+    </section>
+
+    <!-- ===== Heures déclarées ===== -->
+    <section class="screen" data-screen="hoursdone" hidden>
+      <div class="body" style="justify-content:center; text-align:center;">
+        <h1 tabindex="-1">Vos heures sont déclarées</h1>
+        <p data-hours-summary></p>
+        <div class="box ok" style="text-align:left;">Déclarées avant le 5 du mois suivant&nbsp;: vous serez payée dans les temps.</div>
+        <button class="btn solid" type="button" data-go="start">Voir les autres situations</button>
+      </div>
+    </section>
+
+    <!-- ===== Assistant ===== -->
+    <section class="screen" data-screen="ask" hidden>
+      <header class="bar">
+        <button class="back" type="button" data-go="start" aria-label="Retour"><svg viewBox="0 0 14 24" aria-hidden="true"><path d="M12 2 2 12l10 10" fill="none" stroke="#04263f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h1 tabindex="-1">Une question</h1>
+        <span></span>
+      </header>
+      <div class="body">
+        <div class="chat" data-chat></div>
+        <div class="chips" data-suggest></div>
+      </div>
+      <form class="composer" data-composer>
+        <label class="sr-only" for="q">Votre question</label>
+        <input id="q" type="text" placeholder="Écrivez votre question…" autocomplete="off">
+        <button type="submit">Envoyer</button>
+      </form>
+    </section>
+
+    <!-- ===== Fenêtre de confirmation (déclaration) ===== -->
+    <div class="sheet-wrap" data-sheet hidden>
+      <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+        <h2 id="sheet-title">Je confirme ma déclaration</h2>
+        <p data-sheet-text></p>
+        <button class="btn primary" type="button" data-action="confirm">Je confirme ma déclaration</button>
+        <button class="btn outline" type="button" data-action="closesheet">Modifier</button>
+      </div>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <span class="nbadge">Note de lecture · hors maquette</span>
+    <h3>Ce que le prototype propose</h3>
+    <ol>
+      <li><span class="step">La première page</span> n'est pas un écran de l'app&nbsp;: elle pose trois situations de la semaine d'une intervenante et ouvre le parcours correspondant.</li>
+      <li><span class="step">«&nbsp;Je ne peux pas venir&nbsp;»</span>&nbsp;: la règle des 3&nbsp;jours dite clairement, les démarches selon le motif (l'arrêt maladie en 2 gestes) et l'équipe prévenue en un geste.</li>
+      <li><span class="step">«&nbsp;Déclarer mes heures&nbsp;»</span>&nbsp;: la semaine est pré-remplie avec les missions prévues, et «&nbsp;je n'ai pas travaillé&nbsp;» devient une case.</li>
+      <li><span class="step">«&nbsp;Une question&nbsp;»</span>&nbsp;: les réponses reprennent le centre d'aide, appliquées à la situation de l'intervenante, avec la source. Sans réponse fiable, la question part à l'équipe.</li>
+    </ol>
+    <p>Je n'ai pas pu voir l'intérieur de l'app&nbsp;: la création de compte s'est arrêtée à la dernière étape. Les écrans des parcours sont donc des propositions, dans le style des écrans d'inscription (couleurs, typographies, boutons), et les règles citées viennent du centre d'aide.</p>
+  </aside>
+</main>
+
+<script>
+// ---------- Données du prototype ----------
+const HELP = 'https://aide.clickandcare.fr/fr/article/';
+
+// Réponses de l'assistant : reprises du centre d'aide, appliquées à la situation d'Awa.
+// `keys` sert au champ libre (repérage par mots-clés, comme le ferait une première version simple).
+const ANSWERS = {
+  hospital: {
+    q: 'Mme Lefèvre est hospitalisée, est-ce que je suis payée ?',
+    keys: ['hospital', 'absent', 'absence', 'bénéficiaire'],
+    html: `<p><b>Oui.</b> Quand l'absence n'était pas prévue, comme une hospitalisation, Mme Lefèvre, votre employeuse, doit continuer à vous rémunérer.</p>
+      <p>Si l'absence était prévue, elle peut programmer vos congés à l'avance. Si elle se prolonge (souvent plus d'un mois), un licenciement est possible, mais avec une procédure à respecter.</p>`,
+    src: 'que-faire-en-cas-dabsence-du-beneficiaire-12fibrs/'
+  },
+  sick: {
+    q: 'Je suis malade, qu\'est-ce que je dois faire ?',
+    keys: ['malade', 'maladie', 'arrêt', 'arret', 'enceinte', 'maternité'],
+    html: `<p>Dans les <b>48 heures</b> après votre arrêt&nbsp;:</p>
+      <ul><li>les volets 1 et 2 à votre CPAM&nbsp;;</li><li>le volet 3 (ou une copie) à chacun de vos employeurs.</li></ul>
+      <p>Votre mission de jeudi chez Mme Lefèvre est concernée&nbsp;: voulez-vous qu'on prévienne l'équipe&nbsp;?</p>`,
+    src: 'je-suis-malade-que-faire-apres-la-prescription-de-mon-arret-maladie-en-mode-cesu-1s70u8p/',
+    cta: { label: 'Prévenir pour jeudi', action: 'cancel' }
+  },
+  nowork: {
+    q: 'Je n\'ai pas travaillé ce mois-ci, je déclare quoi ?',
+    keys: ['pas travaillé', 'rien travaillé', 'zéro', 'aucune heure'],
+    html: `<p>Il faut quand même déposer votre rapport, sans heures&nbsp;: cochez «&nbsp;Je n'ai pas travaillé cette semaine&nbsp;», puis validez.</p>`,
+    src: 'que-declarer-si-je-nai-pas-travaille-ce-mois-ci-1qwfprk/',
+    cta: { label: 'Ouvrir mes heures', go: 'hours' }
+  },
+  cancel: {
+    q: 'Comment annuler une mission ?',
+    keys: ['annuler', 'annulation', 'pas venir', 'empêchement'],
+    html: `<p>Prévenez l'équipe <b>au moins 3 jours avant</b>, pour qu'un remplaçant soit trouvé. La famille vous demandera un justificatif.</p>`,
+    src: 'quelle-est-la-procedure-pour-annuler-une-mission-1ydwdc6/',
+    cta: { label: 'Je ne peux pas venir', action: 'cancel' }
+  },
+  hours: {
+    q: 'Avant quand je dois déclarer mes heures ?',
+    keys: ['heure', 'déclar', 'declar', 'paie', 'payé', 'salaire'],
+    html: `<p>Avant le <b>5 du mois suivant</b> pour être payée dans les temps. Votre semaine du 2 novembre est déjà pré-remplie.</p>`,
+    src: 'comment-declarer-mes-heures-pour-etre-payee-5wrhw4/',
+    cta: { label: 'Ouvrir mes heures', go: 'hours' }
+  }
+};
+
+// Semaine pré-remplie à partir des missions prévues (fictives)
+const WEEK = [
+  { day: 'Lundi 2', hours: 3, note: 'Mme Lefèvre, 9 h – 12 h' },
+  { day: 'Mardi 3', hours: 0, note: 'Pas de mission' },
+  { day: 'Jeudi 5', hours: 3, note: 'Mme Lefèvre, 9 h – 12 h' },
+  { day: 'Samedi 7', hours: 2, note: 'Mme Lefèvre, 14 h – 16 h' }
+];
+
+const state = { reason: null, hoursDone: false };
+
+// ---------- Navigation ----------
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+
+function showScreen(name) {
+  $$('[data-screen]').forEach(s => { s.hidden = s.dataset.screen !== name; });
+  const screen = $(`[data-screen="${name}"]`);
+  screen.scrollTop = 0;
+  const title = $('h1', screen);
+  if (title) title.focus({ preventScroll: true });
+}
+
+// ---------- Je ne peux pas venir ----------
+function openCancel() {
+  state.reason = null;
+  $$('[data-reason]').forEach(b => b.setAttribute('aria-pressed', 'false'));
+  $$('[data-reason-help]').forEach(c => { c.hidden = true; });
+  $('[data-action="notify"]').disabled = true;
+  showScreen('cancel');
+}
+
+function pickReason(reason) {
+  state.reason = reason;
+  $$('[data-reason]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.reason === reason)));
+  $$('[data-reason-help]').forEach(c => { c.hidden = c.dataset.reasonHelp !== reason; });
+  $('[data-action="notify"]').disabled = false;
+}
+
+function notify() {
+  $('[data-notified-extra]').hidden = state.reason !== 'sick';
+  showScreen('notified');
+}
+
+// ---------- Déclarer mes heures ----------
+function renderWeek() {
+  const noWork = $('[data-nowork]').checked;
+  $('[data-week]').innerHTML = WEEK.map((d, i) => `
+    <div class="day">
+      <div><b>${d.day}</b><small>${d.note}</small></div>
+      <div class="stepper">
+        <button type="button" data-step="-1" data-i="${i}" aria-label="Retirer une heure le ${d.day}" ${noWork ? 'disabled' : ''}>−</button>
+        <output aria-label="Heures le ${d.day}">${noWork ? 0 : d.hours} h</output>
+        <button type="button" data-step="1" data-i="${i}" aria-label="Ajouter une heure le ${d.day}" ${noWork ? 'disabled' : ''}>+</button>
+      </div>
+    </div>`).join('');
+  $('[data-total]').textContent = `${totalHours()} h`;
+}
+
+function totalHours() {
+  return $('[data-nowork]').checked ? 0 : WEEK.reduce((sum, d) => sum + d.hours, 0);
+}
+
+function step(i, delta) {
+  WEEK[i].hours = Math.min(12, Math.max(0, WEEK[i].hours + delta));
+  renderWeek();
+}
+
+function openSheet() {
+  const total = totalHours();
+  $('[data-sheet-text]').textContent = total === 0
+    ? 'Vous déclarez ne pas avoir travaillé la semaine du 2 novembre.'
+    : `Vous déclarez ${total} h chez Mme Lefèvre la semaine du 2 novembre.`;
+  $('[data-sheet]').hidden = false;
+  $('[data-action="confirm"]').focus();
+}
+
+function confirmHours() {
+  $('[data-sheet]').hidden = true;
+  state.hoursDone = true;
+  const total = totalHours();
+  $('[data-hours-summary]').textContent = total === 0
+    ? 'Semaine du 2 novembre : aucune heure, c\'est bien noté.'
+    : `Semaine du 2 novembre : ${total} h chez Mme Lefèvre.`;
+  $('[data-week-pill]').textContent = 'Déclarée';
+  $('[data-week-pill]').className = 'pill ok';
+  showScreen('hoursdone');
+}
+
+// ---------- Assistant ----------
+function botMessage(answer) {
+  const cta = answer.cta
+    ? `<button class="btn solid" type="button" ${answer.cta.go ? `data-go="${answer.cta.go}"` : `data-action="${answer.cta.action}"`}>${answer.cta.label}</button>`
+    : '';
+  return `<div class="msg bot">${answer.html}${cta}<p class="source">Source&nbsp;: <a href="${HELP}${answer.src}" target="_blank" rel="noopener">centre d'aide Click&amp;Care</a></p></div>`;
+}
+
+function fallbackMessage() {
+  return `<div class="msg bot"><p>Je n'ai pas de réponse sûre à cette question. Je la transmets à l'équipe, qui vous répond ici (9&nbsp;h – 19&nbsp;h, 7&nbsp;jours sur 7).</p></div>`;
+}
+
+function ask(topic, text) {
+  const chat = $('[data-chat]');
+  const answer = ANSWERS[topic];
+  chat.insertAdjacentHTML('beforeend', `<div class="msg me">${escapeHtml(text || answer.q)}</div>`);
+  chat.insertAdjacentHTML('beforeend', answer ? botMessage(answer) : fallbackMessage());
+  renderSuggestions(topic);
+  const screen = $('[data-screen="ask"]');
+  screen.scrollTop = screen.scrollHeight;
+}
+
+function renderSuggestions(current) {
+  $('[data-suggest]').innerHTML = Object.entries(ANSWERS)
+    .filter(([key]) => key !== current)
+    .slice(0, 3)
+    .map(([key, a]) => `<button class="chip" type="button" data-topic-ask="${key}">${a.q}</button>`)
+    .join('');
+}
+
+function openAsk(topic) {
+  $('[data-chat]').innerHTML = '';
+  showScreen('ask');
+  if (topic) ask(topic);
+  else renderSuggestions(null);
+}
+
+// Repérage simple par mots-clés : une vraie version s'appuierait sur le centre d'aide complet.
+function matchTopic(text) {
+  const t = text.toLowerCase();
+  const found = Object.entries(ANSWERS).find(([, a]) => a.keys.some(k => t.includes(k)));
+  return found ? found[0] : null;
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+// ---------- Événements ----------
+document.addEventListener('click', e => {
+  const el = e.target.closest('button');
+  if (!el) return;
+  if (el.dataset.go === 'ask') return openAsk(el.dataset.topic);
+  if (el.dataset.go) return showScreen(el.dataset.go);
+  if (el.dataset.reason) return pickReason(el.dataset.reason);
+  if (el.dataset.step) return step(Number(el.dataset.i), Number(el.dataset.step));
+  if (el.dataset.topicAsk) return ask(el.dataset.topicAsk);
+  switch (el.dataset.action) {
+    case 'cancel': return openCancel();
+    case 'notify': return notify();
+    case 'validate': return openSheet();
+    case 'confirm': return confirmHours();
+    case 'closesheet': $('[data-sheet]').hidden = true; return;
+  }
+});
+
+$('[data-nowork]').addEventListener('change', renderWeek);
+
+$('[data-composer]').addEventListener('submit', e => {
+  e.preventDefault();
+  const input = $('#q');
+  const text = input.value.trim();
+  if (!text) return;
+  ask(matchTopic(text), text);
+  input.value = '';
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('[data-sheet]').hidden) $('[data-sheet]').hidden = true;
+});
+
+renderWeek();
+</script>
+</body>
+</html>

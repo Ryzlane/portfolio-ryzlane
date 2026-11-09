@@ -29,7 +29,7 @@ export const HERO_TEXT = {
   baseline: "Un seul cerveau, mille fenêtres",
   repeatedText: `Bienvenue dans ma tête : c'est un joyeux fouillis. Mon métier, c'est de faire le lien entre ceux qui construisent un produit et ceux qui l'utilisent. J'ai été Product Owner et cheffe de produit, j'ai cofondé doted., et je prototype mes idées avec l'IA. Bref, je parle trois langues : dev, design et utilisateur.`,
   // Mettre à null pour masquer le badge de disponibilité
-  availability: "Ouverte aux opportunités · Paris, hybride ou à distance",
+  availability: "Ouverte aux opportunités · Paris, sur site ou hybride",
 };
 
 // ============================================

@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap">
 <style>
 /* Prototype non officiel pour Soliguide (Solinum) : le terrain met à jour Soliguide.
-   1. Le service publie un statut temporaire avec sa durée (aujourd'hui / jusqu'au… / durée inconnue + prochaine nouvelle).
+   1. Le service signale une indisponibilité temporaire avec sa durée (aujourd'hui / jusqu'au… / durée inconnue + prochaine nouvelle).
    2. La personne ou l'orienteur voit ce statut dans le badge et sur la fiche, avec des alternatives ouvertes à proximité.
    3. N'importe qui peut signaler une erreur sur une fiche.
    Style relevé sur des captures de l'app iOS Soliguide (novembre 2026) : couleurs, badges « Ouvert / Fermé », cartes de
@@ -205,8 +205,8 @@ textarea { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; pa
 
           <button class="situation" type="button" data-go="team">
             <span class="kicker">7 h · L'équipe du service</span>
-            <b>Karim, coordinateur des «&nbsp;Douches mobiles&nbsp;», apprend que le camion ne roulera pas. Il met à jour le statut.</b>
-            <span class="go">Mettre à jour le statut ›</span>
+            <b>Karim, coordinateur des «&nbsp;Douches mobiles&nbsp;», apprend que le camion ne roulera pas. Il signale l'indisponibilité.</b>
+            <span class="go">Signaler l'indisponibilité ›</span>
           </button>
           <button class="situation" type="button" data-go="results">
             <span class="kicker">10 h · Une travailleuse sociale</span>
@@ -227,24 +227,16 @@ textarea { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; pa
       <section class="screen" data-screen="team" hidden>
         <header class="topbar">
           <button class="back" type="button" data-go="start" aria-label="Retour"><svg viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2 2 10l8 8" fill="none" stroke="#171717" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-          <h1 tabindex="-1">Statut du service</h1>
+          <h1 tabindex="-1">Signaler une indisponibilité</h1>
         </header>
         <div class="pad">
           <span class="proposed">Écran proposé · espace des structures</span>
           <div>
             <h2>Douches mobiles (exemple)</h2>
-            <p>Comment se passe le service&nbsp;?</p>
+            <p>Le service ne peut pas avoir lieu&nbsp;? Prévenez les personnes et ceux qui les orientent.</p>
           </div>
 
           <div class="block">
-            <h2>Aujourd'hui, le service est…</h2>
-            <div class="choices stack" role="group" aria-label="État du service" data-group="state">
-              <button class="choice" type="button" data-value="ok" aria-pressed="false">Disponible comme prévu</button>
-              <button class="choice" type="button" data-value="unav" aria-pressed="false">Indisponible</button>
-            </div>
-          </div>
-
-          <div class="block" data-when="unav" hidden>
             <h2>Pourquoi&nbsp;? <span class="small">(facultatif, visible sur la fiche)</span></h2>
             <div class="choices" role="group" aria-label="Raison" data-group="reason">
               <button class="choice" type="button" data-value="Panne du véhicule" aria-pressed="false">Panne du véhicule</button>
@@ -253,7 +245,7 @@ textarea { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; pa
             </div>
           </div>
 
-          <div class="block" data-when="unav" hidden>
+          <div class="block">
             <h2>Pour combien de temps&nbsp;?</h2>
             <div class="choices stack" role="group" aria-label="Durée" data-group="duration">
               <button class="choice" type="button" data-value="today" aria-pressed="false">Aujourd'hui seulement</button>
@@ -270,7 +262,7 @@ textarea { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; pa
             </div>
           </div>
 
-          <div class="block" data-when="unav" hidden>
+          <div class="block">
             <h2>Un mot pour les personnes&nbsp;? <span class="small">(facultatif)</span></h2>
             <label class="sr-only" for="msg">Message</label>
             <textarea id="msg" data-msg placeholder="Ex. : en attendant, les bains-douches municipaux sont ouverts."></textarea>
@@ -282,7 +274,7 @@ textarea { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; pa
             <p data-preview-text></p>
           </div>
 
-          <button class="btn cta" type="button" data-action="publish" disabled>Publier le statut</button>
+          <button class="btn cta" type="button" data-action="publish" disabled>Publier l'indisponibilité</button>
         </div>
       </section>
 
@@ -394,7 +386,7 @@ textarea { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; pa
     <span class="nbadge">Note de lecture · hors maquette</span>
     <h3>Le terrain met à jour Soliguide</h3>
     <ol>
-      <li><span class="step">Le service publie un statut temporaire</span>, avec sa durée&nbsp;: aujourd'hui seulement, jusqu'à une date, ou durée inconnue avec une date pour la prochaine nouvelle. Le statut s'efface tout seul à la fin, et un rappel est envoyé si la durée est inconnue.</li>
+      <li><span class="step">Le service signale une indisponibilité</span>, seulement quand il y en a une, avec sa durée&nbsp;: aujourd'hui seulement, jusqu'à une date, ou durée inconnue avec une date pour la prochaine nouvelle. Le statut s'efface tout seul à la fin, et un rappel est envoyé si la durée est inconnue.</li>
       <li><span class="step">La personne ou l'orienteur le voit</span> dans le badge déjà utilisé pour «&nbsp;Ouvert / Fermé&nbsp;», avec la durée et des services similaires ouverts à proximité. Les favoris préviennent du changement.</li>
       <li><span class="step">N'importe qui peut signaler une erreur</span> sur une fiche&nbsp;: la vérification reste à l'équipe Soliguide, mais l'alerte est visible tout de suite.</li>
     </ol>
@@ -436,7 +428,7 @@ const PLACES = {
 // Statut publié par l'équipe des « Douches mobiles ». Par défaut (si l'on saute la 1re situation) : panne jusqu'au jeudi.
 const DEFAULT_STATUS = { state: 'unav', reason: 'Panne du véhicule', duration: 'until', until: 'jeu12', next: null, msg: '', stale: false };
 const state = {
-  form: { state: null, reason: null, duration: null, until: null, next: null },
+  form: { state: 'unav', reason: null, duration: null, until: null, next: null },
   status: { ...DEFAULT_STATUS },
   published: false,
   reports: {},          // signalements par lieu
@@ -481,15 +473,13 @@ function pick(group, value) {
   $$(`[data-group="${group}"] .choice`).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.value === value)));
   if (group === 'issue') { state.issue = value; $('[data-action="send-report"]').disabled = false; return; }
   state.form[group] = value;
-  if (group === 'state') $$('[data-when="unav"]').forEach(el => { el.hidden = value !== 'unav'; });
   if (group === 'duration') $$('[data-when-duration]').forEach(el => { el.hidden = el.dataset.whenDuration !== value; });
   refreshTeamForm();
 }
 
 function formComplete() {
   const f = state.form;
-  if (f.state === 'ok') return true;
-  if (f.state !== 'unav' || !f.duration) return false;
+  if (!f.duration) return false;
   if (f.duration === 'until') return Boolean(f.until);
   if (f.duration === 'unknown') return Boolean(f.next);
   return true;

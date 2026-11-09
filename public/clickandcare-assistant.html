@@ -304,7 +304,7 @@ p { margin: 0; color: var(--text); }
       <li><span class="step">La première page</span> n'est pas un écran de l'app&nbsp;: elle pose trois situations de la semaine d'une intervenante et ouvre le parcours correspondant.</li>
       <li><span class="step">«&nbsp;Je ne peux pas venir&nbsp;»</span>&nbsp;: la règle des 3&nbsp;jours dite clairement, les démarches selon le motif (l'arrêt maladie en 2 gestes) et l'équipe prévenue en un geste.</li>
       <li><span class="step">«&nbsp;Déclarer mes heures&nbsp;»</span>&nbsp;: la semaine est pré-remplie avec les missions prévues, et «&nbsp;je n'ai pas travaillé&nbsp;» devient une case.</li>
-      <li><span class="step">«&nbsp;Une question&nbsp;»</span>&nbsp;: les réponses reprennent le centre d'aide, appliquées à la situation de l'intervenante, avec la source. Sans réponse fiable, la question part à l'équipe.</li>
+      <li><span class="step">«&nbsp;Une question&nbsp;»</span>&nbsp;: les réponses reprennent le centre d'aide, appliquées à la situation de l'intervenante, avec la source. Sans réponse fiable, l'assistant propose de transmettre la question à l'équipe, et attend son accord.</li>
     </ol>
     <p>Je n'ai pas pu voir l'intérieur de l'app&nbsp;: la création de compte s'est arrêtée à la dernière étape. Les écrans des parcours sont donc des propositions, dans le style des écrans d'inscription (couleurs, typographies, boutons), et les règles citées viennent du centre d'aide.</p>
   </aside>
@@ -452,8 +452,26 @@ function botMessage(answer) {
   return `<div class="msg bot">${answer.html}${cta}<p class="source">Source&nbsp;: <a href="${HELP}${answer.src}" target="_blank" rel="noopener">centre d'aide Click&amp;Care</a></p></div>`;
 }
 
+// Sans réponse sûre, l'assistant demande avant de solliciter l'équipe :
+// la question peut être une fausse manipulation, ou se reformuler.
 function fallbackMessage() {
-  return `<div class="msg bot"><p>Je n'ai pas de réponse sûre à cette question. Je la transmets à l'équipe, qui vous répond ici (9&nbsp;h – 19&nbsp;h, 7&nbsp;jours sur 7).</p></div>`;
+  return `<div class="msg bot" data-fallback>
+    <p>Je n'ai pas de réponse sûre à cette question. Voulez-vous que je la transmette à l'équipe&nbsp;?</p>
+    <div class="row">
+      <button class="btn outline" type="button" data-action="rephrase">Non, je reformule</button>
+      <button class="btn solid" type="button" data-action="sendteam">Oui, transmettre</button>
+    </div>
+  </div>`;
+}
+
+// Remplace les deux boutons par la suite choisie, pour qu'on ne puisse répondre qu'une fois
+function resolveFallback(button, send) {
+  const msg = button.closest('[data-fallback]');
+  msg.querySelector('.row').remove();
+  msg.insertAdjacentHTML('afterend', `<div class="msg me">${send ? 'Oui, transmettre' : 'Non, je reformule'}</div>` + (send
+    ? `<div class="msg bot"><p>C'est transmis. L'équipe vous répond ici, de 9&nbsp;h à 19&nbsp;h, 7&nbsp;jours sur 7.</p></div>`
+    : `<div class="msg bot"><p>D'accord. Reformulez votre question, ou choisissez une suggestion ci-dessous.</p></div>`));
+  if (!send) $('#q').focus();
 }
 
 function ask(topic, text) {
@@ -507,6 +525,8 @@ document.addEventListener('click', e => {
     case 'validate': return openSheet();
     case 'confirm': return confirmHours();
     case 'closesheet': $('[data-sheet]').hidden = true; return;
+    case 'sendteam': return resolveFallback(el, true);
+    case 'rephrase': return resolveFallback(el, false);
   }
 });
 

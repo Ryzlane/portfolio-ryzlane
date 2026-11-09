@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Statut du jour et signalement, prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap">
+<style>
+/* Prototype non officiel pour Soliguide (Solinum) : le terrain met à jour Soliguide.
+   1. Le service publie un statut temporaire avec sa durée (aujourd'hui / jusqu'au… / durée inconnue + prochaine nouvelle).
+   2. La personne ou l'orienteur voit ce statut dans le badge et sur la fiche, avec des alternatives ouvertes à proximité.
+   3. N'importe qui peut signaler une erreur sur une fiche.
+   Style relevé sur des captures de l'app iOS Soliguide (novembre 2026) : couleurs, badges « Ouvert / Fermé », cartes de
+   résultats, en-tête de fiche, barre d'onglets. L'écran de l'équipe (comptes pros) n'a pas été vu : il est proposé.
+   Les services et les noms sont fictifs. Navigation : un écran visible à la fois, géré par showScreen(). */
+:root {
+  --purple-bar: #3e3a71;
+  --purple-1: #473352;
+  --purple-2: #603676;
+  --head: linear-gradient(110deg, var(--purple-1), var(--purple-2));
+  --cta: #ff4124;
+  --ink: #171717;
+  --muted: #6b6b76;
+  --bg: #f7f3f7;
+  --line: #ebe6ee;
+  --tint-1: #ffefec;
+  --tint-2: #f6edfa;
+  --tint-3: #e5e7fd;
+  --open-bg: #6ee7b7; --open-dot: #047857;
+  --closed-bg: #fca5a5; --closed-dot: #d32f2f;
+  --unav-bg: #fed7aa; --unav-dot: #c2410c;     /* badge proposé : « Indisponible » */
+  --font: "Nunito", Arial, Helvetica, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #e6e0ec; color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.45; }
+[hidden] { display: none !important; }
+button, input, textarea { font: inherit; color: inherit; }
+button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid var(--purple-2); outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+.page { max-width: 980px; margin: 0 auto; padding: 20px 16px 32px; display: grid; gap: 16px; justify-items: center; }
+.tag { background: var(--purple-bar); color: #f3e8ff; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; text-align: center; }
+
+/* Cadre de téléphone : pleine largeur sur mobile, cadre visible au-delà */
+.phone { width: 100%; max-width: 390px; height: 800px; max-height: calc(100vh - 80px); min-height: 640px;
+  background: var(--bg); border-radius: 36px; border: 10px solid #1a1a1a; overflow: hidden; position: relative;
+  box-shadow: 0 20px 50px rgba(0,0,0,.18); display: flex; flex-direction: column; }
+@media (max-width: 440px) {
+  .page { padding: 12px 0 24px; }
+  .phone { border: 0; border-radius: 0; box-shadow: none; max-height: none; height: calc(100vh - 70px); }
+}
+.statusbar { height: 26px; background: var(--purple-bar); flex: none; }
+.screens { position: relative; flex: 1; overflow: hidden; }
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg); }
+.screen > * { flex-shrink: 0; }
+.pad { padding: 16px 18px 22px; display: flex; flex-direction: column; gap: 14px; }
+h1, h2, h3 { margin: 0; font-weight: 800; }
+h1 { font-size: 22px; line-height: 1.25; }
+h2 { font-size: 18px; line-height: 1.3; }
+h1:focus, h2:focus { outline: none; }
+p { margin: 0; color: var(--muted); }
+
+/* Barre d'onglets (reprise de l'app) */
+.tabbar { flex: none; display: grid; grid-template-columns: repeat(4, 1fr); background: #fff; border-top: 1px solid var(--line); padding: 6px 4px 8px; }
+.tabbar span { display: grid; justify-items: center; gap: 2px; font-size: 12px; color: var(--ink); }
+.tabbar svg { width: 24px; height: 24px; }
+.tabbar .on { color: var(--cta); }
+.tabbar .on svg { background: #ffe1db; border-radius: 10px; padding: 2px; width: 32px; height: 28px; }
+
+/* Mise en situation : volontairement hors du style de l'app */
+.start { background: #fafafa; }
+.offapp { align-self: flex-start; background: #171717; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 4px 9px; border-radius: 4px; }
+.situation { display: grid; gap: 6px; text-align: left; background: #fff; border: 1.5px dashed #a99bb5; border-radius: 14px; padding: 14px 16px; cursor: pointer; }
+.situation:hover { border-color: var(--purple-2); }
+.situation .kicker { font-size: 12px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--purple-2); }
+.situation b { font-size: 16px; line-height: 1.35; }
+.situation .go { color: var(--cta); font-weight: 800; font-size: 14px; }
+.small { font-size: 13px; color: var(--muted); }
+
+/* En-têtes */
+.topbar { display: flex; align-items: center; gap: 8px; padding: 12px 12px; background: var(--bg); position: sticky; top: 0; z-index: 2; }
+.back { width: 40px; height: 40px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; flex: none; }
+.back svg { width: 12px; height: 20px; }
+.searchpill { flex: 1; display: flex; align-items: center; gap: 8px; background: #fff; border: 1.5px solid var(--line); border-radius: 999px; padding: 10px 14px; font-weight: 700; font-size: 14px; }
+.searchpill svg { width: 18px; height: 18px; flex: none; }
+.topbar h1 { font-size: 18px; flex: 1; text-align: center; margin-right: 40px; }
+
+/* Résultats */
+.filters { display: flex; gap: 8px; overflow-x: auto; padding: 0 18px; }
+.filters span { flex: none; background: #fff; border-radius: 10px; padding: 8px 12px; font-weight: 800; font-size: 14px; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+.count { text-align: center; font-weight: 700; margin: 6px 0 2px; }
+.card { background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 2px 8px rgba(40,20,60,.08); }
+.card-head { background: var(--head); color: #fff; padding: 16px 18px 18px; display: grid; gap: 8px; }
+.card-head h3 { font-size: 21px; line-height: 1.2; }
+.card-body { padding: 14px 18px 18px; display: grid; gap: 10px; }
+.card-body .addr { font-weight: 800; }
+.card-body .dist { color: var(--muted); font-size: 14px; }
+.services { display: flex; flex-wrap: wrap; gap: 6px 14px; color: #555; }
+.row { display: flex; gap: 12px; }
+.row > * { flex: 1; }
+
+.badge { justify-self: start; display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 5px 13px; font-weight: 800; font-size: 14px; color: var(--ink); }
+.badge::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+.badge.open { background: var(--open-bg); }
+.badge.open::before { background: var(--open-dot); }
+.badge.closed { background: var(--closed-bg); }
+.badge.closed::before { background: var(--closed-dot); }
+.badge.unav { background: var(--unav-bg); }
+.badge.unav::before { background: var(--unav-dot); }
+.hours { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 15px; }
+.hours svg { width: 16px; height: 16px; }
+
+.btn { border-radius: 10px; padding: 11px 12px; font-weight: 800; font-size: 15px; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn.cta { background: var(--cta); color: #fff; border: 0; }
+.btn.ghost { background: #fff; color: var(--ink); border: 1.5px solid var(--ink); }
+.btn.white { background: transparent; color: #fff; border: 1.5px solid #fff; }
+.btn:disabled { background: #d9d4dd; color: #fff; border-color: #d9d4dd; cursor: not-allowed; }
+.btn svg { width: 18px; height: 18px; }
+.link { background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; font-weight: 800; color: var(--ink); }
+
+/* Fiche */
+.fiche-head { background: var(--head); color: #fff; padding: 8px 18px 22px; display: grid; gap: 14px; }
+.fiche-head .bar { display: flex; justify-content: space-between; align-items: center; }
+.fiche-head .back svg path { stroke: #fff; }
+.heart { width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.2); display: grid; place-items: center; cursor: pointer; }
+.heart svg { width: 24px; height: 24px; }
+.heart[aria-pressed="true"] svg path { fill: #fff; }
+.fiche-head h1 { color: #fff; font-size: 26px; }
+.fiche-head .row .btn { padding: 10px; }
+.status { margin: 16px 18px 0; border-radius: 14px; padding: 14px 16px; display: grid; gap: 6px; border: 1.5px solid; }
+.status.unav { background: #fff4ea; border-color: #fdba74; }
+.status.stale { background: #f4f4f5; border-color: #d4d4d8; }
+.status b { font-size: 16px; }
+.status p { color: #4b4b55; }
+.facts { list-style: none; margin: 0; padding: 0 18px; display: grid; gap: 12px; }
+.facts li { display: flex; gap: 14px; align-items: center; font-weight: 800; }
+.facts svg { width: 22px; height: 22px; flex: none; }
+.updated { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 14px; color: #444; }
+.updated i { width: 30px; height: 30px; border-radius: 50%; background: #ffe1db; display: grid; place-items: center; color: var(--cta); font-style: normal; font-weight: 800; }
+.section { padding: 0 18px; display: grid; gap: 10px; }
+.timetable { display: grid; gap: 4px; }
+.timetable div { display: flex; justify-content: space-between; padding: 10px 14px; border-radius: 8px; color: #333; }
+.timetable .today { background: var(--tint-3); box-shadow: inset 4px 0 0 var(--purple-2); }
+.alt { display: flex; align-items: center; gap: 12px; background: #fff; border-radius: 14px; padding: 12px 14px; box-shadow: 0 1px 4px rgba(40,20,60,.08); text-align: left; border: 0; cursor: pointer; width: 100%; }
+.alt div { flex: 1; display: grid; gap: 2px; }
+.alt small { color: var(--muted); }
+.alt .badge { font-size: 12px; padding: 3px 10px; }
+.report { padding: 6px 18px 24px; text-align: center; }
+
+/* Écran de l'équipe (proposé) */
+.proposed { align-self: flex-start; background: var(--tint-2); color: var(--purple-2); font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; }
+.block { background: #fff; border-radius: 16px; padding: 16px; display: grid; gap: 12px; box-shadow: 0 1px 4px rgba(40,20,60,.06); }
+.block h2 { font-size: 16px; }
+.choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.choice { border: 1.5px solid var(--line); background: #fff; border-radius: 999px; padding: 8px 13px; font-weight: 700; font-size: 14px; cursor: pointer; }
+.choice[aria-pressed="true"] { background: var(--purple-2); border-color: var(--purple-2); color: #fff; }
+.choices.stack { display: grid; }
+.choices.stack .choice { border-radius: 12px; text-align: left; padding: 12px 14px; }
+.sub { display: grid; gap: 8px; padding-left: 4px; }
+textarea { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; resize: vertical; min-height: 64px; }
+.preview { border: 1.5px dashed #c9bdd4; border-radius: 16px; padding: 12px; display: grid; gap: 8px; }
+.preview .label { font-size: 12px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+
+/* Fenêtre du bas (signalement, rappel) */
+.sheet-wrap { position: absolute; inset: 0; background: rgba(30,20,45,.4); display: flex; align-items: flex-end; z-index: 5; }
+.sheet { background: #fff; width: 100%; border-radius: 22px 22px 0 0; padding: 20px 18px 22px; display: grid; gap: 12px; max-height: 90%; overflow-y: auto; }
+.done { background: var(--tint-3); border-radius: 12px; padding: 12px 14px; font-weight: 700; }
+.toast { position: absolute; left: 12px; right: 12px; top: 10px; z-index: 6; background: #fff; border-radius: 16px; padding: 12px 14px; box-shadow: 0 10px 30px rgba(0,0,0,.25); display: grid; gap: 2px; cursor: pointer; text-align: left; border: 0; }
+.toast small { color: var(--muted); font-weight: 700; }
+
+/* Note de lecture, hors maquette */
+.notes { width: 100%; max-width: 390px; background: #fff; border: 2px solid var(--purple-2); border-radius: 16px; padding: 16px 18px; font-size: 14px; }
+.notes .nbadge { display: inline-block; background: var(--purple-2); color: #fff; font-size: 11px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; }
+.notes h3 { margin: 0 0 6px; font-size: 16px; color: var(--purple-2); }
+.notes ol { margin: 6px 0 0; padding-left: 18px; }
+.notes li { margin-bottom: 8px; }
+.notes li::marker { color: var(--purple-2); font-weight: 800; }
+.notes .step { font-weight: 800; }
+.notes p { color: var(--ink); margin-top: 8px; }
+@media (min-width: 900px) {
+  .page { grid-template-columns: 390px 330px; justify-content: center; align-items: start; }
+  .tag { grid-column: 1 / -1; }
+  .notes { position: sticky; top: 20px; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <span class="tag">Prototype non officiel · proposition de Ryzlane Arsac-Gothière pour Soliguide</span>
+
+  <div class="phone" aria-live="polite">
+    <div class="statusbar" aria-hidden="true"></div>
+    <div class="screens">
+
+      <!-- ===== Mise en situation (hors app) ===== -->
+      <section class="screen start" data-screen="start">
+        <div class="pad">
+          <span class="offapp">Mise en situation · hors app</span>
+          <h1 tabindex="-1">Lundi matin, le camion-douche tombe en panne</h1>
+          <p>Trois moments, trois personnes. Faites-les dans l'ordre pour voir l'information circuler.</p>
+
+          <button class="situation" type="button" data-go="team">
+            <span class="kicker">7 h · L'équipe du service</span>
+            <b>Karim, coordinateur des «&nbsp;Douches mobiles&nbsp;», apprend que le camion ne roulera pas. Il met à jour le statut.</b>
+            <span class="go">Mettre à jour le statut ›</span>
+          </button>
+          <button class="situation" type="button" data-go="results">
+            <span class="kicker">10 h · Une travailleuse sociale</span>
+            <b>Inès cherche une douche pour une personne qu'elle accompagne, près de Paris 14e.</b>
+            <span class="go">Faire la recherche ›</span>
+          </button>
+          <button class="situation" type="button" data-action="open-baths">
+            <span class="kicker">14 h · Un bénévole</span>
+            <b>Léo accompagne quelqu'un aux «&nbsp;Bains-douches de la rue Verte&nbsp;» : porte close, alors que la fiche les dit ouverts.</b>
+            <span class="go">Signaler l'erreur ›</span>
+          </button>
+
+          <p class="small">Les services, les adresses et les personnes sont fictifs.</p>
+        </div>
+      </section>
+
+      <!-- ===== Écran de l'équipe : statut du jour (proposé) ===== -->
+      <section class="screen" data-screen="team" hidden>
+        <header class="topbar">
+          <button class="back" type="button" data-go="start" aria-label="Retour"><svg viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2 2 10l8 8" fill="none" stroke="#171717" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <h1 tabindex="-1">Statut du service</h1>
+        </header>
+        <div class="pad">
+          <span class="proposed">Écran proposé · espace des structures</span>
+          <div>
+            <h2>Douches mobiles (exemple)</h2>
+            <p>Comment se passe le service&nbsp;?</p>
+          </div>
+
+          <div class="block">
+            <h2>Aujourd'hui, le service est…</h2>
+            <div class="choices stack" role="group" aria-label="État du service" data-group="state">
+              <button class="choice" type="button" data-value="ok" aria-pressed="false">Disponible comme prévu</button>
+              <button class="choice" type="button" data-value="unav" aria-pressed="false">Indisponible</button>
+            </div>
+          </div>
+
+          <div class="block" data-when="unav" hidden>
+            <h2>Pourquoi&nbsp;? <span class="small">(facultatif, visible sur la fiche)</span></h2>
+            <div class="choices" role="group" aria-label="Raison" data-group="reason">
+              <button class="choice" type="button" data-value="Panne du véhicule" aria-pressed="false">Panne du véhicule</button>
+              <button class="choice" type="button" data-value="Manque de bénévoles" aria-pressed="false">Manque de bénévoles</button>
+              <button class="choice" type="button" data-value="Météo" aria-pressed="false">Météo</button>
+            </div>
+          </div>
+
+          <div class="block" data-when="unav" hidden>
+            <h2>Pour combien de temps&nbsp;?</h2>
+            <div class="choices stack" role="group" aria-label="Durée" data-group="duration">
+              <button class="choice" type="button" data-value="today" aria-pressed="false">Aujourd'hui seulement</button>
+              <button class="choice" type="button" data-value="until" aria-pressed="false">Jusqu'à une date connue</button>
+              <button class="choice" type="button" data-value="unknown" aria-pressed="false">Durée inconnue pour l'instant</button>
+            </div>
+            <div class="sub" data-when-duration="until" hidden>
+              <span class="small">Le service reprend le…</span>
+              <div class="choices" role="group" aria-label="Date de reprise" data-group="until"></div>
+            </div>
+            <div class="sub" data-when-duration="unknown" hidden>
+              <span class="small">Vous donnez des nouvelles au plus tard le… (on vous le rappellera)</span>
+              <div class="choices" role="group" aria-label="Date de la prochaine nouvelle" data-group="next"></div>
+            </div>
+          </div>
+
+          <div class="block" data-when="unav" hidden>
+            <h2>Un mot pour les personnes&nbsp;? <span class="small">(facultatif)</span></h2>
+            <label class="sr-only" for="msg">Message</label>
+            <textarea id="msg" data-msg placeholder="Ex. : en attendant, les bains-douches municipaux sont ouverts."></textarea>
+          </div>
+
+          <div class="preview" data-preview hidden>
+            <span class="label">Ce que verront les personnes</span>
+            <span class="badge unav" data-preview-badge></span>
+            <p data-preview-text></p>
+          </div>
+
+          <button class="btn cta" type="button" data-action="publish" disabled>Publier le statut</button>
+        </div>
+      </section>
+
+      <!-- ===== Statut publié ===== -->
+      <section class="screen" data-screen="published" hidden>
+        <div class="pad" style="flex:1; justify-content:center;">
+          <span class="proposed">Écran proposé · espace des structures</span>
+          <h1 tabindex="-1">C'est publié</h1>
+          <p data-published-text></p>
+          <div class="done">Les personnes qui ont mis «&nbsp;Douches mobiles&nbsp;» en favori sont prévenues.</div>
+          <button class="btn ghost" type="button" data-action="reminder" data-reminder-btn hidden>Voir le rappel prévu</button>
+          <button class="btn cta" type="button" data-go="start">Voir les autres situations</button>
+        </div>
+      </section>
+
+      <!-- ===== Résultats de recherche (reprise de l'app) ===== -->
+      <section class="screen" data-screen="results" hidden>
+        <header class="topbar">
+          <button class="back" type="button" data-go="start" aria-label="Retour"><svg viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2 2 10l8 8" fill="none" stroke="#171717" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="searchpill"><svg viewBox="0 0 18 18" aria-hidden="true"><circle cx="7.5" cy="7.5" r="5.5" fill="none" stroke="#ff4124" stroke-width="2.4"/><path d="m12 12 4.5 4.5" stroke="#ff4124" stroke-width="2.4" stroke-linecap="round"/></svg>Douche, Paris 14e</div>
+        </header>
+        <h1 class="sr-only" tabindex="-1">Résultats</h1>
+        <div class="filters" aria-hidden="true"><span>Ouvert aujourd'hui</span><span>PMR</span><span>Animaux acceptés</span></div>
+        <p class="count">3 lieux trouvés</p>
+        <div class="pad" data-results></div>
+        <nav class="tabbar" aria-hidden="true">
+          <span><svg viewBox="0 0 24 24"><path d="M4 11 12 4l8 7v9h-5v-6H9v6H4z" fill="none" stroke="#171717" stroke-width="1.8" stroke-linejoin="round"/></svg>Accueil</span>
+          <span class="on"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6" fill="none" stroke="#ff4124" stroke-width="2.4"/><path d="m15 15 5 5" stroke="#ff4124" stroke-width="2.4" stroke-linecap="round"/></svg>Rechercher</span>
+          <span><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.3-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.7-7 10-7 10z" fill="none" stroke="#171717" stroke-width="1.8"/></svg>Favoris</span>
+          <span><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" stroke="#171717" stroke-width="1.8" stroke-linecap="round"/></svg>Plus</span>
+        </nav>
+      </section>
+
+      <!-- ===== Fiche (reprise de l'app + bandeau de statut proposé) ===== -->
+      <section class="screen" data-screen="fiche" hidden>
+        <div class="fiche-head">
+          <div class="bar">
+            <button class="back" type="button" data-go="results" aria-label="Retour aux résultats"><svg viewBox="0 0 12 20" aria-hidden="true"><path d="M10 2 2 10l8 8" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="heart" type="button" data-action="fav" aria-pressed="false" aria-label="Ajouter aux favoris"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.3-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.7-7 10-7 10z" fill="none" stroke="#fff" stroke-width="2"/></svg></button>
+          </div>
+          <h1 tabindex="-1" data-fiche-name></h1>
+          <div class="row">
+            <button class="btn white" type="button" data-action="noop">Y aller</button>
+            <button class="btn cta" type="button" data-action="noop">Appeler</button>
+          </div>
+        </div>
+        <div data-fiche-status></div>
+        <div class="pad" style="padding-bottom:6px;">
+          <ul class="facts">
+            <li><svg viewBox="0 0 22 22" aria-hidden="true"><circle cx="8" cy="7" r="3" fill="none" stroke="#171717" stroke-width="1.8"/><path d="M2 18c0-3.3 2.7-5 6-5s6 1.7 6 5M15 4.5a3 3 0 0 1 0 5.5M17 13c2 .6 3 2.3 3 5" fill="none" stroke="#171717" stroke-width="1.8" stroke-linecap="round"/></svg>Accueil inconditionnel</li>
+            <li><svg viewBox="0 0 22 22" aria-hidden="true"><rect x="3" y="4" width="16" height="15" rx="2" fill="none" stroke="#171717" stroke-width="1.8"/><path d="M3 9h16M7 2v4M15 2v4" stroke="#171717" stroke-width="1.8" stroke-linecap="round"/></svg>Accès libre</li>
+          </ul>
+          <div class="updated"><i aria-hidden="true">↻</i><span data-fiche-updated></span></div>
+        </div>
+        <div class="section" data-alternatives></div>
+        <div class="section" style="margin-top:14px;">
+          <h2>Horaires et jours d'ouverture</h2>
+          <div class="timetable" data-timetable></div>
+        </div>
+        <div class="report">
+          <button class="link" type="button" data-action="report">Signaler une erreur sur cette fiche</button>
+        </div>
+      </section>
+
+      <!-- ===== Signalement ===== -->
+      <div class="sheet-wrap" data-sheet="report" hidden>
+        <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="report-title">
+          <h2 id="report-title">Qu'avez-vous constaté&nbsp;?</h2>
+          <div class="choices stack" role="group" aria-label="Type d'erreur" data-group="issue">
+            <button class="choice" type="button" data-value="C'était fermé" aria-pressed="false">C'était fermé</button>
+            <button class="choice" type="button" data-value="Les horaires sont faux" aria-pressed="false">Les horaires sont faux</button>
+            <button class="choice" type="button" data-value="Le lieu a déménagé" aria-pressed="false">Le lieu a déménagé</button>
+            <button class="choice" type="button" data-value="Autre chose" aria-pressed="false">Autre chose</button>
+          </div>
+          <label class="small" for="report-detail">Précisez si vous voulez (facultatif)</label>
+          <textarea id="report-detail" placeholder="Ex. : porte close à 14 h, affiche « fermé pour travaux »"></textarea>
+          <button class="btn cta" type="button" data-action="send-report" disabled>Envoyer</button>
+          <button class="btn ghost" type="button" data-action="close-sheet">Annuler</button>
+        </div>
+      </div>
+      <div class="sheet-wrap" data-sheet="report-done" hidden>
+        <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="done-title">
+          <h2 id="done-title">Merci, c'est transmis</h2>
+          <p>L'équipe Soliguide vérifie avec la structure avant de modifier la fiche. En attendant, la fiche affiche qu'une fermeture a été signalée aujourd'hui.</p>
+          <button class="btn cta" type="button" data-action="close-sheet">Revenir à la fiche</button>
+        </div>
+      </div>
+
+      <!-- ===== Rappel à l'équipe (durée inconnue) ===== -->
+      <div class="sheet-wrap" data-sheet="reminder" hidden>
+        <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="reminder-title">
+          <span class="proposed">Rappel envoyé à l'équipe · <span data-reminder-date></span></span>
+          <h2 id="reminder-title">«&nbsp;Douches mobiles&nbsp;» est-il toujours indisponible&nbsp;?</h2>
+          <p>Sans réponse, la fiche indiquera que le statut n'est plus confirmé.</p>
+          <button class="btn ghost" type="button" data-action="reminder-back">Non, le service reprend</button>
+          <button class="btn ghost" type="button" data-action="reminder-extend">Oui, toujours indisponible</button>
+          <button class="btn ghost" type="button" data-action="reminder-silent">Pas de réponse (voir la fiche)</button>
+        </div>
+      </div>
+
+      <button class="toast" type="button" data-toast data-go="fiche-mobile" hidden>
+        <small>Soliguide · Favori</small>
+        <b data-toast-text></b>
+      </button>
+    </div>
+  </div>
+
+  <aside class="notes">
+    <span class="nbadge">Note de lecture · hors maquette</span>
+    <h3>Le terrain met à jour Soliguide</h3>
+    <ol>
+      <li><span class="step">Le service publie un statut temporaire</span>, avec sa durée&nbsp;: aujourd'hui seulement, jusqu'à une date, ou durée inconnue avec une date pour la prochaine nouvelle. Le statut s'efface tout seul à la fin, et un rappel est envoyé si la durée est inconnue.</li>
+      <li><span class="step">La personne ou l'orienteur le voit</span> dans le badge déjà utilisé pour «&nbsp;Ouvert / Fermé&nbsp;», avec la durée et des services similaires ouverts à proximité. Les favoris préviennent du changement.</li>
+      <li><span class="step">N'importe qui peut signaler une erreur</span> sur une fiche&nbsp;: la vérification reste à l'équipe Soliguide, mais l'alerte est visible tout de suite.</li>
+    </ol>
+    <p>Les résultats et la fiche reprennent l'app Soliguide telle qu'elle est aujourd'hui&nbsp;; le bandeau de statut, le badge «&nbsp;Indisponible&nbsp;», les alternatives et le signalement sont proposés. L'écran de l'équipe est proposé&nbsp;: je n'ai pas vu l'espace des structures.</p>
+  </aside>
+</main>
+
+<script>
+// ---------- Données (fictives) ----------
+const TODAY = { label: 'lundi 9 novembre', dayIndex: 0 };
+// Jours proposés pour la reprise ou la prochaine nouvelle (à partir de demain)
+const DAYS = [
+  { key: 'mar10', short: 'mar. 10', long: 'mardi 10 novembre' },
+  { key: 'mer11', short: 'mer. 11', long: 'mercredi 11 novembre' },
+  { key: 'jeu12', short: 'jeu. 12', long: 'jeudi 12 novembre' },
+  { key: 'ven13', short: 'ven. 13', long: 'vendredi 13 novembre' },
+  { key: 'lun16', short: 'lun. 16', long: 'lundi 16 novembre' }
+];
+const WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
+
+const PLACES = {
+  mobile: {
+    name: 'Douches mobiles (exemple)', addr: 'Secteur Paris 14e', dist: 'Service mobile',
+    hours: ['9h à 13h', '9h à 13h', 'Fermé', '9h à 13h', '9h à 13h', 'Fermé', 'Fermé'],
+    services: ['Douche', 'Vêtements']
+  },
+  baths: {
+    name: 'Bains-douches de la rue Verte (exemple)', addr: '12 rue Verte, 75014 Paris', dist: '0,8 km',
+    hours: ['8h à 12h - 14h à 18h', '8h à 12h - 14h à 18h', '14h à 18h', '8h à 12h - 14h à 18h', '8h à 12h - 14h à 18h', '8h à 12h', 'Fermé'],
+    services: ['Douche', 'Toilettes']
+  },
+  dayCenter: {
+    name: 'Accueil de jour Porte d\'Orléans (exemple)', addr: '3 avenue du Parc, 75014 Paris', dist: '1,6 km',
+    hours: ['9h à 17h', '9h à 17h', '9h à 17h', '9h à 17h', '9h à 17h', 'Fermé', 'Fermé'],
+    services: ['Douche', 'Laverie', 'Petit-déjeuner']
+  }
+};
+
+// Statut publié par l'équipe des « Douches mobiles ». Par défaut (si l'on saute la 1re situation) : panne jusqu'au jeudi.
+const DEFAULT_STATUS = { state: 'unav', reason: 'Panne du véhicule', duration: 'until', until: 'jeu12', next: null, msg: '', stale: false };
+const state = {
+  form: { state: null, reason: null, duration: null, until: null, next: null },
+  status: { ...DEFAULT_STATUS },
+  published: false,
+  reports: {},          // signalements par lieu
+  fav: false,
+  current: 'mobile'     // fiche ouverte
+};
+
+// ---------- Utilitaires ----------
+const $ = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
+const day = key => DAYS.find(d => d.key === key);
+const escapeHtml = s => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+function showScreen(name) {
+  $$('[data-screen]').forEach(s => { s.hidden = s.dataset.screen !== name; });
+  const screen = $(`[data-screen="${name}"]`);
+  screen.scrollTop = 0;
+  const title = $('h1', screen);
+  if (title) title.focus({ preventScroll: true });
+}
+
+function closeSheets() { $$('[data-sheet]').forEach(s => { s.hidden = true; }); }
+
+// Texte court du badge et texte long du bandeau, selon le statut
+function statusTexts(s) {
+  if (s.state !== 'unav') return null;
+  let badge, line;
+  if (s.duration === 'today') { badge = 'Indisponible aujourd\'hui'; line = 'Reprise prévue demain.'; }
+  if (s.duration === 'until') { badge = `Indisponible jusqu'au ${day(s.until).short}`; line = `Reprise prévue le ${day(s.until).long}.`; }
+  if (s.duration === 'unknown') { badge = 'Indisponible, durée inconnue'; line = `Prochaine nouvelle de l'équipe au plus tard le ${day(s.next).long}.`; }
+  return { badge, line, reason: s.reason, msg: s.msg };
+}
+
+// ---------- 1. Écran de l'équipe ----------
+function renderDayChoices() {
+  const chips = d => `<button class="choice" type="button" data-value="${d.key}" aria-pressed="false">${d.short}</button>`;
+  $('[data-group="until"]').innerHTML = DAYS.map(chips).join('');
+  $('[data-group="next"]').innerHTML = DAYS.slice(0, 3).map(chips).join('');
+}
+
+function pick(group, value) {
+  $$(`[data-group="${group}"] .choice`).forEach(b => b.setAttribute('aria-pressed', String(b.dataset.value === value)));
+  if (group === 'issue') { state.issue = value; $('[data-action="send-report"]').disabled = false; return; }
+  state.form[group] = value;
+  if (group === 'state') $$('[data-when="unav"]').forEach(el => { el.hidden = value !== 'unav'; });
+  if (group === 'duration') $$('[data-when-duration]').forEach(el => { el.hidden = el.dataset.whenDuration !== value; });
+  refreshTeamForm();
+}
+
+function formComplete() {
+  const f = state.form;
+  if (f.state === 'ok') return true;
+  if (f.state !== 'unav' || !f.duration) return false;
+  if (f.duration === 'until') return Boolean(f.until);
+  if (f.duration === 'unknown') return Boolean(f.next);
+  return true;
+}
+
+function refreshTeamForm() {
+  const ok = formComplete();
+  $('[data-action="publish"]').disabled = !ok;
+  const t = ok ? statusTexts({ ...state.form, msg: $('[data-msg]').value.trim() }) : null;
+  $('[data-preview]').hidden = !t;
+  if (t) {
+    $('[data-preview-badge]').textContent = t.badge;
+    $('[data-preview-text]').textContent = [t.reason, t.line, t.msg].filter(Boolean).join(' · ');
+  }
+}
+
+function publish() {
+  const f = state.form;
+  state.status = { state: f.state, reason: f.reason, duration: f.duration, until: f.until, next: f.next, msg: $('[data-msg]').value.trim(), stale: false };
+  state.published = true;
+  const t = statusTexts(state.status);
+  $('[data-published-text]').textContent = t
+    ? `La fiche affiche maintenant « ${t.badge} ». ${t.line}`
+    : 'La fiche affiche le service comme disponible aujourd\'hui.';
+  $('[data-reminder-btn]').hidden = state.status.duration !== 'unknown';
+  showScreen('published');
+  if (t) showToast(`Douches mobiles : ${t.badge.toLowerCase()}`);
+}
+
+// ---------- 2. Résultats et fiche ----------
+function badgeFor(key) {
+  if (key === 'mobile') {
+    const t = statusTexts(state.status);
+    if (t) return state.status.stale ? `<span class="badge closed">Statut non confirmé</span>` : `<span class="badge unav">${t.badge}</span>`;
+  }
+  if (state.reports[key]) return `<span class="badge closed">Fermeture signalée aujourd'hui</span>`;
+  const h = PLACES[key].hours[TODAY.dayIndex];
+  return h === 'Fermé' ? `<span class="badge closed">Fermé</span>` : `<span class="badge open">Ouvert</span>`;
+}
+
+function hoursLine(key) {
+  // Pas d'horaires du jour affichés si le service est indisponible ou signalé fermé
+  if ((key === 'mobile' && statusTexts(state.status)) || state.reports[key]) return '';
+  const h = PLACES[key].hours[TODAY.dayIndex];
+  return h === 'Fermé' ? '' : `<span class="hours"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="#fff" stroke-width="1.6"/><path d="M8 4.5V8l2.5 1.5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>Aujourd'hui : ${h}</span>`;
+}
+
+function renderResults() {
+  $('[data-results]').innerHTML = ['mobile', 'baths', 'dayCenter'].map(key => {
+    const p = PLACES[key];
+    return `<article class="card">
+      <div class="card-head">${badgeFor(key)}${hoursLine(key)}<h3>${p.name}</h3></div>
+      <div class="card-body">
+        <div><div class="addr">${p.addr}</div><div class="dist">${p.dist}</div></div>
+        <div class="services">${p.services.join(' · ')}</div>
+        <div class="row"><button class="btn ghost" type="button" data-action="noop">Appeler</button>
+        <button class="btn cta" type="button" data-open="${key}">Plus d'infos</button></div>
+      </div></article>`;
+  }).join('');
+}
+
+function openFiche(key) {
+  state.current = key;
+  const p = PLACES[key];
+  $('[data-fiche-name]').textContent = p.name;
+  $('[data-action="fav"]').hidden = key !== 'mobile';
+  $('[data-action="fav"]').setAttribute('aria-pressed', String(state.fav));
+
+  // Bandeau de statut (proposé)
+  let banner = '';
+  const t = key === 'mobile' ? statusTexts(state.status) : null;
+  if (t && state.status.stale) {
+    banner = `<div class="status stale"><b>Statut non confirmé depuis 2 jours</b><p>L'équipe avait annoncé une indisponibilité et n'a pas donné de nouvelles. Appelez avant de vous déplacer.</p></div>`;
+  } else if (t) {
+    banner = `<div class="status unav"><b>${t.badge}</b><p>${[t.reason, t.line].filter(Boolean).join(' · ')}</p>${t.msg ? `<p>« ${escapeHtml(t.msg)} »</p>` : ''}<p class="small">Mis à jour par l'équipe du service aujourd'hui à 7 h 12.</p></div>`;
+  } else if (state.reports[key]) {
+    banner = `<div class="status stale"><b>Fermeture signalée aujourd'hui</b><p>Quelqu'un a trouvé porte close. L'équipe Soliguide vérifie avec la structure.</p></div>`;
+  }
+  $('[data-fiche-status]').innerHTML = banner;
+  $('[data-fiche-updated]').textContent = !t ? 'Dernière mise à jour 10 juin 2026'
+    : state.status.stale ? 'Statut annoncé le lundi 9 novembre' : 'Statut du jour : aujourd\'hui, 7 h 12';
+
+  // Alternatives ouvertes aujourd'hui, seulement si le service ne l'est pas
+  const showAlt = Boolean(t) || Boolean(state.reports[key]);
+  const others = ['baths', 'dayCenter'].filter(k => k !== key && !state.reports[k]);
+  $('[data-alternatives]').innerHTML = showAlt ? `<h2 style="margin-top:14px;">Ouvert aujourd'hui près d'ici</h2>` + others.map(k => `
+    <button class="alt" type="button" data-open="${k}"><div><b>${PLACES[k].name}</b><small>${PLACES[k].dist} · ${PLACES[k].hours[TODAY.dayIndex]}</small></div><span class="badge open">Ouvert</span></button>`).join('') : '';
+
+  $('[data-timetable]').innerHTML = WEEK.map((d, i) => `<div class="${i === TODAY.dayIndex ? 'today' : ''}"><span>${d}</span><span>${p.hours[i]}</span></div>`).join('');
+  showScreen('fiche');
+}
+
+function toggleFav() {
+  state.fav = !state.fav;
+  $('[data-action="fav"]').setAttribute('aria-pressed', String(state.fav));
+  if (state.fav) showToast('Favori ajouté : vous serez prévenu de la reprise ou d\'un changement.');
+}
+
+// ---------- 3. Signalement ----------
+function openReport() {
+  state.issue = null;
+  $$('[data-group="issue"] .choice').forEach(b => b.setAttribute('aria-pressed', 'false'));
+  $('[data-action="send-report"]').disabled = true;
+  $('#report-detail').value = '';
+  $('[data-sheet="report"]').hidden = false;
+}
+
+function sendReport() {
+  if (state.issue === 'C\'était fermé') state.reports[state.current] = true;
+  $('[data-sheet="report"]').hidden = true;
+  $('[data-sheet="report-done"]').hidden = false;
+}
+
+// ---------- Rappel (durée inconnue) ----------
+function openReminder() {
+  $('[data-reminder-date]').textContent = day(state.status.next).long;
+  $('[data-sheet="reminder"]').hidden = false;
+}
+
+function reminderAnswer(answer) {
+  closeSheets();
+  if (answer === 'back') { state.status = { ...state.status, state: 'ok' }; showToast('Douches mobiles : le service reprend.'); }
+  if (answer === 'extend') { state.status = { ...state.status, next: 'ven13' }; showToast('Statut prolongé, prochaine nouvelle le vendredi 13.'); }
+  if (answer === 'silent') { state.status = { ...state.status, stale: true }; openFiche('mobile'); }
+}
+
+// ---------- Notification (favoris) ----------
+let toastTimer;
+function showToast(text) {
+  $('[data-toast-text]').textContent = text;
+  $('[data-toast]').hidden = false;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { $('[data-toast]').hidden = true; }, 3800);
+}
+
+// ---------- Événements ----------
+document.addEventListener('click', e => {
+  const el = e.target.closest('button');
+  if (!el) return;
+  if (el.matches('.choice')) return pick(el.closest('[data-group]').dataset.group, el.dataset.value);
+  if (el.dataset.open) return openFiche(el.dataset.open);
+  if (el.dataset.go === 'results') { closeSheets(); renderResults(); return showScreen('results'); }
+  if (el.dataset.go === 'fiche-mobile') { $('[data-toast]').hidden = true; return openFiche('mobile'); }
+  if (el.dataset.go) { closeSheets(); return showScreen(el.dataset.go); }
+  switch (el.dataset.action) {
+    case 'publish': return publish();
+    case 'fav': return toggleFav();
+    case 'report': return openReport();
+    case 'send-report': return sendReport();
+    case 'close-sheet': closeSheets(); return openFiche(state.current);
+    case 'reminder': return openReminder();
+    case 'reminder-back': return reminderAnswer('back');
+    case 'reminder-extend': return reminderAnswer('extend');
+    case 'reminder-silent': return reminderAnswer('silent');
+    case 'open-baths': renderResults(); return openFiche('baths');
+  }
+});
+
+$('[data-msg]').addEventListener('input', refreshTeamForm);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheets(); });
+
+renderDayChoices();
+renderResults();
+</script>
+</body>
+</html>

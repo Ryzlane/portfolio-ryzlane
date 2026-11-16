@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Et après ? Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700&family=DM+Sans:wght@400;500;700&display=swap">
+<style>
+/* Prototype non officiel, proposé à Make.org. Un seul axe : boucler la boucle.
+   Constats (observés sur make.org le 16/11/2026, compte connecté) :
+   - aucune consultation ouverte en France depuis le 26/07/2026 ; la page « consultations en cours » répond
+     « Nous sommes désolés… » et propose « S'inscrire » à une personne déjà connectée ;
+   - le profil d'une nouvelle inscrite est vide (ni sujets suivis, ni historique) ;
+   - les pages de résultats s'arrêtent aux chiffres et au rapport : rien ne dit ce que sont devenues les idées.
+   Le prototype ne refait aucun écran existant : il ajoute un « Et après ? », des sujets à suivre et un espace
+   « ce que mes votes ont changé ». Les chiffres de la consultation mode durable sont réels ; les statuts des idées
+   et la persona sont fictifs et signalés comme tels. Les polices sont des équivalents libres. */
+:root {
+  --ink: #121212;
+  --muted: rgba(0,0,0,.62);
+  --line: rgba(0,0,0,.12);
+  --bg: #ffffff;
+  --soft: #f2f4fc;
+  --brand: #d5153c;
+  --green: #05b126;
+  --green-dark: #507a1f;
+  --s-done: #05b126;
+  --s-progress: #e8a400;
+  --s-study: #3b6fd8;
+  --s-no: #8a8a8a;
+  --title: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --font: "DM Sans", Arial, Helvetica, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #e9e7e3; color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.45; }
+[hidden] { display: none !important; }
+button, input { font: inherit; color: inherit; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+
+.page { max-width: 980px; margin: 0 auto; padding: 20px 16px 32px; display: grid; gap: 16px; justify-items: center; }
+.tag { background: var(--ink); color: #fff; font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 999px; text-align: center; }
+.phone { width: 100%; max-width: 390px; height: 800px; max-height: calc(100vh - 80px); min-height: 640px; background: var(--bg);
+  border-radius: 36px; border: 10px solid #1a1a1a; overflow: hidden; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,.18); }
+@media (max-width: 440px) {
+  .page { padding: 12px 0 24px; }
+  .phone { border: 0; border-radius: 0; box-shadow: none; max-height: none; height: calc(100vh - 70px); }
+}
+.screen { position: absolute; inset: 0; display: flex; flex-direction: column; overflow-y: auto; background: var(--bg); }
+.screen > * { flex-shrink: 0; }
+.body { padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+h1, h2, h3 { margin: 0; }
+h1 { font-family: var(--title); font-size: 30px; line-height: 1.05; letter-spacing: .2px; }
+h1:focus { outline: none; }
+h2 { font-family: var(--title); font-size: 22px; line-height: 1.1; }
+h3 { font-size: 15px; }
+p { margin: 0; color: var(--muted); }
+
+/* Mise en situation, hors produit */
+.offapp { align-self: flex-start; background: var(--ink); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 4px 9px; border-radius: 4px; }
+.situation { display: grid; gap: 6px; text-align: left; background: #fff; border: 1.5px dashed #b9b2a8; border-radius: 12px; padding: 14px 16px; cursor: pointer; }
+.situation:hover { border-color: var(--brand); }
+.situation b { font-size: 16px; }
+.situation .go { color: var(--brand); font-weight: 700; font-size: 14px; }
+
+/* En-tête */
+.top { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: #fff; z-index: 3; }
+.wordmark { font-family: var(--title); font-size: 20px; line-height: 1; }
+.wordmark span { color: var(--brand); }
+.top .spacer { flex: 1; }
+.me { display: flex; align-items: center; gap: 6px; border: 0; background: none; cursor: pointer; font-weight: 700; font-size: 13px; }
+.me .av { width: 28px; height: 28px; border-radius: 50%; background: #c98d6b; color: #fff; display: grid; place-items: center; font-size: 12px; }
+.back { width: 34px; height: 34px; border: 0; background: none; cursor: pointer; display: grid; place-items: center; margin-left: -6px; border-radius: 8px; }
+.back svg { width: 20px; height: 20px; }
+
+.tabs { display: flex; gap: 18px; padding: 0 18px; border-bottom: 1px solid var(--line); }
+.tabs span { padding: 12px 0; font-size: 14px; font-weight: 700; color: var(--muted); }
+.tabs span.on { color: var(--ink); border-bottom: 3px solid var(--brand); }
+
+/* Badge « proposé » pour distinguer ce qui n'existe pas aujourd'hui */
+.new { display: inline-block; background: #fff1f3; color: var(--brand); border: 1px dashed var(--brand); font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; letter-spacing: .03em; text-transform: uppercase; }
+.fict { display: inline-block; background: #fff6dc; color: #8a5b00; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; }
+
+.card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; display: grid; gap: 10px; background: #fff; }
+.card.soft { background: var(--soft); border-color: transparent; }
+.btn { border: 0; border-radius: 999px; padding: 12px 16px; font-weight: 700; font-size: 15px; cursor: pointer; text-align: center; }
+.btn.primary { background: var(--brand); color: #fff; }
+.btn.dark { background: var(--ink); color: #fff; }
+.btn.outline { background: #fff; color: var(--ink); border: 1.5px solid var(--ink); }
+.btn.link { background: none; padding: 4px 0; text-decoration: underline; font-weight: 500; color: var(--ink); justify-self: start; }
+
+/* Sujets à suivre */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1.5px solid var(--ink); background: #fff; border-radius: 999px; padding: 7px 12px; font-size: 13.5px; font-weight: 500; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.chip[aria-pressed="true"]::before { content: "✓ "; }
+.choices { display: grid; gap: 8px; }
+.choice { width: 100%; display: flex; gap: 10px; align-items: flex-start; text-align: left; border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 12px; background: #fff; cursor: pointer; }
+.choice[aria-checked="true"] { border-color: var(--ink); background: var(--soft); }
+.choice .dot { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--ink); flex: none; margin-top: 2px; }
+.choice[aria-checked="true"] .dot { background: radial-gradient(var(--ink) 45%, transparent 50%); }
+.choice span { font-size: 13px; color: var(--muted); display: block; }
+
+/* Résultats */
+.hero { background: var(--green); padding: 18px; display: grid; gap: 10px; }
+.labels { display: flex; gap: 0; }
+.labels span { font-size: 12px; font-weight: 700; padding: 3px 8px; text-transform: uppercase; }
+.labels .l1 { background: var(--green-dark); color: #fff; }
+.labels .l2 { background: #fff; color: var(--ink); }
+.hero h1 { font-size: 28px; }
+.hero p { color: var(--ink); font-size: 13px; }
+.figures { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.figures b { display: block; font-size: 18px; }
+.figures span { font-size: 12px; color: var(--muted); }
+.sep { height: 8px; background: var(--soft); }
+
+/* Frise « Et après ? » */
+.timeline { display: grid; gap: 0; }
+.step { display: grid; grid-template-columns: 20px 1fr; gap: 10px; }
+.step .rail { display: grid; justify-items: center; }
+.step .pt { width: 14px; height: 14px; border-radius: 50%; border: 3px solid var(--ink); background: #fff; margin-top: 3px; }
+.step.done .pt { background: var(--ink); }
+.step .ln { width: 2px; background: var(--line); flex: 1; min-height: 26px; }
+.step:last-child .ln { display: none; }
+.step .txt { padding-bottom: 14px; }
+.step .when { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+
+.idea { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 6px; }
+.idea .head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.idea b { font-size: 14.5px; }
+.idea .stat { font-size: 12px; color: var(--muted); }
+.status { flex: none; font-size: 11.5px; font-weight: 700; padding: 3px 8px; border-radius: 999px; color: #fff; white-space: nowrap; }
+.status.done { background: var(--s-done); }
+.status.progress { background: var(--s-progress); color: #222; }
+.status.study { background: var(--s-study); }
+.status.no { background: var(--s-no); }
+.why { font-size: 13px; color: var(--ink); background: var(--soft); border-radius: 8px; padding: 8px 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.follow { display: flex; gap: 10px; align-items: center; }
+.follow p { flex: 1; font-size: 13.5px; color: var(--ink); }
+
+.toast { position: absolute; left: 14px; right: 14px; bottom: 18px; background: var(--ink); color: #fff; border-radius: 12px; padding: 12px 14px; font-size: 14px; z-index: 6; box-shadow: 0 8px 20px rgba(0,0,0,.2); }
+
+/* Note de lecture, hors maquette */
+.notes { width: 100%; max-width: 390px; background: #fff; border: 2px solid var(--brand); border-radius: 16px; padding: 16px 18px; font-size: 14px; }
+.notes .nbadge { display: inline-block; background: var(--brand); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; margin-bottom: 8px; }
+.notes h3 { margin: 14px 0 6px; font-size: 16px; color: var(--brand); }
+.notes h3:first-of-type { margin-top: 0; }
+.notes ul, .notes ol { margin: 6px 0 0; padding-left: 18px; }
+.notes li { margin-bottom: 6px; }
+.notes p { color: var(--ink); margin-top: 6px; }
+.notes a { color: var(--brand); }
+@media (min-width: 900px) {
+  .page { grid-template-columns: 390px 330px; justify-content: center; align-items: start; }
+  .tag { grid-column: 1 / -1; }
+  .notes { position: sticky; top: 20px; }
+}
+</style>
+</head>
+<body>
+<main class="page">
+  <div class="tag">Prototype non officiel · proposition pour Make.org</div>
+
+  <div class="phone" aria-live="polite">
+
+    <!-- 0. Mise en situation -->
+    <section class="screen" data-screen="start">
+      <div class="body">
+        <span class="offapp">Mise en situation</span>
+        <h1 tabindex="-1">Avril : tu as voté sur la mode durable. Novembre : tu reviens.</h1>
+        <p>Au printemps, tu as participé à « Comment donner envie de s'habiller éthique et durable ? », avec 38 149 autres personnes. Sept mois plus tard, tu te demandes ce qu'il en est sorti, et tu repasses sur Make.org.</p>
+        <button class="situation" data-go="browse">
+          <b>Ouvrir les consultations</b>
+          <span class="go">Il n'y en a aucune d'ouverte : que se passe-t-il ? →</span>
+        </button>
+        <button class="situation" data-go="results">
+          <b>Revoir les résultats de « ma » consultation</b>
+          <span class="go">Avec un « Et après ? » →</span>
+        </button>
+        <button class="situation" data-go="space">
+          <b>Ouvrir mon espace</b>
+          <span class="go">Ce que mes votes ont changé →</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- 1. Consultations : quand rien n'est ouvert -->
+    <section class="screen" data-screen="browse" hidden>
+      <div class="top">
+        <button class="back" data-back aria-label="Retour"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4l-6 6 6 6"/></svg></button>
+        <div class="wordmark" tabindex="-1">MAKE<span>.</span>ORG</div>
+        <div class="spacer"></div>
+        <button class="me" data-go="space"><span class="av">R</span>Ryzlane</button>
+      </div>
+      <div class="tabs"><span class="on">Les consultations en cours</span><span>Les résultats</span></div>
+      <div class="body">
+        <h2>Pas de consultation ouverte en ce moment</h2>
+        <p>Les prochaines s'ouvrent selon les projets de nos partenaires. Plutôt que de revenir vérifier, choisis tes sujets : on te prévient dès qu'une consultation s'ouvre.</p>
+
+        <div class="card soft">
+          <span class="new">Proposé</span>
+          <h3>Ce que tes votes ont changé</h3>
+          <p>Tu as soutenu 3 idées de la consultation mode durable. L'une d'elles a avancé depuis ta dernière visite.</p>
+          <button class="btn dark" data-go="results">Voir l'« Et après ? »</button>
+        </div>
+
+        <div class="card">
+          <span class="new">Proposé</span>
+          <h3>Être prévenu·e de la prochaine consultation</h3>
+          <div class="chips" data-chips="browse"></div>
+          <button class="btn primary" data-go="topics">Choisir mes sujets</button>
+        </div>
+
+        <h3>Les dernières consultations</h3>
+        <div class="card">
+          <b>Vous avez entre 15 et 25 ans, comment vous aider à vous épanouir pleinement et construire votre avenir en Île-de-France ?</b>
+          <p>5 232 participants · terminée le 26 juillet</p>
+        </div>
+        <div class="card">
+          <b>Quelles solutions pour faciliter l'achat ou la location d'un logement ?</b>
+          <p>16 348 participants · terminée le 28 mai</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Choisir ses sujets -->
+    <section class="screen" data-screen="topics" hidden>
+      <div class="top">
+        <button class="back" data-back aria-label="Retour"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4l-6 6 6 6"/></svg></button>
+        <div class="wordmark" tabindex="-1">Mes sujets</div>
+      </div>
+      <div class="body">
+        <h1>Les sujets qui te tiennent à cœur</h1>
+        <p>On te prévient quand une consultation s'ouvre sur l'un d'eux, et quand une idée que tu as soutenue avance. Rien d'autre.</p>
+        <div class="chips" data-chips="topics"></div>
+        <h3>Comment te prévenir ?</h3>
+        <div class="choices" role="radiogroup" aria-label="Canal de notification">
+          <button class="choice" role="radio" aria-checked="true" data-channel="email"><i class="dot"></i><div><b>Par email</b><span>Un message à l'ouverture, un autre quand une idée avance.</span></div></button>
+          <button class="choice" role="radio" aria-checked="false" data-channel="digest"><i class="dot"></i><div><b>Un récapitulatif par mois</b><span>Tout regroupé, le premier lundi du mois.</span></div></button>
+        </div>
+        <button class="btn primary" data-action="save-topics">Enregistrer</button>
+      </div>
+    </section>
+
+    <!-- 3. Résultats + « Et après ? » -->
+    <section class="screen" data-screen="results" hidden>
+      <div class="top">
+        <button class="back" data-back aria-label="Retour"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4l-6 6 6 6"/></svg></button>
+        <div class="wordmark" tabindex="-1">MAKE<span>.</span>ORG</div>
+        <div class="spacer"></div>
+        <button class="me" data-go="space"><span class="av">R</span>Ryzlane</button>
+      </div>
+      <div class="hero">
+        <div class="labels"><span class="l1">Consultation citoyenne</span><span class="l2">Les résultats</span></div>
+        <h1>Comment donner envie de s'habiller éthique et durable ?</h1>
+        <p>Initiée par 10 acteurs de la mode, dont Etam Groupe, Galeries Lafayette, Kiabi et Lacoste.</p>
+      </div>
+      <div class="body">
+        <div class="figures">
+          <div><b>38 149</b><span>participants</span></div>
+          <div><b>1 680</b><span>propositions</span></div>
+          <div><b>481 156</b><span>votes</span></div>
+        </div>
+        <button class="btn link" data-action="existing">Le top des idées, la cartographie du débat… (existe déjà)</button>
+      </div>
+      <div class="sep"></div>
+      <div class="body" data-after>
+        <div><span class="new">Proposé</span></div>
+        <h2>Et après ?</h2>
+        <p>Ce que les initiateurs ont fait des idées retenues, mis à jour au fil des mois.</p>
+        <div class="timeline">
+          <div class="step done"><div class="rail"><i class="pt"></i><i class="ln"></i></div><div class="txt"><div class="when">16 avril 2026</div><b>Fin de la consultation</b></div></div>
+          <div class="step done"><div class="rail"><i class="pt"></i><i class="ln"></i></div><div class="txt"><div class="when">Juin <span class="fict">exemple</span></div><b>Résultats remis aux 10 initiateurs</b></div></div>
+          <div class="step"><div class="rail"><i class="pt"></i><i class="ln"></i></div><div class="txt"><div class="when">Novembre <span class="fict">exemple</span></div><b>Point d'étape sur les idées de l'axe 1</b></div></div>
+        </div>
+        <h3>Axe 1 : information, transparence et éducation</h3>
+        <div class="legend"><span class="fict">Statuts fictifs, pour la démonstration</span></div>
+        <div class="ideas" data-ideas></div>
+        <div class="card soft follow">
+          <p>Suivre cette consultation : être prévenu·e à chaque nouvelle étape.</p>
+          <button class="btn dark" data-action="follow" aria-pressed="false">Suivre</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Mon espace -->
+    <section class="screen" data-screen="space" hidden>
+      <div class="top">
+        <button class="back" data-back aria-label="Retour"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4l-6 6 6 6"/></svg></button>
+        <div class="wordmark" tabindex="-1">Mon espace</div>
+      </div>
+      <div class="body">
+        <h1>Bonjour Ryzlane</h1>
+        <p>Aujourd'hui, ton profil n'affiche que tes informations et une liste de propositions vide. Voici ce qu'il pourrait raconter.</p>
+        <div class="card soft">
+          <span class="new">Proposé</span>
+          <h3>Ce que mes votes ont changé</h3>
+          <p data-space-summary></p>
+          <div class="ideas" data-my-ideas></div>
+          <button class="btn dark" data-go="results">Voir toute la consultation</button>
+        </div>
+        <div class="card">
+          <span class="new">Proposé</span>
+          <h3>Mes participations</h3>
+          <p>Mode durable · 34 votes · avril 2026 <span class="fict">persona</span></p>
+        </div>
+        <div class="card">
+          <span class="new">Proposé</span>
+          <h3>Mes sujets suivis</h3>
+          <p data-my-topics></p>
+          <button class="btn outline" data-go="topics">Modifier</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="toast" data-toast hidden role="status"></div>
+  </div>
+
+  <aside class="notes">
+    <span class="nbadge">À lire avant de tester</span>
+    <h3>Ce que j'ai observé</h3>
+    <ul>
+      <li>Aucune consultation ouverte en France depuis le 26 juillet. La page « consultations en cours » répond « Nous sommes désolés… » et propose « S'inscrire » à une personne déjà connectée.</li>
+      <li>Le profil d'une nouvelle inscrite est vide : ni sujets à suivre, ni historique.</li>
+      <li>Les résultats (très riches) s'arrêtent aux chiffres et au rapport : rien ne dit ce que les idées sont devenues.</li>
+    </ul>
+    <h3>La proposition : boucler la boucle</h3>
+    <ol>
+      <li>Une page d'attente utile quand rien n'est ouvert.</li>
+      <li>Des sujets à suivre, pour être prévenu·e de la prochaine consultation.</li>
+      <li>Un « Et après ? » sur les résultats : les idées retenues et leur avancement.</li>
+      <li>Un espace « ce que mes votes ont changé ».</li>
+    </ol>
+    <h3>À savoir</h3>
+    <p>Les chiffres de la consultation mode durable sont réels. Les statuts des idées, les dates d'étape et la persona sont fictifs et signalés. Les éléments marqués « Proposé » n'existent pas aujourd'hui.</p>
+  </aside>
+</main>
+
+<script>
+// Grandes causes listées sur la page d'accueil de Make.org (réelles)
+const TOPICS = ['Santé Prévention Bien-être', 'Mieux vivre en ville', 'Diversité & Inclusion', 'Agir pour la Biodiversité', 'Pratique du sport', 'Qualité de vie seniors', 'Solutions Jeunes', 'Inégalités Femmes', 'Agir pour nos territoires', 'Protéger les enfants', 'Action environnement', 'Médias et citoyens', 'Action handicap', 'Mieux manger'];
+
+// Idées de l'axe 1 (réelles, avec leurs scores) ; statuts et explications fictifs pour la démonstration
+const IDEAS = [
+  { title: 'Avoir des scores d\'impact simples et faciles à comprendre', agree: 88, status: 'progress', label: 'En cours', note: 'Un pilote d\'étiquette d\'impact est testé dans quelques magasins.', mine: true, updated: true },
+  { title: 'Obtenir une transparence totale sur les produits textiles', agree: 94, status: 'study', label: 'À l\'étude', note: 'Les initiateurs comparent les solutions de traçabilité existantes.', mine: true },
+  { title: 'Informer les consommateurs sur les impacts de la mode', agree: 92, status: 'done', label: 'Réalisée', note: 'Une campagne commune a été diffusée en magasin et en ligne.' },
+  { title: 'Communiquer sur la mode durable via les influenceurs et les médias', agree: 89, status: 'no', label: 'Pas retenue', note: 'Jugée trop proche de la communication habituelle des marques : les initiateurs expliquent pourquoi.', mine: true },
+];
+
+const state = { history: [], topics: new Set(['Action environnement']), channel: 'email', following: false };
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+function show(name, { push = true } = {}) {
+  const cur = $$('[data-screen]').find(s => !s.hidden);
+  if (push && cur && cur.dataset.screen !== name) state.history.push(cur.dataset.screen);
+  $$('[data-screen]').forEach(s => { s.hidden = s.dataset.screen !== name; });
+  const screen = $(`[data-screen="${name}"]`);
+  screen.scrollTop = 0;
+  render();
+  const f = $('h1, .wordmark', screen);
+  if (f) { f.setAttribute('tabindex', '-1'); f.focus(); }
+  hideToast();
+}
+function back() { show(state.history.pop() || 'start', { push: false }); }
+
+let tt;
+function toast(t) { const el = $('[data-toast]'); el.textContent = t; el.hidden = false; clearTimeout(tt); tt = setTimeout(hideToast, 4200); }
+function hideToast() { $('[data-toast]').hidden = true; }
+
+function chipsInto(box, compact) {
+  box.innerHTML = '';
+  const list = compact ? TOPICS.slice(0, 6) : TOPICS;
+  list.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'chip';
+    b.textContent = t;
+    b.setAttribute('aria-pressed', String(state.topics.has(t)));
+    b.addEventListener('click', () => {
+      state.topics.has(t) ? state.topics.delete(t) : state.topics.add(t);
+      b.setAttribute('aria-pressed', String(state.topics.has(t)));
+    });
+    box.appendChild(b);
+  });
+}
+
+function ideaCard(i) {
+  const d = document.createElement('div');
+  d.className = 'idea';
+  d.innerHTML = `<div class="head"><b></b><span class="status ${i.status}">${i.label}</span></div>
+    <span class="stat">${i.agree} % d'accord${i.mine ? ' · tu l\'as soutenue' : ''}${i.updated ? ' · mise à jour depuis ta visite' : ''}</span>
+    <div class="why"></div>`;
+  $('b', d).textContent = i.title;
+  $('.why', d).textContent = i.note;
+  return d;
+}
+
+function render() {
+  chipsInto($('[data-chips="browse"]'), true);
+  chipsInto($('[data-chips="topics"]'), false);
+  const box = $('[data-ideas]'); box.innerHTML = ''; IDEAS.forEach(i => box.appendChild(ideaCard(i)));
+  const mine = IDEAS.filter(i => i.mine);
+  const myBox = $('[data-my-ideas]'); myBox.innerHTML = ''; mine.forEach(i => myBox.appendChild(ideaCard(i)));
+  $('[data-space-summary]').textContent = `Tu as soutenu ${mine.length} idées. Une a avancé depuis ta dernière visite, une a été écartée, avec l'explication des initiateurs.`;
+  $('[data-my-topics]').textContent = state.topics.size ? [...state.topics].join(', ') : 'Aucun sujet suivi pour l\'instant.';
+  $$('.choice').forEach(c => c.setAttribute('aria-checked', String(c.dataset.channel === state.channel)));
+  const f = $('[data-action="follow"]');
+  f.textContent = state.following ? 'Suivie ✓' : 'Suivre';
+  f.setAttribute('aria-pressed', String(state.following));
+}
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('button');
+  if (!el) return;
+  if (el.dataset.go) { show(el.dataset.go); return; }
+  if (el.hasAttribute('data-back')) { back(); return; }
+  if (el.dataset.channel) { state.channel = el.dataset.channel; render(); return; }
+  switch (el.dataset.action) {
+    case 'save-topics': {
+      const n = state.topics.size;
+      if (!n) { toast('Choisis au moins un sujet, ou reviens plus tard : rien n\'est obligatoire.'); return; }
+      const how = state.channel === 'email' ? 'par email' : 'dans ton récapitulatif mensuel';
+      toast(`C'est noté : ${n} sujet${n > 1 ? 's' : ''} suivi${n > 1 ? 's' : ''}. On te prévient ${how}.`);
+      setTimeout(back, 900);
+      break;
+    }
+    case 'follow':
+      state.following = !state.following; render();
+      toast(state.following ? 'Tu seras prévenu·e à chaque nouvelle étape de cette consultation.' : 'Tu ne suis plus cette consultation.');
+      break;
+    case 'existing':
+      toast('Cette partie existe déjà sur Make.org : le prototype ne la refait pas.');
+      break;
+  }
+});
+
+render();
+</script>
+</body>
+</html>
